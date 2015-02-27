@@ -4,7 +4,7 @@
 
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1-SNAPSHOT</version>
 
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -36,7 +36,7 @@
         <url>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</url>
         <connection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</connection>
         <developerConnection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</developerConnection>
-      <tag>elasticsearch-beyonder-1.4.0</tag>
+      <tag>elasticsearch-beyonder-0.1.0</tag>
   </scm>
 
     <issueManagement>
