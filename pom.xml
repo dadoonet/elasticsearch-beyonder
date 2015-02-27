@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
 
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -29,7 +27,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>1.4.2</elasticsearch.version>
+        <elasticsearch.version>1.4.4</elasticsearch.version>
         <log4j.version>2.1</log4j.version>
         <commons.io.version>2.4</commons.io.version>
     </properties>
@@ -38,7 +36,8 @@
         <url>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</url>
         <connection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</connection>
         <developerConnection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</developerConnection>
-    </scm>
+      <tag>elasticsearch-beyonder-0.1.0</tag>
+  </scm>
 
     <issueManagement>
         <system>GitHub</system>

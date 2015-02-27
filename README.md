@@ -11,7 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 0.1.0-SNAPSHOT          |      1.4      |  2015-01-17  |
+| 1.4.0                   |      1.4      |  2015-02-27  |
 
 
 Build Status
