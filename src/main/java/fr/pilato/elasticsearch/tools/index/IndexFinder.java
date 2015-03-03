@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class IndexFinder extends SettingsFinder {
@@ -33,7 +34,7 @@ public class IndexFinder extends SettingsFinder {
     /**
      * Find all indices existing in a given default classpath dir
      */
-    public static List<String> findIndexNames() throws IOException {
+    public static List<String> findIndexNames() throws IOException, URISyntaxException {
         return findIndexNames(Defaults.ConfigDir);
     }
 
@@ -41,7 +42,7 @@ public class IndexFinder extends SettingsFinder {
      * Find all indices existing in a given classpath dir
      * @param root dir within the classpath
      */
-    public static List<String> findIndexNames(final String root) throws IOException {
+    public static List<String> findIndexNames(final String root) throws IOException, URISyntaxException {
         if (root == null) {
             return findIndexNames();
         }
@@ -50,21 +51,21 @@ public class IndexFinder extends SettingsFinder {
 
         final List<String> indexNames = new ArrayList<>();
         final Set<String> keys = new HashSet<>();
-        Collection<String> resources = ResourceList.getResources(root + "/"); // "es/" or "a/b/c/"
+        String[] resources = ResourceList.getResources(root + "/"); // "es/" or "a/b/c/"
         for (String resource : resources) {
-            logger.trace(" - resource [{}].", resource);
-            String withoutRoot = resource.substring(root.length()+1);
-            logger.trace(" - withoutRoot [{}].", withoutRoot);
-            String key;
-            if (withoutRoot.indexOf("/") >= 0) {
-                key = withoutRoot.substring(0, withoutRoot.indexOf("/"));
-            } else {
-                key = withoutRoot;
-            }
-            if (!key.equals(Defaults.TemplateDir) && !keys.contains(key)) {
-                logger.trace(" - found [{}].", key);
-                keys.add(key);
-                indexNames.add(key);
+            if (!resource.isEmpty()) {
+                logger.trace(" - resource [{}].", resource);
+                String key;
+                if (resource.contains("/")) {
+                    key = resource.substring(0, resource.indexOf("/"));
+                } else {
+                    key = resource;
+                }
+                if (!key.equals(Defaults.TemplateDir) && !keys.contains(key)) {
+                    logger.trace(" - found [{}].", key);
+                    keys.add(key);
+                    indexNames.add(key);
+                }
             }
         }
 

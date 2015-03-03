@@ -21,7 +21,8 @@ package fr.pilato.elasticsearch.tools;
 
 import org.junit.Test;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,8 +31,8 @@ import static org.hamcrest.Matchers.is;
 public class ResourceListTest {
 
     @Test
-    public void testClasspath() {
-        final Collection<String> list = ResourceList.getResources("\\.json");
+    public void testClasspath() throws IOException, URISyntaxException {
+        final String[] list = ResourceList.getResources("\\.json");
         for(final String name : list) {
             System.out.println(name);
             String file = SettingsReader.readFileFromClasspath(name);

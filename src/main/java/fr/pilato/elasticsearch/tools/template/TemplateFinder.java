@@ -25,8 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class TemplateFinder extends SettingsFinder {
@@ -35,7 +35,7 @@ public class TemplateFinder extends SettingsFinder {
     /**
      * Find all templates in default classpath dir
      */
-    public static List<String> findTemplates() throws IOException {
+    public static List<String> findTemplates() throws IOException, URISyntaxException {
         return findTemplates(fromClasspath(Defaults.ConfigDir));
     }
 
@@ -43,7 +43,7 @@ public class TemplateFinder extends SettingsFinder {
      * Find all templates
      * @param root dir within the classpath
      */
-    public static List<String> findTemplates(String root) throws IOException {
+    public static List<String> findTemplates(String root) throws IOException, URISyntaxException {
         if (root == null) {
             return findTemplates();
         }
@@ -51,13 +51,14 @@ public class TemplateFinder extends SettingsFinder {
         logger.debug("Looking for templates in classpath under [{}].", root);
 
         final List<String> templateNames = new ArrayList<>();
-        Collection<String> resources = ResourceList.getResources(root + "/" + Defaults.TemplateDir + "/"); // "es/_template/"
+        String[] resources = ResourceList.getResources(root + "/" + Defaults.TemplateDir + "/"); // "es/_template/"
         for (String resource : resources) {
-            String withoutRoot = resource.substring((root + "/" + Defaults.TemplateDir).length()+1);
-            String withoutIndex = withoutRoot.substring(withoutRoot.indexOf("/")+1);
-            String template = withoutIndex.substring(0, withoutIndex.indexOf(Defaults.JsonFileExtension));
-            logger.trace(" - found [{}].", template);
-            templateNames.add(template);
+            if (!resource.isEmpty()) {
+                String withoutIndex = resource.substring(resource.indexOf("/")+1);
+                String template = withoutIndex.substring(0, withoutIndex.indexOf(Defaults.JsonFileExtension));
+                logger.trace(" - found [{}].", template);
+                templateNames.add(template);
+            }
         }
 
         return templateNames;

@@ -24,135 +24,77 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Enumeration;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * list resources available from the classpath @ *
  * From http://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory
+ * http://www.uofr.net/~greg/java/get-resource-listing.html
  */
 public class ResourceList {
     private static final Logger logger = LogManager.getLogger(ResourceList.class);
+    private static final String[] NO_RESOURCE = {};
 
     /**
-     * @param root
-     *            the pattern to match
-     * @return the resources in the order they are found
+     * List directory contents for a resource folder. Not recursive.
+     * This is basically a brute-force implementation.
+     * Works for regular files and also JARs.
+     *
+     * @author Greg Briggs
+     * @param root Should end with "/", but not start with one.
+     * @return Just the name of each member item, not the full paths.
+     * @throws URISyntaxException
+     * @throws IOException
      */
-    public static Collection<String> getResources(
-            final String root) {
-        logger.trace("getResources({})", root);
-        Pattern patternDir = Pattern.compile(".*");
-        Pattern patternJar = Pattern.compile(".*");
-        if (root != null) {
-            patternDir = Pattern.compile(".*" + root + ".*");
-            patternJar = Pattern.compile(root + ".*");
+    public static String[] getResources(final String root) throws URISyntaxException, IOException {
+        logger.trace("Reading classpath resources from {}", root);
+        URL dirURL = ResourceList.class.getClassLoader().getResource(root);
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            /* A file path: easy enough */
+            logger.trace("found a file resource: {}", dirURL);
+            return new File(dirURL.toURI()).list();
         }
 
-        final ArrayList<String> retval = new ArrayList<>();
-        final String classPath = System.getProperty("java.class.path", ".");
-        final String[] classPathElements = classPath.split(File.pathSeparator);
-        for (final String element : classPathElements) {
-            retval.addAll(getResources(element, patternDir, patternJar, root));
+        if (dirURL == null) {
+            /*
+             * In case of a jar file, we can't actually find a directory.
+             * Have to assume the same jar as clazz.
+             */
+            String me = ResourceList.class.getName().replace(".", "/")+".class";
+            dirURL = ResourceList.class.getClassLoader().getResource(me);
         }
-        return retval;
-    }
 
-    private static Collection<String> getResources(
-            final String element,
-            final Pattern patternDir,
-            final Pattern patternJar,
-            final String root) {
-        final ArrayList<String> retval = new ArrayList<>();
-        final File file = new File(element);
-        if (file.isDirectory()) {
-            retval.addAll(getResourcesFromDirectory(file, patternDir, element, root));
-        } else {
-            retval.addAll(getResourcesFromJarFile(file, patternJar));
-        }
-        return retval;
-    }
-
-    private static Collection<String> getResourcesFromJarFile(
-            final File file,
-            final Pattern pattern) {
-        final ArrayList<String> retval = new ArrayList<>();
-        ZipFile zf;
-        try {
-            zf = new ZipFile(file);
-        } catch (final ZipException e) {
-            throw new Error(e);
-        } catch (final IOException e) {
-            throw new Error(e);
-        }
-        final Enumeration<? extends ZipEntry> e = zf.entries();
-        while(e.hasMoreElements()){
-            final ZipEntry ze = e.nextElement();
-            String fileName = ze.getName();
-            final boolean accept = pattern.matcher(fileName).matches();
-            if (accept) {
-                // We should ignore dirs. They end with /
-                if (!fileName.endsWith("/")) {
-                    retval.add(fileName);
+        if (dirURL.getProtocol().equals("jar")) {
+            /* A JAR path */
+            logger.trace("found a jar file resource: {}", dirURL);
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+            JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+            Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+            Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
+            while(entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                if (name.startsWith(root)) { //filter according to the path
+                    String entry = name.substring(root.length());
+                    int checkSubdir = entry.indexOf("/");
+                    if (checkSubdir >= 0) {
+                        // if it is a subdirectory, we just return the directory name
+                        entry = entry.substring(0, checkSubdir);
+                    }
+                    result.add(entry);
                 }
             }
+            return result.toArray(new String[result.size()]);
         }
-        try {
-            zf.close();
-        } catch (final IOException e1) {
-            throw new Error(e1);
-        }
-        return retval;
-    }
 
-    /**
-     * TODO Use Path
-     try (DirectoryStream<Path> stream = Files.newDirectoryStream(templatesDir)) {
-        for (Path templatesFile : stream) {
-        }
-     }
-     */
-    private static Collection<String> getResourcesFromDirectory(
-            final File directory,
-            final Pattern pattern,
-            final String element,
-            final String root) {
-        final ArrayList<String> retval = new ArrayList<>();
-        final File[] fileList = directory.listFiles();
-        for (final File file : fileList) {
-            if (file.isDirectory()) {
-                // We add the dirname itself
-                try {
-                    final String fileName = file.getCanonicalPath();
-                    final boolean accept = pattern.matcher(fileName).matches();
-                    if (accept) {
-                        if (Pattern.compile(element + File.separator +  root + ".*").matcher(fileName).matches()) {
-                            retval.add(fileName.substring((element + File.separator).length()));
-                        }
-                    }
-                } catch (final IOException e) {
-                    throw new Error(e);
-                }
-                retval.addAll(getResourcesFromDirectory(file, pattern, element, root));
-            } else {
-                try {
-                    final String fileName = file.getCanonicalPath();
-                    final boolean accept = pattern.matcher(fileName).matches();
-                    if (accept) {
-                        if (Pattern.compile(element + File.separator +  root + ".*").matcher(fileName).matches()) {
-                            retval.add(fileName.substring((element + File.separator).length()));
-                        }
-                    }
-                } catch (final IOException e) {
-                    throw new Error(e);
-                }
-            }
-        }
-        return retval;
+        // Resource does not exist. We can return an empty list
+        logger.trace("did not find any resource. returning empty array");
+        return NO_RESOURCE;
     }
 }

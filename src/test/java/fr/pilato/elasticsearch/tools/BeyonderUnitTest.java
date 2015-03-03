@@ -26,6 +26,7 @@ import fr.pilato.elasticsearch.tools.type.TypeFinder;
 import fr.pilato.elasticsearch.tools.type.TypeSettingsReader;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
@@ -37,7 +38,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
     protected void testBeyonder(String root,
                                 List<String> indices,
                                 List<List<String>> types,
-                                List<String> templates) throws IOException {
+                                List<String> templates) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
         List<String> indexNames;
         if (root == null) {

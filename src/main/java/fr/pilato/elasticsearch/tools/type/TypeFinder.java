@@ -25,8 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class TypeFinder extends SettingsFinder {
@@ -37,7 +37,7 @@ public class TypeFinder extends SettingsFinder {
      * Find all types within an index in default classpath dir
      * @param index index name
      */
-    public static List<String> findTypes(String index) throws IOException {
+    public static List<String> findTypes(String index) throws IOException, URISyntaxException {
         return findTypes(Defaults.ConfigDir, index);
     }
 
@@ -46,7 +46,7 @@ public class TypeFinder extends SettingsFinder {
      * @param root dir within the classpath
      * @param index index name
      */
-    public static List<String> findTypes(String root, String index) throws IOException {
+    public static List<String> findTypes(String root, String index) throws IOException, URISyntaxException {
         if (root == null) {
             return findTypes(index);
         }
@@ -54,11 +54,10 @@ public class TypeFinder extends SettingsFinder {
         logger.debug("Looking for types in classpath under [{}/{}].", root, index);
 
         final List<String> typeNames = new ArrayList<>();
-        Collection<String> resources = ResourceList.getResources(root + "/" + index + "/"); // "es/index/"
+        String[] resources = ResourceList.getResources(root + "/" + index + "/"); // "es/index/"
         for (String resource : resources) {
-            if (!root.equals(resource)) {
-                String withoutRoot = resource.substring(root.length() + 1);
-                String withoutIndex = withoutRoot.substring(withoutRoot.indexOf("/") + 1);
+            if (!resource.isEmpty() && !root.equals(resource)) {
+                String withoutIndex = resource.substring(resource.indexOf("/") + 1);
                 if (withoutIndex.equals(Defaults.IndexSettingsFileName) ||
                         withoutIndex.equals(Defaults.UpdateIndexSettingsFileName)) {
                     logger.trace(" - ignoring: [{}]", withoutIndex);
