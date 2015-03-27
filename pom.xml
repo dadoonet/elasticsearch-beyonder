@@ -4,7 +4,7 @@
 
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -27,7 +27,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>1.4.4</elasticsearch.version>
+        <elasticsearch.version>1.5.0</elasticsearch.version>
         <log4j.version>2.1</log4j.version>
         <commons.io.version>2.4</commons.io.version>
     </properties>
