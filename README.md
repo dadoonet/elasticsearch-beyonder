@@ -1,7 +1,7 @@
 Elasticsearch Beyonder
 ======================
 
-Welcome to the [Elasticsearch](http://www.elasticsearch.org/) Beyonder project.
+Welcome to the [Elasticsearch](http://www.elastic.co/) Beyonder project.
 
 This project comes historically from [spring-elasticsearch](https://github.com/dadoonet/spring-elasticsearch) project.
 
@@ -11,6 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
+| 2.0.0                   |      2.0      |  2015-10-12  |
 | 1.5.0                   |      1.5      |  2015-03-27  |
 | 1.4.1                   |      1.4      |  2015-03-02  |
 | 1.4.0                   |      1.4      |  2015-02-27  |
@@ -35,7 +36,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>1.5.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -45,7 +46,7 @@ If you want to set a specific version of elasticsearch, add it to your `pom.xml`
 <dependency>
   <groupId>org.elasticsearch</groupId>
   <artifactId>elasticsearch</artifactId>
-  <version>1.5.0</version>
+  <version>2.0.0-rc1</version>
 </dependency>
 ```
 

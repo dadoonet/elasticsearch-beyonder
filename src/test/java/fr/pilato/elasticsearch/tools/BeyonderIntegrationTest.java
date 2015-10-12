@@ -22,7 +22,7 @@ package fr.pilato.elasticsearch.tools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.junit.AfterClass;
@@ -61,7 +61,7 @@ public class BeyonderIntegrationTest extends AbstractBeyonderTest {
         testDir = File.createTempFile("junit", "");
         testDir.delete();
         testDir.mkdir();
-        node = NodeBuilder.nodeBuilder().settings(ImmutableSettings.builder()
+        node = NodeBuilder.nodeBuilder().settings(Settings.builder()
             .put("path.home", testDir.getAbsolutePath()).build()
         ).node();
         client = node.client();
@@ -73,7 +73,7 @@ public class BeyonderIntegrationTest extends AbstractBeyonderTest {
             client.close();
         }
         if (node != null) {
-            node.stop().close();
+            node.close();
         }
         recursiveDelete(testDir);
     }

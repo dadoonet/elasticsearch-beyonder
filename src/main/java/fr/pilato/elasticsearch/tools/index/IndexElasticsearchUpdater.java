@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 
 /**
@@ -70,22 +71,24 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param index Index name
+	 * @param force Remove index if exists (Warning: remove all data)
 	 * @throws Exception
 	 */
-	public static void createIndex(Client client, String root, String index) throws Exception {
+	public static void createIndex(Client client, String root, String index, boolean force) throws Exception {
 		String settings = IndexSettingsReader.readSettings(root, index);
-		createIndexWithSettings(client, index, settings);
+		createIndexWithSettings(client, index, settings, force);
 	}
 
 	/**
 	 * Create a new index in Elasticsearch. Read also _settings.json if exists in default classpath dir.
 	 * @param client Elasticsearch client
 	 * @param index Index name
+	 * @param force Remove index if exists (Warning: remove all data)
 	 * @throws Exception
 	 */
-	public static void createIndex(Client client, String index) throws Exception {
+	public static void createIndex(Client client, String index, boolean force) throws Exception {
 		String settings = IndexSettingsReader.readSettings(index);
-		createIndexWithSettings(client, index, settings);
+		createIndexWithSettings(client, index, settings, force);
 	}
 
 	/**
@@ -93,15 +96,41 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
+	 * @param force Remove index if exists (Warning: remove all data)
 	 * @throws Exception
 	 */
-	public static void createIndexWithSettings(Client client, String index, String settings) throws Exception {
-		if (!isIndexExist(client, index)) {
+	public static void createIndexWithSettings(Client client, String index, String settings, boolean force) throws Exception {
+		if (force && isIndexExist(client, index)) {
+			logger.debug("Index [{}] already exists but force set to true. Removing all data!", index);
+			removeIndexInElasticsearch(client, index);
+		}
+		if (force || !isIndexExist(client, index)) {
 			logger.debug("Index [{}] doesn't exist. Creating it.", index);
 			createIndexWithSettingsInElasticsearch(client, index, settings);
 		} else {
 			logger.debug("Index [{}] already exists.", index);
 		}
+	}
+
+	/**
+	 * Remove a new index in Elasticsearch
+	 * @param client Elasticsearch client
+	 * @param index Index name
+	 * @throws Exception
+	 */
+	private static void removeIndexInElasticsearch(Client client, String index) throws Exception {
+		logger.trace("removeIndex([{}])", index);
+
+		assert client != null;
+		assert index != null;
+
+		DeleteIndexResponse deleteIndexResponse = client.admin().indices().prepareDelete(index).get();
+		if (!deleteIndexResponse.isAcknowledged()) {
+			logger.warn("Could not delete index [{}]", index);
+			throw new Exception("Could not delete index ["+index+"].");
+		}
+
+		logger.trace("/removeIndex([{}])", index);
 	}
 
 	/**
