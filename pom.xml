@@ -139,8 +139,7 @@
                     <smtpPort implementation="java.lang.Integer">25</smtpPort>
                     <fromDeveloperId>dadoonet</fromDeveloperId>
                     <toAddresses>
-                        <toAddress implementation="java.lang.String">elasticsearch@googlegroups.com</toAddress>
-                        <toAddress implementation="java.lang.String">elasticsearch-fr@googlegroups.com</toAddress>
+                        <toAddress implementation="java.lang.String">discuss+announcements@elastic.co</toAddress>
                     </toAddresses>
                 </configuration>
             </plugin>
