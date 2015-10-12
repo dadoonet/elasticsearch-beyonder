@@ -105,13 +105,13 @@ public class ElasticsearchBeyonder {
 		// create indices
 		Collection<String> indexNames = IndexFinder.findIndexNames(root);
 		for (String indexName : indexNames) {
-			createIndex(client, root, indexName);
+			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
 
 			// create types
 			List<String> types = TypeFinder.findTypes(root, indexName);
 			for (String typeName : types) {
-				createMapping(client, root, indexName, typeName, merge, force);
+				createMapping(client, root, indexName, typeName, merge);
 			}
 
 		}

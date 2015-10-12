@@ -35,12 +35,11 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @param force Remove mapping if exists (Warning: remove all data)
      * @throws Exception
      */
-    public static void createMapping(Client client, String index, String type, boolean merge, boolean force) throws Exception {
+    public static void createMapping(Client client, String index, String type, boolean merge) throws Exception {
         String mapping = TypeSettingsReader.readMapping(index, type);
-        createMappingWithJson(client, index, type, mapping, merge, force);
+        createMappingWithJson(client, index, type, mapping, merge);
     }
 
     /**
@@ -50,13 +49,12 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @param force Remove mapping if exists (Warning: remove all data)
      * @throws Exception
      */
-    public static void createMapping(Client client, String root, String index, String type, boolean merge, boolean force)
+    public static void createMapping(Client client, String root, String index, String type, boolean merge)
             throws Exception {
         String mapping = TypeSettingsReader.readMapping(root, index, type);
-        createMappingWithJson(client, index, type, mapping, merge, force);
+        createMappingWithJson(client, index, type, mapping, merge);
     }
 
     /**
@@ -66,16 +64,10 @@ public class TypeElasticsearchUpdater {
      * @param type Type name
      * @param mapping Mapping if any, null if no specific mapping
      * @param merge Try to merge mapping if type already exists
-     * @param force Remove mapping if exists (Warning: remove all data)
      * @throws Exception
      */
-    public static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge,
-                                             boolean force)
+    public static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge)
             throws Exception {
-        if (force && isTypeExist(client, index, type)) {
-            removeType(client, index, type);
-        }
-
         boolean mappingExist = isTypeExist(client, index, type);
         if (merge || !mappingExist) {
             if (mappingExist) {
@@ -105,22 +97,6 @@ public class TypeElasticsearchUpdater {
      */
     public static boolean isTypeExist(Client client, String index, String type) throws Exception {
         return !client.admin().indices().prepareGetMappings(index).setTypes(type).get().getMappings().isEmpty();
-    }
-
-    /**
-     * Remove a type
-     * @param client Elasticsearch client
-     * @param index Index name
-     * @param type Type name
-     * @throws Exception
-     */
-    public static void removeType(Client client, String index, String type) throws Exception {
-        logger.debug("Remove mapping [{}]/[{}]", index, type);
-        client.admin().indices()
-                .prepareDeleteMapping(index)
-                .setType(type)
-                .get();
-        client.admin().cluster().prepareHealth(index).setWaitForYellowStatus().get();
     }
 
     /**
