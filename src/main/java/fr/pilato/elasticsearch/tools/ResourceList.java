@@ -37,6 +37,7 @@ import java.util.jar.JarFile;
  * list resources available from the classpath @ *
  * From http://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory
  * http://www.uofr.net/~greg/java/get-resource-listing.html
+ * @author Greg Briggs
  */
 public class ResourceList {
     private static final Logger logger = LogManager.getLogger(ResourceList.class);
@@ -47,11 +48,10 @@ public class ResourceList {
      * This is basically a brute-force implementation.
      * Works for regular files and also JARs.
      *
-     * @author Greg Briggs
      * @param root Should end with "/", but not start with one.
      * @return Just the name of each member item, not the full paths.
-     * @throws URISyntaxException
-     * @throws IOException
+     * @throws URISyntaxException When a file:// resource can not be converted to URL
+     * @throws IOException When a URL can not be decoded
      */
     public static String[] getResources(final String root) throws URISyntaxException, IOException {
         logger.trace("Reading classpath resources from {}", root);
@@ -69,6 +69,10 @@ public class ResourceList {
              */
             String me = ResourceList.class.getName().replace(".", "/")+".class";
             dirURL = ResourceList.class.getClassLoader().getResource(me);
+        }
+
+        if (dirURL == null) {
+            throw new RuntimeException("can not get resource file " + root);
         }
 
         if (dirURL.getProtocol().equals("jar")) {

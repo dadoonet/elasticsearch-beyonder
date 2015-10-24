@@ -30,9 +30,9 @@ public class AliasElasticsearchUpdater {
 
     /**
      * Create an alias if needed
-     * @param alias
-     * @param index
-     * @throws Exception
+     * @param alias Alias name
+     * @param index Index name
+     * @throws Exception When alias can not be set
      */
     public static void createAlias(Client client, String alias, String index) throws Exception {
         logger.trace("createAlias({},{})", alias, index);
