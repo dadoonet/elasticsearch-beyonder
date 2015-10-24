@@ -43,7 +43,6 @@ import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.create
  * So if you create a file named /es/twitter/_settings.json in your src/main/resources folder (for maven lovers),
  * it will be used by the factory to create the twitter index.
  * <pre>
- * {@code
  * {
  *   "index" : {
  *     "number_of_shards" : 3,
@@ -58,7 +57,6 @@ import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.create
  * So if you create a file named /es/twitter/tweet.json in your src/main/resources folder (for maven lovers),
  * it will be used by the factory to create the tweet type in twitter index.
  * <pre>
- * {@code
  * {
  *   "tweet" : {
  *     "properties" : {
@@ -79,6 +77,7 @@ public class ElasticsearchBeyonder {
 	/**
 	 * Automatically scan classpath and creates indices, types, templates... in default dir.
 	 * @param client elasticsearch client
+	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(Client client) throws Exception {
 		start(client, fromClasspath(Defaults.ConfigDir));
@@ -88,6 +87,7 @@ public class ElasticsearchBeyonder {
 	 * Automatically scan classpath and creates indices, types, templates...
 	 * @param client elasticsearch client
 	 * @param root dir within the classpath
+	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(Client client, String root) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");

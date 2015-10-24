@@ -29,39 +29,7 @@ import java.io.IOException;
 import static fr.pilato.elasticsearch.tools.SettingsFinder.fromClasspath;
 
 /**
- * By default, indexes are created with their default Elasticsearch settings. You can specify
- * your own settings for your index by putting a /es/indexname/_settings.json in your classpath.
- * <br>
- * So if you create a file named /es/twitter/_settings.json in your src/main/resources folder (for maven lovers),
- * it will be used by the factory to create the twitter index.
- * <pre>
- * {@code
- * {
- *   "index" : {
- *     "number_of_shards" : 3,
- *     "number_of_replicas" : 2
- *   }
- * }
- * </pre>
- * By default, types are not created and wait for the first document you send to Elasticsearch (auto mapping).
- * But, if you define a file named /es/indexname/type.json in your classpath, the type will be created at startup using
- * the type definition you give.
- * <br>
- * So if you create a file named /es/twitter/tweet.json in your src/main/resources folder (for maven lovers),
- * it will be used by the factory to create the tweet type in twitter index.
- * <pre>
- * {@code
- * {
- *   "tweet" : {
- *     "properties" : {
- *       "message" : {"type" : "string", "store" : "yes"}
- *     }
- *   }
- * }
- * </pre>
- *
- * By convention, the factory will create all settings and mappings found under the /es classpath.<br>
- * You can disable convention and use configuration by setting autoscan to false.
+ * Manage elasticsearch template files
  * @author David Pilato
  */
 public class TemplateSettingsReader extends SettingsReader {
