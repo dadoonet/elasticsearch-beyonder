@@ -20,8 +20,8 @@ Versions
 Build Status
 ============
 
-Thanks to cloudbees for the [build status](https://buildhive.cloudbees.com):
-[![Build Status](https://buildhive.cloudbees.com/job/dadoonet/job/elasticsearch-beyonder/badge/icon)](https://buildhive.cloudbees.com/job/dadoonet/job/elasticsearch-beyonder/)
+Thanks to Travis for the [build status](https://travis-ci.org/dadoonet/elasticsearch-beyonder): 
+[![Build Status](https://travis-ci.org/dadoonet/elasticsearch-beyonder.svg)](https://travis-ci.org/dadoonet/elasticsearch-beyonder)
 
 
 Getting Started
