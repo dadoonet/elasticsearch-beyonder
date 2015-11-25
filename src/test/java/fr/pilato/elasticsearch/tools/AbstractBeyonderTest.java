@@ -19,9 +19,9 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import static java.util.Arrays.asList;
 
 public abstract class AbstractBeyonderTest {
 
-    protected static final Logger logger = LogManager.getLogger(AbstractBeyonderTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractBeyonderTest.class);
 
     abstract protected void testBeyonder(String root,
                                 List<String> indices,

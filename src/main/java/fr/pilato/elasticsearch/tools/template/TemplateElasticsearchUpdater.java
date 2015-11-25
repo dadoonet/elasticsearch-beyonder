@@ -19,10 +19,10 @@
 
 package fr.pilato.elasticsearch.tools.template;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
 import org.elasticsearch.client.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manage elasticsearch templates
@@ -30,7 +30,7 @@ import org.elasticsearch.client.Client;
  */
 public class TemplateElasticsearchUpdater {
 
-	private static final Logger logger = LogManager.getLogger(TemplateElasticsearchUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(TemplateElasticsearchUpdater.class);
 
 	/**
 	 * Create a template in Elasticsearch.

@@ -21,8 +21,8 @@ package fr.pilato.elasticsearch.tools.template;
 
 import fr.pilato.elasticsearch.tools.ResourceList;
 import fr.pilato.elasticsearch.tools.SettingsFinder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateFinder extends SettingsFinder {
-    private static final Logger logger = LogManager.getLogger(TemplateFinder.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateFinder.class);
 
     /**
      * Find all templates in default classpath dir

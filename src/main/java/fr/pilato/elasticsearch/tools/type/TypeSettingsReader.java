@@ -21,8 +21,8 @@ package fr.pilato.elasticsearch.tools.type;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.SettingsReader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ import java.io.IOException;
  */
 public class TypeSettingsReader extends SettingsReader {
 
-	private static final Logger logger = LogManager.getLogger(TypeSettingsReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(TypeSettingsReader.class);
 
 	/**
 	 * Read a mapping

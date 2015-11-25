@@ -19,8 +19,6 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -28,6 +26,8 @@ import org.elasticsearch.node.NodeBuilder;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertThat;
 
 public class BeyonderIntegrationTest extends AbstractBeyonderTest {
 
-    private static final Logger logger = LogManager.getLogger(BeyonderIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BeyonderIntegrationTest.class);
     private static Node node;
     private static Client client;
     private static File testDir;

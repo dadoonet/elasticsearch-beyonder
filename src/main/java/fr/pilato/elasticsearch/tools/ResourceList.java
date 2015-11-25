@@ -19,8 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.util.jar.JarFile;
  * @author Greg Briggs
  */
 public class ResourceList {
-    private static final Logger logger = LogManager.getLogger(ResourceList.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourceList.class);
     private static final String[] NO_RESOURCE = {};
 
     /**

@@ -23,9 +23,9 @@ import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.type.TypeFinder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +72,7 @@ import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.create
  */
 public class ElasticsearchBeyonder {
 
-	private static final Logger logger = LogManager.getLogger(ElasticsearchBeyonder.class);
+	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchBeyonder.class);
 
 	/**
 	 * Automatically scan classpath and creates indices, types, templates... in default dir.

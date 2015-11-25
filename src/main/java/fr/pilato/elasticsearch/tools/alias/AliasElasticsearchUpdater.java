@@ -19,14 +19,14 @@
 
 package fr.pilato.elasticsearch.tools.alias;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.client.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AliasElasticsearchUpdater {
 
-    private static final Logger logger = LogManager.getLogger(AliasElasticsearchUpdater.class);
+    private static final Logger logger = LoggerFactory.getLogger(AliasElasticsearchUpdater.class);
 
     /**
      * Create an alias if needed

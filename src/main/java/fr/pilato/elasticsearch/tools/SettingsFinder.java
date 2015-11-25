@@ -19,8 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -34,7 +34,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 
 public class SettingsFinder {
 
-	private static final Logger logger = LogManager.getLogger(SettingsFinder.class);
+	private static final Logger logger = LoggerFactory.getLogger(SettingsFinder.class);
 
 	public static class Defaults {
 		/**

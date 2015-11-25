@@ -19,10 +19,10 @@
 
 package fr.pilato.elasticsearch.tools.type;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manage elasticsearch types (mappings)
@@ -30,7 +30,7 @@ import org.elasticsearch.client.Client;
  */
 public class TypeElasticsearchUpdater {
 
-    private static final Logger logger = LogManager.getLogger(TypeElasticsearchUpdater.class);
+    private static final Logger logger = LoggerFactory.getLogger(TypeElasticsearchUpdater.class);
 
 
     /**

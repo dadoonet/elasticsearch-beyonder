@@ -20,15 +20,15 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class SettingsReader {
 
-	private static final Logger logger = LogManager.getLogger(SettingsReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(SettingsReader.class);
 
 	/**
 	 * Read a file content from the classpath

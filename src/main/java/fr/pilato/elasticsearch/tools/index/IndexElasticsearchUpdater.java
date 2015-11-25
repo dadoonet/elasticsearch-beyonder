@@ -19,12 +19,12 @@
 
 package fr.pilato.elasticsearch.tools.index;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manage elasticsearch index settings
@@ -32,7 +32,7 @@ import org.elasticsearch.client.Client;
  */
 public class IndexElasticsearchUpdater {
 
-	private static final Logger logger = LogManager.getLogger(IndexElasticsearchUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(IndexElasticsearchUpdater.class);
 
 	/**
 	 * Create a new index in Elasticsearch. Read also _settings.json if exists.
