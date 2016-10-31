@@ -19,25 +19,24 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
 import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.node.Node;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BeyonderIntegrationTest extends AbstractBeyonderTest {
 
@@ -61,14 +60,14 @@ public class BeyonderIntegrationTest extends AbstractBeyonderTest {
         testDir = File.createTempFile("junit", "");
         testDir.delete();
         testDir.mkdir();
-        node = NodeBuilder.nodeBuilder().settings(Settings.builder()
+        node = new Node(Settings.builder()
             .put("path.home", testDir.getAbsolutePath()).build()
-        ).node();
+        );
         client = node.client();
     }
 
     @AfterClass
-    public static void stopElasticsearch() {
+    public static void stopElasticsearch() throws IOException {
         if (client != null) {
             client.close();
         }
