@@ -20,17 +20,18 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
@@ -38,33 +39,17 @@ import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdate
 import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeNoException;
 
-public class BeyonderIntegrationTest extends AbstractBeyonderTest {
+public class BeyonderIT extends AbstractBeyonderTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeyonderIntegrationTest.class);
-    private static Node node;
+    private static final Logger logger = LoggerFactory.getLogger(BeyonderIT.class);
     private static Client client;
-    private static File testDir;
-
-    private static void recursiveDelete(File file) {
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File each : files) {
-                recursiveDelete(each);
-            }
-        }
-        file.delete();
-    }
 
     @BeforeClass
     public static void startElasticsearch() throws IOException {
-        testDir = File.createTempFile("junit", "");
-        testDir.delete();
-        testDir.mkdir();
-        node = NodeBuilder.nodeBuilder().settings(Settings.builder()
-            .put("path.home", testDir.getAbsolutePath()).build()
-        ).node();
-        client = node.client();
+        client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
+                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
     }
 
     @AfterClass
@@ -72,15 +57,15 @@ public class BeyonderIntegrationTest extends AbstractBeyonderTest {
         if (client != null) {
             client.close();
         }
-        if (node != null) {
-            node.close();
-        }
-        recursiveDelete(testDir);
     }
 
     @Before
     public void cleanCluster() {
-        client.admin().indices().prepareDelete("_all").get();
+        try {
+            client.admin().indices().prepareDelete("_all").get();
+        } catch (NoNodeAvailableException e) {
+            assumeNoException(e);
+        }
     }
 
     protected void testBeyonder(String root,
