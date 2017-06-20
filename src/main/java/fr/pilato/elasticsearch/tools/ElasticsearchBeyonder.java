@@ -24,6 +24,7 @@ import fr.pilato.elasticsearch.tools.index.IndexFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.type.TypeFinder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,7 @@ public class ElasticsearchBeyonder {
 	 * @param client elasticsearch client
 	 * @throws Exception when beyonder can not start
 	 */
-	public static void start(Client client) throws Exception {
+	public static void start(RestClient client) throws Exception {
 		start(client, fromClasspath(Defaults.ConfigDir));
 	}
 
@@ -89,6 +90,56 @@ public class ElasticsearchBeyonder {
 	 * @param root dir within the classpath
 	 * @throws Exception when beyonder can not start
 	 */
+	public static void start(RestClient client, String root) throws Exception {
+		logger.info("starting automatic settings/mappings discovery");
+
+		// TODO make it a parameter
+		boolean merge = true;
+		boolean force = false;
+
+		// create templates
+		List<String> templateNames = TemplateFinder.findTemplates(root);
+		for (String templateName : templateNames) {
+			createTemplate(client, root, templateName, force);
+		}
+
+		// create indices
+		Collection<String> indexNames = IndexFinder.findIndexNames(root);
+		for (String indexName : indexNames) {
+			createIndex(client, root, indexName, force);
+			updateSettings(client, root, indexName);
+
+			// create types
+			List<String> types = TypeFinder.findTypes(root, indexName);
+			for (String typeName : types) {
+				createMapping(client, root, indexName, typeName, merge);
+			}
+
+		}
+		logger.info("start done. Rock & roll!");
+	}
+
+	/**
+	 * Automatically scan classpath and creates indices, types, templates... in default dir.
+	 * @param client elasticsearch client
+	 * @throws Exception when beyonder can not start
+	 * @deprecated You should use now the RestClient implementation
+	 * @see #start(RestClient) for the RestClient implementation
+	 */
+	@Deprecated
+	public static void start(Client client) throws Exception {
+		start(client, fromClasspath(Defaults.ConfigDir));
+	}
+
+	/**
+	 * Automatically scan classpath and creates indices, types, templates...
+	 * @param client elasticsearch client
+	 * @param root dir within the classpath
+	 * @throws Exception when beyonder can not start
+	 * @deprecated You should use now the RestClient implementation
+	 * @see #start(RestClient, String) for the RestClient implementation
+	 */
+	@Deprecated
 	public static void start(Client client, String root) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
 

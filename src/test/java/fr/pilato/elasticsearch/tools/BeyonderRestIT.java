@@ -19,7 +19,9 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import org.apache.http.HttpHost;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -41,19 +43,18 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
 
-public class BeyonderIT extends AbstractBeyonderTest {
+public class BeyonderRestIT extends AbstractBeyonderTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeyonderIT.class);
-    private static Client client;
+    private static final Logger logger = LoggerFactory.getLogger(BeyonderRestIT.class);
+    private static RestClient client;
 
     @BeforeClass
     public static void startElasticsearch() throws IOException {
-        client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
-                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+        client = RestClient.builder(new HttpHost("localhost", 9200, "http")).build();
     }
 
     @AfterClass
-    public static void stopElasticsearch() {
+    public static void stopElasticsearch() throws IOException {
         if (client != null) {
             client.close();
         }
@@ -62,8 +63,8 @@ public class BeyonderIT extends AbstractBeyonderTest {
     @Before
     public void cleanCluster() {
         try {
-            client.admin().indices().prepareDelete("_all").get();
-        } catch (NoNodeAvailableException e) {
+            client.performRequest("DELETE", "/_all");
+        } catch (IOException e) {
             assumeNoException(e);
         }
     }

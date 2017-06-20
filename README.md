@@ -11,6 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
+| 5.0.0                   | 5.x, 6.x      |  2017-??-??  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
 | 2.0.0                   |      2.0      |  2015-10-24  |
 | 1.5.0                   |      1.5      |  2015-03-27  |
@@ -37,7 +38,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>2.1.0</version>
+  <version>5.0.0</version>
 </dependency>
 ```
 
@@ -47,14 +48,14 @@ If you want to set a specific version of elasticsearch, add it to your `pom.xml`
 <dependency>
   <groupId>org.elasticsearch</groupId>
   <artifactId>elasticsearch</artifactId>
-  <version>2.1.0</version>
+  <version>5.4.2</version>
 </dependency>
 ```
 
 Adding Beyonder to your client
 ------------------------------
 
-For both TransportClient and NodeClient, you can define many properties to manage automatic creation
+For RestClient or TransportClient, you can define many properties to manage automatic creation
 of index, mappings, templates and aliases.
 
 To activate those features, you only need to call:
@@ -74,6 +75,28 @@ ElasticsearchBeyonder.start(client, "models/myelasticsearch");
 
 In that case, Beyonder will search for resources from `models/myelasticsearch`.
 
+
+## Using REST Client (recommended)
+
+Elasticsearch now provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/5.4/index.html).
+It's the recommended way as the Transport Client is now deprecated and will be removed in a next major version.
+
+Just pass to Beyonder a Rest Client instance:
+
+```java
+RestClient client = RestClient.builder(new HttpHost("localhost", 9200, "http")).build();
+ElasticsearchBeyonder.start(client);
+```
+
+## Using Transport Client (deprecated)
+
+To use the deprecated TransportClient, just pass it to Beyonder:
+
+```java
+Client client = new PreBuiltTransportClient(Settings.EMPTY)
+           .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+ElasticsearchBeyonder.start(client);
+```
 
 Managing indices
 ----------------
