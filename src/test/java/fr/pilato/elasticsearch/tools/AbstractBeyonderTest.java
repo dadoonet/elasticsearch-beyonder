@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assume.assumeTrue;
 
 public abstract class AbstractBeyonderTest {
 
@@ -35,6 +36,8 @@ public abstract class AbstractBeyonderTest {
                                 List<String> indices,
                                 List<List<String>> types,
                                 List<String> templates) throws Exception;
+
+    protected static boolean supportsMultipleTypes = true;
 
     @Test
     public void testDefaultDir() throws Exception {
@@ -56,6 +59,7 @@ public abstract class AbstractBeyonderTest {
 
     @Test
     public void testTwoIndicesTwoTypesOneType() throws Exception {
+        assumeTrue("Skipping test as current version does not support multiple types.", supportsMultipleTypes);
         // 2 indices: 2 types and 1 type
         testBeyonder("models/twoindicestwotypesonetype",
                 asList("rss", "twitter"),

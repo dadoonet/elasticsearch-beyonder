@@ -19,6 +19,9 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import org.elasticsearch.Version;
+import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
@@ -56,6 +59,21 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
     public static void stopElasticsearch() {
         if (client != null) {
             client.close();
+        }
+    }
+
+    @BeforeClass
+    public static void setTestBehavior() {
+        try {
+            NodesInfoResponse response = client.admin().cluster().prepareNodesInfo().get();
+            for (NodeInfo nodeInfo : response.getNodes()) {
+                Version version = nodeInfo.getVersion();
+                if (version.id >= 6000000) {
+                    supportsMultipleTypes = false;
+                }
+            }
+        } catch (NoNodeAvailableException e) {
+            assumeNoException(e);
         }
     }
 

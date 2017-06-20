@@ -20,11 +20,16 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.Version;
+import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.mapper.ObjectMapper;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
@@ -64,6 +70,38 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     public void cleanCluster() {
         try {
             client.performRequest("DELETE", "/_all");
+        } catch (IOException e) {
+            assumeNoException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> extractFromPath(Map<String, Object> json, String... path) {
+        Map<String, Object> currentObject = json;
+        for (String fieldName : path) {
+            Object jObject = currentObject.get(fieldName);
+            if (jObject == null) {
+                throw new RuntimeException("incorrect Json. Was expecting field " + fieldName);
+            }
+            if (!(jObject instanceof Map)) {
+                throw new RuntimeException("incorrect datatype in json. Expected Map and got " + jObject.getClass().getName());
+            }
+            currentObject = (Map<String, Object>) jObject;
+        }
+        return currentObject;
+    }
+
+    @BeforeClass
+    public static void setTestBehavior() {
+        try {
+            Response response = client.performRequest("GET", "/");
+            Map<String, Object> responseAsMap = JsonUtil.asMap(response);
+            logger.trace("get server response: {}", responseAsMap);
+            Object oVersion = extractFromPath(responseAsMap, "version").get("number");
+            String version = (String) oVersion;
+            if (new VersionComparator().compare(version, "6") > 0) {
+                supportsMultipleTypes = false;
+            }
         } catch (IOException e) {
             assumeNoException(e);
         }
