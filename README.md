@@ -11,7 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 5.0.0                   | 5.x, 6.x      |  2017-??-??  |
+| 5.0                     | 5.x, 6.x      |  2017-??-??  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
 | 2.0.0                   |      2.0      |  2015-10-24  |
 | 1.5.0                   |      1.5      |  2015-03-27  |
@@ -38,7 +38,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>5.0.0</version>
+  <version>5.0</version>
 </dependency>
 ```
 

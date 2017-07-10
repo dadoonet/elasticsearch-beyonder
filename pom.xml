@@ -4,7 +4,7 @@
 
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
 
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
