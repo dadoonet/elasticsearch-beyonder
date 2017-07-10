@@ -33,6 +33,20 @@
         <log4j.version>2.8.1</log4j.version>
         <commons.io.version>2.4</commons.io.version>
         <jackson.version>2.8.6</jackson.version>
+
+        <!-- For integration tests -->
+        <elasticsearch.groupid>org.elasticsearch.distribution.zip</elasticsearch.groupid>
+        <skipTests>false</skipTests>
+        <skipUnitTests>${skipTests}</skipUnitTests>
+        <skipIntegTests>${skipTests}</skipIntegTests>
+        <tests.cluster.rest.port>9400</tests.cluster.rest.port>
+        <tests.cluster.transport.port>9500</tests.cluster.transport.port>
+        <elasticsearch.security.artifact>x-pack</elasticsearch.security.artifact>
+        <elasticsearch.security.version>${test.elasticsearch.version}</elasticsearch.security.version>
+        <integ.security.username>elastic</integ.security.username>
+        <integ.security.password>changeme</integ.security.password>
+
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <scm>
@@ -57,6 +71,33 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <!-- This repository is used to test with x-pack -->
+        <repository>
+            <id>elastic-download-service</id>
+            <name>Elastic Download Service</name>
+            <url>https://artifacts.elastic.co/maven/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>oss-snapshots</id>
+            <name>Sonatype OSS Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Elasticsearch -->
         <!-- TODO remove in next major version as deprecated -->
@@ -64,11 +105,20 @@
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>transport</artifactId>
             <version>${elasticsearch.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>rest</artifactId>
             <version>${elasticsearch.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- add the x-pack jar as a dependency -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>x-pack-transport</artifactId>
+            <version>${elasticsearch.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -206,40 +256,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.alexcojocaru</groupId>
-                <artifactId>elasticsearch-maven-plugin</artifactId>
-                <version>5.7</version>
-                <configuration>
-                    <version>${test.elasticsearch.version}</version>
-                </configuration>
-                <executions>
-                    <!--
-                        The elasticsearch maven plugin goals are by default bound to the
-                        pre-integration-test and post-integration-test phases
-                    -->
-                    <execution>
-                        <id>start-elasticsearch</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>runforked</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-elasticsearch</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <!-- Skips unit tests if the value of skip.unit.tests property is true -->
-                    <skipTests>${skip.unit.tests}</skipTests>
+                    <!-- Skips unit tests if the value of skipUnitTests property is true -->
+                    <skipTests>${skipUnitTests}</skipTests>
                     <!-- Excludes integration tests when unit tests are run -->
                     <excludes>
                         <exclude>**/IT*.java</exclude>
@@ -263,15 +285,50 @@
                         </goals>
                         <configuration>
                             <!--
-                                Skips integration tests if the value of skip.integration.tests
-                                property is true
+                                Skips integration tests if the value of skipIntegTests property is true
                             -->
-                            <skipTests>${skip.integration.tests}</skipTests>
+                            <skipTests>${skipIntegTests}</skipTests>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.alexcojocaru</groupId>
+                    <artifactId>elasticsearch-maven-plugin</artifactId>
+                    <version>5.7</version>
+                    <configuration>
+                        <version>${test.elasticsearch.version}</version>
+                        <httpPort>${tests.cluster.rest.port}</httpPort>
+                        <transportPort>${tests.cluster.transport.port}</transportPort>
+                        <autoCreateIndex>true</autoCreateIndex>
+                        <skip>${skipIntegTests}</skip>
+                    </configuration>
+                    <executions>
+                        <!--
+                            The elasticsearch maven plugin goals are by default bound to the
+                            pre-integration-test and post-integration-test phases
+                        -->
+                        <execution>
+                            <id>start-elasticsearch</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>runforked</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop-elasticsearch</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <developers>
@@ -286,10 +343,79 @@
 
     <profiles>
         <profile>
+            <id>es-5x</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>es-xpack</id>
+            <build>
+                <plugins>
+                    <!-- Copy dependencies into lib folder -->
+                    <!-- To see full classpath use  mvn dependency:build-classpath -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>integ-setup-dependencies-plugins</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skipIntegTests}</skip>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.elasticsearch.plugin</groupId>
+                                            <artifactId>${elasticsearch.security.artifact}</artifactId>
+                                            <version>${elasticsearch.security.version}</version>
+                                            <type>zip</type>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <useBaseVersion>true</useBaseVersion>
+                                    <outputDirectory>${project.build.directory}/integration-tests/plugins</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                        <configuration>
+                            <plugins>
+                                <plugin>
+                                    <uri>file://${project.build.directory}/integration-tests/plugins/x-pack-${elasticsearch.security.version}.zip</uri>
+                                </plugin>
+                            </plugins>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>es-6x</id>
             <properties>
                 <test.elasticsearch.version>6.0.0-alpha2</test.elasticsearch.version>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.alexcojocaru</groupId>
+                        <artifactId>elasticsearch-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

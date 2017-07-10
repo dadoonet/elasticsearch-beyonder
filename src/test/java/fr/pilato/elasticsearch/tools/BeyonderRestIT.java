@@ -19,18 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.http.HttpHost;
-import org.elasticsearch.Version;
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.mapper.ObjectMapper;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 
@@ -55,12 +44,12 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     private static RestClient client;
 
     @BeforeClass
-    public static void startElasticsearch() throws IOException {
-        client = RestClient.builder(new HttpHost("localhost", 9200, "http")).build();
+    public static void startElasticsearchRestClient() throws IOException {
+        client = restClient();
     }
 
     @AfterClass
-    public static void stopElasticsearch() throws IOException {
+    public static void stopElasticsearchRestClient() throws IOException {
         if (client != null) {
             client.close();
         }
