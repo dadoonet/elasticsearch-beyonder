@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,7 +60,9 @@ public class ResourceList {
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             /* A file path: easy enough */
             logger.trace("found a file resource: {}", dirURL);
-            return new File(dirURL.toURI()).list();
+            String[] resources = new File(dirURL.toURI()).list();
+            Arrays.sort(resources);
+            return resources;
         }
 
         if (dirURL == null) {
@@ -94,7 +97,9 @@ public class ResourceList {
                     result.add(entry);
                 }
             }
-            return result.toArray(new String[result.size()]);
+            String[] resources = result.toArray(new String[result.size()]);
+            Arrays.sort(resources);
+            return resources;
         }
 
         // Resource does not exist. We can return an empty list

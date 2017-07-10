@@ -42,15 +42,40 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 </dependency>
 ```
 
-If you want to set a specific version of elasticsearch, add it to your `pom.xml` file:
+You need to import as well the elasticsearch client you want to use by adding one of the following
+dependencies to your `pom.xml` file.
+
+For example, here is how to import the REST Client to your project:
 
 ```xml
 <dependency>
-  <groupId>org.elasticsearch</groupId>
-  <artifactId>elasticsearch</artifactId>
-  <version>5.4.2</version>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>rest</artifactId>
+    <version>5.4.2</version>
 </dependency>
 ```
+
+For example, here is how to import the Transport Client to your project (deprecated):
+
+```xml
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>transport</artifactId>
+    <version>5.4.2</version>
+</dependency>
+```
+
+For example, here is how to import the Secured Transport Client to your project (deprecated):
+
+```xml
+<dependency>
+    <groupId>org.elasticsearch.client</groupId>
+    <artifactId>x-pack-transport</artifactId>
+    <version>5.4.2</version>
+</dependency>
+```
+
+
 
 Adding Beyonder to your client
 ------------------------------
@@ -84,7 +109,22 @@ It's the recommended way as the Transport Client is now deprecated and will be r
 Just pass to Beyonder a Rest Client instance:
 
 ```java
-RestClient client = RestClient.builder(new HttpHost("localhost", 9200, "http")).build();
+RestClient client = RestClient.builder(new HttpHost("127.0.0.1", 9200)).build();
+ElasticsearchBeyonder.start(client);
+```
+
+For the record, you can also use X-Pack security with:
+
+```java
+CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
+RestClient client = RestClient.builder(new HttpHost("127.0.0.1", 9200))
+        .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+            @Override
+            public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            }
+        }).build();
 ElasticsearchBeyonder.start(client);
 ```
 
@@ -94,6 +134,16 @@ To use the deprecated TransportClient, just pass it to Beyonder:
 
 ```java
 Client client = new PreBuiltTransportClient(Settings.EMPTY)
+           .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
+ElasticsearchBeyonder.start(client);
+```
+
+## Using Secured Transport Client (deprecated)
+
+To use the deprecated TransportClient, just pass it to Beyonder:
+
+```java
+Client client = new PreBuiltXPackTransportClient(Settings.builder().put("xpack.security.user", "elastic:changeme").build())
            .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
 ElasticsearchBeyonder.start(client);
 ```
@@ -176,12 +226,90 @@ powerful character.
 
 This project gives some features beyond elasticsearch itself. :)
 
+# Tests
+
+This project comes with unit tests and integration tests.
+You can disable running them by using `skipTests` option as follows:
+
+```sh
+mvn clean install -DskipTests
+```
+
+## Unit Tests
+
+If you want to disable only running unit tests, use `skipUnitTests` option:
+
+```sh
+mvn clean install -DskipUnitTests
+```
+
+## Integration Tests
+
+Integration tests are launching an elasticsearch server thank to [elasticsearch-maven-plugin](https://github.com/alexcojocaru/elasticsearch-maven-plugin/)
+which makes that super easy to have!
+
+Tests are ran by default on the 5.x series but you can choose to run them against another version by using the following
+maven profiles:
+
+* `es-6x`: runs against an elasticsearch 6.x cluster
+* `es-5x` (default): runs against an elasticsearch 5.x cluster
+
+
+If you want to disable running integration tests, use `skipIntegTests` option:
+
+```sh
+mvn clean install -DskipIntegTests
+```
+
+Integration tests can be ran against a cluster secured by [x-pack](https://www.elastic.co/downloads/x-pack).
+You have to activate as well the `es-xpack` profile:
+
+```sh
+mvn clean install -Pes-xpack
+```
+
+Or if you want to run x-pack with a given elasticsearch version:
+
+```sh
+mvn clean install -Pes-6x -Pes-xpack
+```
+
+If you wish to run integration tests against a cluster which is already running externally, you can configure the
+following settings to locate your cluster:
+
+|            setting            |     default   |
+|:-----------------------------:|:-------------:|
+| `tests.cluster.host`          | `127.0.0.1`   |
+| `tests.cluster.scheme`        | `http`        |
+| `tests.cluster.rest.port`     | `9400`        |
+| `tests.cluster.transport.port`| `9500`        |
+| `tests.cluster.user`          | `elastic`     |
+| `tests.cluster.pass`          | `changeme`    |
+
+For example:
+
+```sh
+mvn clean install -Dtests.cluster.rest.port=9200 -Dtests.cluster.transport.port=9300
+```
+
+If you want to run your tests against an [Elastic Cloud](https://cloud.elastic.co/) instance, you can use something like:
+
+```sh
+mvn clean install \
+    -Dtests.cluster.host=CLUSTERID.eu-west-1.aws.found.io \
+    -Dtests.cluster.scheme=https \
+    -Dtests.cluster.rest.port=9243 \
+    -Dtests.cluster.transport.port=9300 \
+    -Dtests.cluster.user=elastic \
+    -Dtests.cluster.pass=GENERATEDPASSWORD
+```
+
 License
 =======
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2015 David Pilato
+	Copyright 2011-2017 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
