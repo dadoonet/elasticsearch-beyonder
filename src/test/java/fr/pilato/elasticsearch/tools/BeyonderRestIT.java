@@ -19,11 +19,14 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
+import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +34,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
 import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
@@ -84,7 +89,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     public static void setTestBehavior() {
         try {
             Response response = client.performRequest("GET", "/");
-            Map<String, Object> responseAsMap = JsonUtil.asMap(response);
+            Map<String, Object> responseAsMap = asMap(response);
             logger.trace("get server response: {}", responseAsMap);
             Object oVersion = extractFromPath(responseAsMap, "version").get("number");
             String version = (String) oVersion;
@@ -136,5 +141,15 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 }
             }
         }
+    }
+
+    // This is a manual test as we don't have a real support of this in Beyonder yet
+    // See https://github.com/dadoonet/elasticsearch-beyonder/issues/2
+    @Test
+    public void testAliases() throws Exception {
+        IndexElasticsearchUpdater.createIndex(client, "test_aliases", true);
+        AliasElasticsearchUpdater.createAlias(client, "foo", "test_aliases");
+        Map<String, Object> response = asMap(client.performRequest("GET", "/_alias/foo"));
+        assertThat(response, hasKey("test_aliases"));
     }
 }
