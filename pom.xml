@@ -409,7 +409,7 @@
         <profile>
             <id>es-6x</id>
             <properties>
-                <test.elasticsearch.version>6.0.0-alpha2</test.elasticsearch.version>
+                <test.elasticsearch.version>6.0.0-beta1-SNAPSHOT</test.elasticsearch.version>
             </properties>
             <build>
                 <plugins>
