@@ -86,7 +86,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                     supportsMultipleTypes = false;
                 }
             }
-        } catch (NoNodeAvailableException|TransportSerializationException e) {
+        } catch (NoNodeAvailableException e) {
             assumeNoException(e);
         }
     }
