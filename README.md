@@ -11,7 +11,8 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 5.1-SNAPSHOT            | 5.x, 6.x      |              |
+| 5.2-SNAPSHOT            | 5.x, 6.x      |              |
+| 5.1                     | 5.x, 6.x      |  2017-07-12  |
 | 5.0                     | 5.x, 6.x      |  2017-07-11  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
 | 2.0.0                   |      2.0      |  2015-10-24  |
@@ -51,8 +52,8 @@ For example, here is how to import the REST Client to your project:
 ```xml
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
-    <artifactId>rest</artifactId>
-    <version>5.5.0</version>
+    <artifactId>elasticsearch-rest-client</artifactId>
+    <version>5.6.0</version>
 </dependency>
 ```
 
@@ -62,7 +63,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>5.5.0</version>
+    <version>5.6.0</version>
 </dependency>
 ```
 
@@ -72,7 +73,7 @@ For example, here is how to import the Secured Transport Client to your project 
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>x-pack-transport</artifactId>
-    <version>5.5.0</version>
+    <version>5.6.0</version>
 </dependency>
 ```
 

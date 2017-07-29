@@ -22,7 +22,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>5.5.0</elasticsearch.version>
+        <elasticsearch.version>5.6.0-SNAPSHOT</elasticsearch.version>
         <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
         <slf4j.version>1.7.13</slf4j.version>
         <log4j.version>2.8.1</log4j.version>
@@ -91,6 +91,14 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <id>elastic-snapshots</id>
+            <name>Elastic Snapshots</name>
+            <url>http://snapshots.elastic.co/maven/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -104,7 +112,7 @@
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
-            <artifactId>rest</artifactId>
+            <artifactId>elasticsearch-rest-client</artifactId>
             <version>${elasticsearch.version}</version>
             <optional>true</optional>
         </dependency>

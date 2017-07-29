@@ -19,16 +19,16 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.http.HttpHost;
+import org.elasticsearch.client.http.auth.AuthScope;
+import org.elasticsearch.client.http.auth.UsernamePasswordCredentials;
+import org.elasticsearch.client.http.client.CredentialsProvider;
+import org.elasticsearch.client.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.client.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
