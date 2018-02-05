@@ -25,6 +25,7 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +135,7 @@ public class TypeElasticsearchUpdater {
             // Create type and mapping
             PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
                     .setType(type)
-                    .setSource(mapping).get();
+                    .setSource(mapping, XContentType.JSON).get();
             if (!mappingResponse.isAcknowledged()) {
                 logger.warn("Could not create type [{}/{}]", index, type);
                 throw new Exception("Could not create type ["+index+"/"+type+"].");
