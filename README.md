@@ -52,8 +52,8 @@ For example, here is how to import the REST Client to your project:
 ```xml
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
-    <artifactId>rest</artifactId>
-    <version>5.5.0</version>
+    <artifactId>elasticsearch-rest-client</artifactId>
+    <version>5.6.7</version>
 </dependency>
 ```
 
@@ -63,7 +63,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>5.5.0</version>
+    <version>5.6.7</version>
 </dependency>
 ```
 
@@ -73,7 +73,7 @@ For example, here is how to import the Secured Transport Client to your project 
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>x-pack-transport</artifactId>
-    <version>5.5.0</version>
+    <version>5.6.7</version>
 </dependency>
 ```
 
