@@ -50,7 +50,8 @@
         <url>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</url>
         <connection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</connection>
         <developerConnection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</developerConnection>
-    </scm>
+      <tag>es-5.x</tag>
+  </scm>
 
     <issueManagement>
         <system>GitHub</system>
