@@ -9,8 +9,8 @@
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
-        Elasticsearch beyonder provides automatic index, mapping, alias or template creation
-        when an elasticsearch client starts.
+Elasticsearch beyonder provides automatic index, mapping, alias or template creation
+when an elasticsearch client starts.
     </description>
 
     <licenses>
@@ -238,9 +238,8 @@
                         <remove>remove</remove>
                     </issueTypes>
                     <onlyCurrentVersion>true</onlyCurrentVersion>
-                    <urlDownload>
-                        <urlDownload>https://repo1.maven.org/maven2/fr/pilato/elasticsearch/elasticsearch-beyonder/${project.version}/</urlDownload>
-                    </urlDownload>
+                    <includeOpenIssues>true</includeOpenIssues>
+                    <urlDownload>https://repo1.maven.org/maven2/fr/pilato/elasticsearch/elasticsearch-beyonder/${project.version}/</urlDownload>
                 </configuration>
             </plugin>
             <plugin>
