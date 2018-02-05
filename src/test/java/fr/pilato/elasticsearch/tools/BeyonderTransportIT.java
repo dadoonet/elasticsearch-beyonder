@@ -26,7 +26,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.transport.TransportSerializationException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.junit.AfterClass;
