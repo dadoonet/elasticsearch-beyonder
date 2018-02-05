@@ -27,6 +27,7 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +131,7 @@ public class IndexElasticsearchUpdater {
 		// If there are settings for this index, we use it. If not, using Elasticsearch defaults.
 		if (settings != null) {
 			logger.trace("Found settings for index [{}]: [{}]", index, settings);
-			cirb.setSettings(settings);
+			cirb.setSettings(settings, XContentType.JSON);
 		}
 
 		CreateIndexResponse createIndexResponse = cirb.execute().actionGet();
@@ -159,7 +160,7 @@ public class IndexElasticsearchUpdater {
 		if (settings != null) {
 			logger.trace("Found update settings for index [{}]: [{}]", index, settings);
 			logger.debug("updating settings for index [{}]", index);
-			client.admin().indices().prepareUpdateSettings(index).setSettings(settings).get();
+			client.admin().indices().prepareUpdateSettings(index).setSettings(settings, XContentType.JSON).get();
 		}
 
 		logger.trace("/updateIndex([{}])", index);

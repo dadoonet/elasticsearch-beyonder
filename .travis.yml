@@ -5,7 +5,6 @@ jdk:
 install: true
 #before_install:
 #  - sudo apt-get -qq update
-#  - sudo apt-get install -y tesseract-ocr
 before_script:
   - sudo sysctl -w vm.max_map_count=262144
 script:
@@ -13,9 +12,9 @@ script:
 # Sadly this is the only way to make maven download everything and not pollute the logs...
   - mvn --batch-mode clean dependency:resolve dependency:resolve-plugins install -DskipTests -Dsilent=true > /dev/null
   # TODO We should add -Pes-xpack
-  # Test against 6.x version
-  - mvn --batch-mode clean verify -Pes-6x
-  # Test against 5.x version (default)
+  # Test against 5.x version
+  - mvn --batch-mode clean verify -Pes-5x
+  # Test against 6.x version (default)
   - mvn --batch-mode clean verify
 after_success:
   - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && mvn deploy -DskipTests --settings deploy-settings.xml"

@@ -25,7 +25,7 @@ import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.junit.AfterClass;
@@ -61,10 +61,10 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                             .put("client.transport.ignore_cluster_name", true)
                             .put("xpack.security.user", testClusterUser + ":" + testClusterPass)
                             .build()
-            ).addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
+            ).addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
         } else {
             client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
-                    .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
+                    .addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
         }
     }
 

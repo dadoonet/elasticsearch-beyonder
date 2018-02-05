@@ -25,6 +25,7 @@ import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRespo
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ public class TemplateElasticsearchUpdater {
 
 		PutIndexTemplateResponse response = client.admin().indices()
 				.preparePutTemplate(template)
-				.setSource(json)
+				.setSource(json.getBytes(), XContentType.JSON)
 				.get();
 
 		if (!response.isAcknowledged()) {
