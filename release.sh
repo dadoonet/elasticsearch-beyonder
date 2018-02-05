@@ -130,7 +130,7 @@ mvn versions:set -DnewVersion=${RELEASE_VERSION} >> /tmp/beyonder-${RELEASE_VERS
 git commit -q -a -m "prepare release beyonder-$RELEASE_VERSION"
 
 # Testing against different elasticsearch versions
-test_against_version 6
+test_against_version 5
 
 # The actual build is made against latest version
 test_against_version
