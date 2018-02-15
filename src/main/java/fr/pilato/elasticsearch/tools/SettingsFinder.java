@@ -46,6 +46,16 @@ public class SettingsFinder {
 		public static String IndexSettingsFileName = "_settings.json";
 		public static String UpdateIndexSettingsFileName = "_update_settings.json";
 		public static String TemplateDir = "_template";
+
+		/**
+		 * Default setting of whether or not to merge mappings on start.
+		 */
+		public static boolean MergeMappings = true;
+
+		/**
+		 * Default setting of whether or not to force creation of indices and templates on start.
+		 */
+		public static boolean ForceCreation = false;
 	}
 
 	/**

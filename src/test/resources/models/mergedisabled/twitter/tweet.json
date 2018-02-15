@@ -1,0 +1,10 @@
+{
+  "tweet": {
+    "properties": {
+      "language": {
+        "type": "keyword",
+        "store": true
+      }
+    }
+  }
+}
