@@ -91,11 +91,20 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client, String root) throws Exception {
-		logger.info("starting automatic settings/mappings discovery");
+		start(client, root, Defaults.MergeMappings, Defaults.ForceCreation);
+	}
 
-		// TODO make it a parameter
-		boolean merge = true;
-		boolean force = false;
+	/**
+	 * Automatically scan classpath and create indices, mappings, templates, and other settings.
+	 * @param client elasticsearch client
+	 * @param root dir within the classpath
+	 * @param merge whether or not to merge mappings
+	 * @param force whether or not to force creation of indices and templates
+	 * @throws Exception when beyonder can not start
+	 * @since 6.1
+	 */
+	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
+		logger.info("starting automatic settings/mappings discovery");
 
 		// create templates
 		List<String> templateNames = TemplateFinder.findTemplates(root);
@@ -144,8 +153,8 @@ public class ElasticsearchBeyonder {
 		logger.info("starting automatic settings/mappings discovery");
 
 		// TODO make it a parameter
-		boolean merge = true;
-		boolean force = false;
+		boolean merge = Defaults.MergeMappings;
+		boolean force = Defaults.ForceCreation;
 
 		// create templates
 		List<String> templateNames = TemplateFinder.findTemplates(root);

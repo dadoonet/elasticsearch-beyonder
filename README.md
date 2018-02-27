@@ -179,6 +179,10 @@ For example, create the following file `src/main/resources/elasticsearch/twitter
 }
 ```
 
+By default, Beyonder will not overwrite an index if it already exists.
+This can be overridden by setting `force` to `true` in the expanded factory method
+`ElasticsearchBeyonder.start()`.
+
 Managing types
 --------------
 
@@ -196,6 +200,10 @@ For example, create the following file `src/main/resources/elasticsearch/twitter
   }
 }
 ```
+
+By default, Beyonder will attempt to merge defined mappings with existing ones.
+This can be overridden by setting `merge` to `false` in the expanded factory method
+`ElasticsearchBeyonder.start()`.
 
 Managing templates
 ------------------
@@ -225,6 +233,9 @@ in your project:
 }
 ```
 
+By default, Beyonder will not overwrite a template if it already exists.
+This can be overridden by setting `force` to `true` in the expanded factory method
+`ElasticsearchBeyonder.start()`.
 
 Why this name?
 ==============

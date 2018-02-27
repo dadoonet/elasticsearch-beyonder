@@ -21,6 +21,8 @@ package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.junit.AfterClass;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +43,7 @@ import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdate
 import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
 
@@ -151,5 +155,30 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         AliasElasticsearchUpdater.createAlias(client, "foo", "test_aliases");
         Map<String, Object> response = asMap(client.performRequest("GET", "/_alias/foo"));
         assertThat(response, hasKey("test_aliases"));
+    }
+
+    @Test
+    public void testMergeDisabled() throws Exception {
+        ElasticsearchBeyonder.start(client);
+        String expectedMapping = getMapping("twitter");
+        ElasticsearchBeyonder.start(client, "models/mergedisabled", false, false);
+        String actualMapping = getMapping("twitter");
+        assertThat(actualMapping, is(expectedMapping));
+    }
+
+    @Test
+    public void testForceEnabled() throws Exception {
+        ElasticsearchBeyonder.start(client);
+        String oldMapping = getMapping("twitter");
+        ElasticsearchBeyonder.start(client, "models/forceenabled", true, true);
+        String newMapping = getMapping("twitter");
+        assertThat(newMapping, is(not(oldMapping)));
+    }
+
+    private String getMapping(String indexName) throws IOException {
+        HttpEntity response = client.performRequest("GET", indexName + "/_mapping").getEntity();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength()));
+        IOUtils.copy(response.getContent(), out);
+        return new String(out.toByteArray());
     }
 }
