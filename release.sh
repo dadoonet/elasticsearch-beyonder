@@ -218,7 +218,8 @@ then
         then
             # We need to checkout the tag, announce and checkout the branch we started from
             git checkout -q beyonder-${RELEASE_VERSION}
-            mvn changes:announcement-mail >> /tmp/beyonder-${RELEASE_VERSION}.log
+            SMTP_PASSWORD=$(readvalue "Enter your SMTP password" "")
+            mvn changes:announcement-mail -Dchanges.password=${SMTP_PASSWORD} >> /tmp/beyonder-${RELEASE_VERSION}.log
             git checkout -q ${CURRENT_BRANCH}
         else
             echo "Message not sent. You can send it manually using:"
