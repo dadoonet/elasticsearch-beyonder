@@ -51,7 +51,7 @@ No changes defined in this version.
 #else
 #set($dueto="")
 #end
-* [#$issue](https://github.com/dadoonet/spring-elasticsearch/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
+* [#$issue](https://github.com/dadoonet/elasticsearch-beyonder/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #set($issue="")
 #set($dueto="")
@@ -73,7 +73,7 @@ No changes defined in this version.
 #else
 #set($dueto="")
 #end
-* [#$issue](https://github.com/dadoonet/spring-elasticsearch/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
+* [#$issue](https://github.com/dadoonet/elasticsearch-beyonder/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #set($issue="")
 #set($dueto="")
@@ -95,7 +95,7 @@ No changes defined in this version.
 #else
 #set($dueto="")
 #end
-* [#$issue](https://github.com/dadoonet/spring-elasticsearch/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
+* [#$issue](https://github.com/dadoonet/elasticsearch-beyonder/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #set($issue="")
 #set($dueto="")
@@ -117,7 +117,7 @@ No changes defined in this version.
 #else
 #set($dueto="")
 #end
-* [#$issue](https://github.com/dadoonet/spring-elasticsearch/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
+* [#$issue](https://github.com/dadoonet/elasticsearch-beyonder/issues/$issue): ${action} #if($!issue != ""). #end#if($!dueto != "")Thanks to $dueto. #end
 
 #set($issue="")
 #set($dueto="")
