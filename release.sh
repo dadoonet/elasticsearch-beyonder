@@ -59,8 +59,8 @@ promptyn () {
 
 test_against_version () {
     if [ -z "$1" ]; then
-        echo "Building and testing the release..."
-        mvn clean install -Prelease ${MAVEN_OPTION} >> /tmp/beyonder-${RELEASE_VERSION}.log
+        echo "Building the release..."
+        mvn clean install -DskipTests -Prelease ${MAVEN_OPTION} >> /tmp/beyonder-${RELEASE_VERSION}.log
     else
         echo "Building and testing against elasticsearch $1.x..."
         mvn clean verify -Pes-$1x ${MAVEN_OPTION} >> /tmp/beyonder-${RELEASE_VERSION}.log
@@ -131,8 +131,9 @@ git commit -q -a -m "prepare release beyonder-$RELEASE_VERSION"
 
 # Testing against different elasticsearch versions
 test_against_version 5
+test_against_version 6
 
-# The actual build is made against latest version
+# Testing that release will work at the end
 test_against_version
 
 # Just display the end of the build
