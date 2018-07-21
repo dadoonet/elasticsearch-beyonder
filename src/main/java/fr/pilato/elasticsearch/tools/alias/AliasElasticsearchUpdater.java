@@ -36,6 +36,7 @@ public class AliasElasticsearchUpdater {
 
     /**
      * Create an alias if needed
+     * @param client Client to use
      * @param alias Alias name
      * @param index Index name
      * @throws Exception When alias can not be set
@@ -50,6 +51,7 @@ public class AliasElasticsearchUpdater {
 
     /**
      * Create an alias if needed
+     * @param client Client to use
      * @param alias Alias name
      * @param index Index name
      * @throws Exception When alias can not be set

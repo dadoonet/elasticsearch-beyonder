@@ -45,7 +45,9 @@ public class TemplateElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-	 * @throws Exception
+     * @param force set it to true if you want to force cleaning template before adding it
+	 * @throws Exception if something goes wrong
+	 * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String root, String template, boolean force) throws Exception {
@@ -57,7 +59,9 @@ public class TemplateElasticsearchUpdater {
 	 * Create a template in Elasticsearch. Read read content from default classpath dir.
 	 * @param client Elasticsearch client
 	 * @param template Template name
-	 * @throws Exception
+     * @param force set it to true if you want to force cleaning template before adding it
+     * @throws Exception if something goes wrong
+     * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String template, boolean force) throws Exception {
@@ -71,7 +75,8 @@ public class TemplateElasticsearchUpdater {
 	 * @param template Template name
 	 * @param json JSon content for the template
 	 * @param force set it to true if you want to force cleaning template before adding it
-	 * @throws Exception
+     * @throws Exception if something goes wrong
+     * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
 	public static void createTemplateWithJson(Client client, String template, String json, boolean force) throws Exception {
@@ -95,7 +100,8 @@ public class TemplateElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param template Template name
 	 * @param json JSon content for the template
-	 * @throws Exception
+     * @throws Exception if something goes wrong
+     * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
 	private static void createTemplateWithJsonInElasticsearch(Client client, String template, String json) throws Exception {
@@ -119,7 +125,10 @@ public class TemplateElasticsearchUpdater {
 
 	/**
 	 * Check if a template exists
+     * @param client Elasticsearch client
 	 * @param template template name
+     * @return true if the template exists
+     * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
 	public static boolean isTemplateExist(Client client, String template) {
@@ -128,11 +137,12 @@ public class TemplateElasticsearchUpdater {
 
 	/**
 	 * Remove a template
-	 * @param template
-	 * @throws Exception
+     * @param client Elasticsearch client
+	 * @param template template name
+     * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
-	public static void removeTemplate(Client client, String template) throws Exception {
+	public static void removeTemplate(Client client, String template) {
 		logger.trace("removeTemplate({})", template);
 		client.admin().indices().prepareDeleteTemplate(template).get();
 		logger.trace("/removeTemplate({})", template);
@@ -143,7 +153,8 @@ public class TemplateElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-	 * @throws Exception
+     * @param force set it to true if you want to force cleaning template before adding it
+     * @throws Exception if something goes wrong
 	 */
 	public static void createTemplate(RestClient client, String root, String template, boolean force) throws Exception {
 		String json = TemplateSettingsReader.readTemplate(root, template);
@@ -154,7 +165,8 @@ public class TemplateElasticsearchUpdater {
 	 * Create a template in Elasticsearch. Read read content from default classpath dir.
 	 * @param client Elasticsearch client
 	 * @param template Template name
-	 * @throws Exception
+     * @param force set it to true if you want to force cleaning template before adding it
+     * @throws Exception if something goes wrong
 	 */
 	public static void createTemplate(RestClient client, String template, boolean force) throws Exception {
 		String json = TemplateSettingsReader.readTemplate(template);
@@ -167,7 +179,7 @@ public class TemplateElasticsearchUpdater {
 	 * @param template Template name
 	 * @param json JSon content for the template
 	 * @param force set it to true if you want to force cleaning template before adding it
-	 * @throws Exception
+     * @throws Exception if something goes wrong
 	 */
 	public static void createTemplateWithJson(RestClient client, String template, String json, boolean force) throws Exception {
 		if (isTemplateExist(client, template)) {
@@ -190,7 +202,7 @@ public class TemplateElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param template Template name
 	 * @param json JSon content for the template
-	 * @throws Exception
+     * @throws Exception if something goes wrong
 	 */
 	private static void createTemplateWithJsonInElasticsearch(RestClient client, String template, String json) throws Exception {
 		logger.trace("createTemplate([{}])", template);
@@ -212,7 +224,10 @@ public class TemplateElasticsearchUpdater {
 
 	/**
 	 * Check if a template exists
+     * @param client Elasticsearch client
 	 * @param template template name
+     * @return true if the template exists
+     * @throws IOException if something goes wrong
 	 */
 	public static boolean isTemplateExist(RestClient client, String template) throws IOException {
 		Response response = client.performRequest("HEAD", "/_template/" + template);
@@ -221,8 +236,9 @@ public class TemplateElasticsearchUpdater {
 
 	/**
 	 * Remove a template
-	 * @param template
-	 * @throws Exception
+     * @param client Elasticsearch client
+	 * @param template template name
+     * @throws Exception if something goes wrong
 	 */
 	public static void removeTemplate(RestClient client, String template) throws Exception {
 		logger.trace("removeTemplate({})", template);

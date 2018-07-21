@@ -46,7 +46,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
     public static void createMapping(Client client, String index, String type, boolean merge) throws Exception {
@@ -61,7 +61,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
     public static void createMapping(Client client, String root, String index, String type, boolean merge)
@@ -77,7 +77,7 @@ public class TypeElasticsearchUpdater {
      * @param type Type name
      * @param mapping Mapping if any, null if no specific mapping
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
     public static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge)
@@ -107,7 +107,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @return true if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
     public static boolean isTypeExist(Client client, String index, String type) throws Exception {
@@ -120,7 +120,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param mapping Mapping if any, null if no specific mapping
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
     private static void createTypeWithMappingInElasticsearch(Client client, String index, String type, String mapping)
@@ -153,7 +153,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     public static void createMapping(RestClient client, String index, String type, boolean merge) throws Exception {
         String mapping = TypeSettingsReader.readMapping(index, type);
@@ -167,7 +167,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     public static void createMapping(RestClient client, String root, String index, String type, boolean merge)
             throws Exception {
@@ -182,7 +182,7 @@ public class TypeElasticsearchUpdater {
      * @param type Type name
      * @param mapping Mapping if any, null if no specific mapping
      * @param merge Try to merge mapping if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     public static void createMappingWithJson(RestClient client, String index, String type, String mapping, boolean merge)
             throws Exception {
@@ -211,7 +211,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @return true if type already exists
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     public static boolean isTypeExist(RestClient client, String index, String type) throws Exception {
         Response response = client.performRequest("HEAD", "/" + index + "/_mapping/" + type);
@@ -224,7 +224,7 @@ public class TypeElasticsearchUpdater {
      * @param index Index name
      * @param type Type name
      * @param mapping Mapping if any, null if no specific mapping
-     * @throws Exception
+     * @throws Exception if the elasticsearch call is failing
      */
     private static void createTypeWithMappingInElasticsearch(RestClient client, String index, String type, String mapping)
             throws Exception {

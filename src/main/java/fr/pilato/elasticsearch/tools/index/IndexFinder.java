@@ -36,6 +36,9 @@ public class IndexFinder extends SettingsFinder {
 
     /**
      * Find all indices existing in a given default classpath dir
+     * @return a list of indices
+     * @throws IOException if connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findIndexNames() throws IOException, URISyntaxException {
         return findIndexNames(Defaults.ConfigDir);
@@ -44,6 +47,9 @@ public class IndexFinder extends SettingsFinder {
     /**
      * Find all indices existing in a given classpath dir
      * @param root dir within the classpath
+     * @return a list of indices
+     * @throws IOException if connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findIndexNames(final String root) throws IOException, URISyntaxException {
         if (root == null) {

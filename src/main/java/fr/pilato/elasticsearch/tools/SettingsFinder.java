@@ -61,9 +61,12 @@ public class SettingsFinder {
 	/**
 	 * Return a classpath:file from a file
 	 * @param file for example "es"
+	 * @return file (no transformation is made)
+	 * @deprecated Will be removed most likely
 	 * TODO REMOVE
 	 */
-	public static String fromClasspath(String file) throws IOException {
+	@Deprecated
+	public static String fromClasspath(String file) {
 		return file;
 	}
 
@@ -71,7 +74,11 @@ public class SettingsFinder {
 	 * Find all types within an index
 	 * @param root dir within the classpath
 	 * @param subdir subdir name
+     * @return A list of found JSON files
+     * @deprecated Sounds like it's not used. We will remove it
+     * @throws IOException if something goes wrong
 	 */
+	@Deprecated
 	protected static ArrayList<String> findJsonFiles(Path root, String subdir) throws IOException {
 		logger.debug("Looking for json files in classpath under [{}/{}].", root, subdir);
 
