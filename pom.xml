@@ -296,6 +296,7 @@ when an elasticsearch client starts.
                     <artifactId>elasticsearch-maven-plugin</artifactId>
                     <version>6.6</version>
                     <configuration>
+                        <flavor>oss</flavor>
                         <version>${test.elasticsearch.version}</version>
                         <httpPort>${tests.cluster.rest.port}</httpPort>
                         <transportPort>${tests.cluster.transport.port}</transportPort>
@@ -357,44 +358,11 @@ when an elasticsearch client starts.
             <id>es-xpack</id>
             <build>
                 <plugins>
-                    <!-- Copy dependencies into lib folder -->
-                    <!-- To see full classpath use  mvn dependency:build-classpath -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>integ-setup-dependencies-plugins</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <skip>${skipIntegTests}</skip>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.elasticsearch.plugin</groupId>
-                                            <artifactId>${elasticsearch.security.artifact}</artifactId>
-                                            <version>${elasticsearch.security.version}</version>
-                                            <type>zip</type>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <useBaseVersion>true</useBaseVersion>
-                                    <outputDirectory>${project.build.directory}/integration-tests/plugins</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
                         <configuration>
-                            <plugins>
-                                <plugin>
-                                    <uri>file://${project.build.directory}/integration-tests/plugins/x-pack-${elasticsearch.security.version}.zip</uri>
-                                </plugin>
-                            </plugins>
+                            <flavour>default</flavour>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -410,6 +378,9 @@ when an elasticsearch client starts.
                     <plugin>
                         <groupId>com.github.alexcojocaru</groupId>
                         <artifactId>elasticsearch-maven-plugin</artifactId>
+                        <configuration>
+                            <flavour>oss</flavour>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

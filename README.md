@@ -11,7 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 6.0-SNAPSHOT            | 5.x, 6.x      |              |
+| 6.3-SNAPSHOT            | 5.x, 6.x      |              |
 | 5.1                     | 5.x, 6.x      |  2017-07-12  |
 | 5.0                     | 5.x, 6.x      |  2017-07-11  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
@@ -282,16 +282,10 @@ mvn clean install -DskipIntegTests
 ```
 
 Integration tests can be ran against a cluster secured by [x-pack](https://www.elastic.co/downloads/x-pack).
-You have to activate as well the `es-xpack` profile:
+You have to activate as well the `es-xpack` profile (not supported yet):
 
 ```sh
 mvn clean install -Pes-xpack
-```
-
-Or if you want to run x-pack with a given elasticsearch version:
-
-```sh
-mvn clean install -Pes-6x -Pes-xpack
 ```
 
 If you wish to run integration tests against a cluster which is already running externally, you can configure the
@@ -329,7 +323,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2017 David Pilato
+	Copyright 2011-2018 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
