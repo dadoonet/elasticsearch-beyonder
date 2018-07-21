@@ -341,7 +341,7 @@ when an elasticsearch client starts.
         <profile>
             <id>es-5x</id>
             <properties>
-                <test.elasticsearch.version>5.6.7</test.elasticsearch.version>
+                <test.elasticsearch.version>5.6.10</test.elasticsearch.version>
             </properties>
             <build>
                 <plugins>
@@ -362,7 +362,7 @@ when an elasticsearch client starts.
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.1.1</version>
                         <executions>
                             <execution>
                                 <id>integ-setup-dependencies-plugins</id>
