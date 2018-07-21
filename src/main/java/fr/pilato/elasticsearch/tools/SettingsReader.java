@@ -33,6 +33,7 @@ public class SettingsReader {
 	/**
 	 * Read a file content from the classpath
 	 * @param file filename
+	 * @return The file content
 	 */
 	public static String readFileFromClasspath(String file) {
 		logger.trace("Reading file [{}]...", file);

@@ -32,10 +32,12 @@ import java.util.List;
 public class TypeFinder extends SettingsFinder {
     private static final Logger logger = LoggerFactory.getLogger(TypeFinder.class);
 
-
     /**
      * Find all types within an index in default classpath dir
      * @param index index name
+     * @return The list of types
+     * @throws IOException if the connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findTypes(String index) throws IOException, URISyntaxException {
         return findTypes(Defaults.ConfigDir, index);
@@ -45,6 +47,9 @@ public class TypeFinder extends SettingsFinder {
      * Find all types within an index
      * @param root dir within the classpath
      * @param index index name
+     * @return The list of types
+     * @throws IOException if the connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findTypes(String root, String index) throws IOException, URISyntaxException {
         if (root == null) {

@@ -47,7 +47,7 @@ public class IndexElasticsearchUpdater {
 	 * @param root dir within the classpath
 	 * @param index Index name
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	public static void createIndex(Client client, String root, String index, boolean force) throws Exception {
@@ -60,7 +60,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	public static void createIndex(Client client, String index, boolean force) throws Exception {
@@ -74,7 +74,7 @@ public class IndexElasticsearchUpdater {
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	public static void createIndexWithSettings(Client client, String index, String settings, boolean force) throws Exception {
@@ -94,7 +94,7 @@ public class IndexElasticsearchUpdater {
 	 * Remove a new index in Elasticsearch
 	 * @param client Elasticsearch client
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	private static void removeIndexInElasticsearch(Client client, String index) throws Exception {
@@ -117,7 +117,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	private static void createIndexWithSettingsInElasticsearch(Client client, String index, String settings) throws Exception {
@@ -148,7 +148,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no update settings
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	private static void updateIndexWithSettingsInElasticsearch(Client client, String index, String settings) throws Exception {
@@ -168,12 +168,12 @@ public class IndexElasticsearchUpdater {
 
 	/**
 	 * Check if an index already exists
+	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @return true if index already exists
-	 * @throws Exception
 	 */
 	@Deprecated
-	public static boolean isIndexExist(Client client, String index) throws Exception {
+	public static boolean isIndexExist(Client client, String index) {
 		return client.admin().indices().prepareExists(index).get().isExists();
 	}
 
@@ -182,7 +182,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	public static void updateSettings(Client client, String root, String index) throws Exception {
@@ -194,7 +194,7 @@ public class IndexElasticsearchUpdater {
 	 * Update index settings in Elasticsearch. Read also _update_settings.json if exists in default classpath dir.
 	 * @param client Elasticsearch client
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
 	public static void updateSettings(Client client, String index) throws Exception {
@@ -208,7 +208,7 @@ public class IndexElasticsearchUpdater {
 	 * @param root dir within the classpath
 	 * @param index Index name
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void createIndex(RestClient client, String root, String index, boolean force) throws Exception {
 		String settings = IndexSettingsReader.readSettings(root, index);
@@ -220,7 +220,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void createIndex(RestClient client, String index, boolean force) throws Exception {
 		String settings = IndexSettingsReader.readSettings(index);
@@ -233,7 +233,7 @@ public class IndexElasticsearchUpdater {
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
 	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void createIndexWithSettings(RestClient client, String index, String settings, boolean force) throws Exception {
 		if (force && isIndexExist(client, index)) {
@@ -252,7 +252,7 @@ public class IndexElasticsearchUpdater {
 	 * Remove a new index in Elasticsearch
 	 * @param client Elasticsearch client
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	private static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
@@ -274,7 +274,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	private static void createIndexWithSettingsInElasticsearch(RestClient client, String index, String settings) throws Exception {
 		logger.trace("createIndex([{}])", index);
@@ -304,7 +304,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no update settings
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	private static void updateIndexWithSettingsInElasticsearch(RestClient client, String index, String settings) throws Exception {
 		logger.trace("updateIndex([{}])", index);
@@ -324,9 +324,10 @@ public class IndexElasticsearchUpdater {
 
 	/**
 	 * Check if an index already exists
+	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @return true if index already exists
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static boolean isIndexExist(RestClient client, String index) throws Exception {
 		Response response = client.performRequest("HEAD", "/" + index);
@@ -338,7 +339,7 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateSettings(RestClient client, String root, String index) throws Exception {
 		String settings = IndexSettingsReader.readUpdateSettings(root, index);
@@ -349,7 +350,7 @@ public class IndexElasticsearchUpdater {
 	 * Update index settings in Elasticsearch. Read also _update_settings.json if exists in default classpath dir.
 	 * @param client Elasticsearch client
 	 * @param index Index name
-	 * @throws Exception
+	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateSettings(RestClient client, String index) throws Exception {
 		String settings = IndexSettingsReader.readUpdateSettings(index);

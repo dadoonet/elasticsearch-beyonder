@@ -39,6 +39,8 @@ public class TypeSettingsReader extends SettingsReader {
 	 * @param root dir within the classpath
 	 * @param index index name
 	 * @param type type name (.json will be appended)
+	 * @return The mapping
+	 * @throws IOException if the connection with elasticsearch is failing
 	 */
 	public static String readMapping(String root, String index, String type) throws IOException {
 		if (root == null) {
@@ -52,6 +54,8 @@ public class TypeSettingsReader extends SettingsReader {
 	 * Read a mapping in default classpath dir
 	 * @param index index name
 	 * @param type type name (.json will be appended)
+	 * @return The mapping
+	 * @throws IOException if the connection with elasticsearch is failing
 	 */
 	public static String readMapping(String index, String type) throws IOException {
 		return readMapping(Defaults.ConfigDir, index, type);

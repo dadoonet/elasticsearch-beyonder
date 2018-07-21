@@ -34,6 +34,9 @@ public class TemplateFinder extends SettingsFinder {
 
     /**
      * Find all templates in default classpath dir
+     * @return a list of templates
+     * @throws IOException if connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findTemplates() throws IOException, URISyntaxException {
         return findTemplates(fromClasspath(Defaults.ConfigDir));
@@ -42,6 +45,9 @@ public class TemplateFinder extends SettingsFinder {
     /**
      * Find all templates
      * @param root dir within the classpath
+     * @return a list of templates
+     * @throws IOException if connection with elasticsearch is failing
+     * @throws URISyntaxException this should not happen
      */
     public static List<String> findTemplates(String root) throws IOException, URISyntaxException {
         if (root == null) {

@@ -40,6 +40,8 @@ public class TemplateSettingsReader extends SettingsReader {
 	 * Read a template
 	 * @param root dir within the classpath
 	 * @param template template name (.json will be appended)
+	 * @return The template content
+	 * @throws IOException if the connection with elasticsearch is failing
 	 */
 	public static String readTemplate(String root, String template) throws IOException {
 		if (root == null) {
@@ -52,6 +54,8 @@ public class TemplateSettingsReader extends SettingsReader {
 	/**
 	 * Read a template in default classpath dir
 	 * @param template template name (.json will be appended)
+	 * @return The template content
+	 * @throws IOException if the connection with elasticsearch is failing
 	 */
 	public static String readTemplate(String template) throws IOException {
 		return readTemplate(fromClasspath(Defaults.ConfigDir), template);

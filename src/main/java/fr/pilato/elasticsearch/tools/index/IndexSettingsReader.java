@@ -41,6 +41,7 @@ public class IndexSettingsReader extends SettingsReader {
 	 * @param root dir within the classpath
 	 * @param index index name
 	 * @param jsonFile json file to read
+	 * @return Settings
 	 */
 	public static String readSettings(String root, String index, String jsonFile) {
 		logger.trace("Reading [{}] for [{}] in [{}]...", jsonFile, index, root);
@@ -52,7 +53,9 @@ public class IndexSettingsReader extends SettingsReader {
 	 * Read index settings
 	 * @param root dir within the classpath
 	 * @param index index name
-	 */
+     * @return Settings
+     * @throws IOException if connection with elasticsearch is failing
+     */
 	public static String readSettings(String root, String index) throws IOException {
 		if (root == null) {
 			return readSettings(index);
@@ -63,6 +66,8 @@ public class IndexSettingsReader extends SettingsReader {
 	/**
 	 * Read index settings in default classpath dir
 	 * @param index index name
+     * @return Settings
+     * @throws IOException if connection with elasticsearch is failing
 	 */
 	public static String readSettings(String index) throws IOException {
 		return readSettings(fromClasspath(Defaults.ConfigDir), index);
@@ -72,6 +77,7 @@ public class IndexSettingsReader extends SettingsReader {
 	 * Read index settings
 	 * @param root dir within the classpath
 	 * @param index index name
+     * @return Update Settings
 	 */
 	public static String readUpdateSettings(String root, String index) {
 		return readSettings(root, index, Defaults.UpdateIndexSettingsFileName);
@@ -80,8 +86,9 @@ public class IndexSettingsReader extends SettingsReader {
 	/**
 	 * Read index settings in default classpath dir
 	 * @param index index name
-	 */
-	public static String readUpdateSettings(String index) throws IOException {
+     * @return Update Settings
+     */
+	public static String readUpdateSettings(String index) {
 		return readUpdateSettings(fromClasspath(Defaults.ConfigDir), index);
 	}
 }
