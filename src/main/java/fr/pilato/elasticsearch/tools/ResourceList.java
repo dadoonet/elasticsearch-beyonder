@@ -82,13 +82,18 @@ public class ResourceList {
             /* A JAR path */
             logger.trace("found a jar file resource: {}", dirURL);
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+            String prefix = dirURL.getPath().substring(5 + jarPath.length())
+                        // remove any ! that a class loader (e.g. from spring boot) could have added
+                        .replaceAll("!", "")
+                        // remove leading slash that is not part of the JarEntry::getName
+                        .substring(1);
             Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
             try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"))) {
                 Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
                 while(entries.hasMoreElements()) {
                     String name = entries.nextElement().getName();
-                    if (name.startsWith(root)) { //filter according to the path
-                        String entry = name.substring(root.length());
+                    if (name.startsWith(prefix)) { //filter according to the path
+                        String entry = name.substring(prefix.length());
                         int checkSubdir = entry.indexOf("/");
                         if (checkSubdir >= 0) {
                             // if it is a subdirectory, we just return the directory name
