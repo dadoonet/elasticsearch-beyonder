@@ -5,7 +5,7 @@
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
     <packaging>jar</packaging>
-    <version>6.4-SNAPSHOT</version>
+    <version>6.5-SNAPSHOT</version>
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -22,24 +22,22 @@ when an elasticsearch client starts.
     </licenses>
 
     <properties>
-        <elasticsearch.version>6.3.1</elasticsearch.version>
+        <elasticsearch.version>6.5.0</elasticsearch.version>
         <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
         <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>2.11.0</log4j.version>
         <commons.io.version>2.6</commons.io.version>
-        <jackson.version>2.9.6</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
 
-        <!-- For integration tests -->
-        <elasticsearch.groupid>org.elasticsearch.distribution.zip</elasticsearch.groupid>
+        <!-- For integration tests using Docker or external cluster -->
+        <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
+        <integ.elasticsearch.version>${elasticsearch.version}</integ.elasticsearch.version>
+        <tests.cluster.rest.port>9400</tests.cluster.rest.port>
+        <tests.cluster.transport.port>9500</tests.cluster.transport.port>
+
         <skipTests>false</skipTests>
         <skipUnitTests>${skipTests}</skipUnitTests>
         <skipIntegTests>${skipTests}</skipIntegTests>
-        <tests.cluster.rest.port>9400</tests.cluster.rest.port>
-        <tests.cluster.transport.port>9500</tests.cluster.transport.port>
-        <elasticsearch.security.artifact>x-pack</elasticsearch.security.artifact>
-        <elasticsearch.security.version>${test.elasticsearch.version}</elasticsearch.security.version>
-        <integ.security.username>elastic</integ.security.username>
-        <integ.security.password>changeme</integ.security.password>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -94,6 +92,14 @@ when an elasticsearch client starts.
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
+
+        <repository>
+            <id>elastic-lucene-snapshots</id>
+            <name>Elastic Lucene Snapshots</name>
+            <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/6d9c714052</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -108,13 +114,6 @@ when an elasticsearch client starts.
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
-            <version>${elasticsearch.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <!-- add the x-pack jar as a dependency -->
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>x-pack-transport</artifactId>
             <version>${elasticsearch.version}</version>
             <optional>true</optional>
         </dependency>
@@ -288,44 +287,55 @@ when an elasticsearch client starts.
                     </execution>
                 </executions>
             </plugin>
+            <!-- For IT using Docker -->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.26.1</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <alias>elasticsearch-it</alias>
+                            <name>dadoonet/docker-elasticsearch:${project.version}</name>
+                            <build>
+                                <from>${integ.elasticsearch.image}:${integ.elasticsearch.version}</from>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>tests.cluster.rest.port:9200</port>
+                                    <port>tests.cluster.transport.port:9300</port>
+                                </ports>
+                                <wait>
+                                    <http>
+                                        <url>http://localhost:${tests.cluster.rest.port}/</url>
+                                        <status>200..499</status>
+                                    </http>
+                                    <time>60000</time>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-elasticsearch</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>stop</goal>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop-elasticsearch</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.6</version>
-                    <configuration>
-                        <flavor>oss</flavor>
-                        <version>${test.elasticsearch.version}</version>
-                        <httpPort>${tests.cluster.rest.port}</httpPort>
-                        <transportPort>${tests.cluster.transport.port}</transportPort>
-                        <autoCreateIndex>true</autoCreateIndex>
-                        <skip>${skipIntegTests}</skip>
-                    </configuration>
-                    <executions>
-                        <!--
-                            The elasticsearch maven plugin goals are by default bound to the
-                            pre-integration-test and post-integration-test phases
-                        -->
-                        <execution>
-                            <id>start-elasticsearch</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>runforked</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>stop-elasticsearch</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <developers>
@@ -339,52 +349,6 @@ when an elasticsearch client starts.
     </developers>
 
     <profiles>
-        <profile>
-            <id>es-5x</id>
-            <properties>
-                <test.elasticsearch.version>5.6.10</test.elasticsearch.version>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.alexcojocaru</groupId>
-                        <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <version>5.11</version>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>es-xpack</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.alexcojocaru</groupId>
-                        <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <flavour>default</flavour>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>es-6x</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.alexcojocaru</groupId>
-                        <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <flavour>oss</flavour>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>release</id>
             <build>

@@ -19,17 +19,14 @@
 
 package fr.pilato.elasticsearch.tools.type;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
 
 /**
  * Manage elasticsearch types (mappings)
@@ -133,10 +130,10 @@ public class TypeElasticsearchUpdater {
 
         if (mapping != null) {
             // Create type and mapping
-            PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
+            AcknowledgedResponse response = client.admin().indices().preparePutMapping(index)
                     .setType(type)
                     .setSource(mapping, XContentType.JSON).get();
-            if (!mappingResponse.isAcknowledged()) {
+            if (!response.isAcknowledged()) {
                 logger.warn("Could not create type [{}/{}]", index, type);
                 throw new Exception("Could not create type ["+index+"/"+type+"].");
             }
@@ -214,7 +211,7 @@ public class TypeElasticsearchUpdater {
      * @throws Exception if the elasticsearch call is failing
      */
     public static boolean isTypeExist(RestClient client, String index, String type) throws Exception {
-        Response response = client.performRequest("HEAD", "/" + index + "/_mapping/" + type);
+        Response response = client.performRequest(new Request("HEAD", "/" + index + "/_mapping/" + type));
         return response.getStatusLine().getStatusCode() == 200;
     }
 
@@ -236,8 +233,9 @@ public class TypeElasticsearchUpdater {
 
         if (mapping != null) {
             // Create type and mapping
-            StringEntity entity = new StringEntity(mapping, ContentType.APPLICATION_JSON);
-            Response response = client.performRequest("PUT", "/" + index + "/_mapping/" + type, Collections.<String, String>emptyMap(), entity);
+            Request request = new Request("PUT", "/" + index + "/_mapping/" + type);
+            request.setJsonEntity(mapping);
+            Response response = client.performRequest(request);
             if (response.getStatusLine().getStatusCode() != 200) {
                 logger.warn("Could not create type [{}/{}]", index, type);
                 throw new Exception("Could not create type ["+index+"/"+type+"].");

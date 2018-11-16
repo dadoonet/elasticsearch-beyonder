@@ -19,19 +19,16 @@
 
 package fr.pilato.elasticsearch.tools.index;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
 
 /**
  * Manage elasticsearch index settings
@@ -103,8 +100,8 @@ public class IndexElasticsearchUpdater {
 		assert client != null;
 		assert index != null;
 
-		DeleteIndexResponse deleteIndexResponse = client.admin().indices().prepareDelete(index).get();
-		if (!deleteIndexResponse.isAcknowledged()) {
+        AcknowledgedResponse response = client.admin().indices().prepareDelete(index).get();
+		if (!response.isAcknowledged()) {
 			logger.warn("Could not delete index [{}]", index);
 			throw new Exception("Could not delete index ["+index+"].");
 		}
@@ -131,7 +128,7 @@ public class IndexElasticsearchUpdater {
 		// If there are settings for this index, we use it. If not, using Elasticsearch defaults.
 		if (settings != null) {
 			logger.trace("Found settings for index [{}]: [{}]", index, settings);
-			cirb.setSettings(settings, XContentType.JSON);
+			cirb.setSource(settings, XContentType.JSON);
 		}
 
 		CreateIndexResponse createIndexResponse = cirb.execute().actionGet();
@@ -260,7 +257,7 @@ public class IndexElasticsearchUpdater {
 		assert client != null;
 		assert index != null;
 
-		Response response = client.performRequest("DELETE", "/" + index);
+		Response response = client.performRequest(new Request("DELETE", "/" + index));
 		if (response.getStatusLine().getStatusCode() != 200) {
 			logger.warn("Could not delete index [{}]", index);
 			throw new Exception("Could not delete index ["+index+"].");
@@ -282,15 +279,15 @@ public class IndexElasticsearchUpdater {
 		assert client != null;
 		assert index != null;
 
-		StringEntity entity = null;
+        Request request = new Request("PUT", "/" + index);
 
 		// If there are settings for this index, we use it. If not, using Elasticsearch defaults.
 		if (settings != null) {
 			logger.trace("Found settings for index [{}]: [{}]", index, settings);
-			entity = new StringEntity(settings, ContentType.APPLICATION_JSON);
+			request.setJsonEntity(settings);
 		}
 
-		Response response = client.performRequest("PUT", "/" + index, Collections.<String, String>emptyMap(), entity);
+        Response response = client.performRequest(request);
 		if (response.getStatusLine().getStatusCode() != 200) {
 			logger.warn("Could not create index [{}]", index);
 			throw new Exception("Could not create index ["+index+"].");
@@ -312,11 +309,13 @@ public class IndexElasticsearchUpdater {
 		assert client != null;
 		assert index != null;
 
+
 		if (settings != null) {
 			logger.trace("Found update settings for index [{}]: [{}]", index, settings);
 			logger.debug("updating settings for index [{}]", index);
-			StringEntity entity = new StringEntity(settings, ContentType.APPLICATION_JSON);
-			client.performRequest("PUT", "/" + index + "/_settings", Collections.<String, String>emptyMap(), entity);
+            Request request = new Request("PUT", "/" + index + "/_settings");
+            request.setJsonEntity(settings);
+			client.performRequest(request);
 		}
 
 		logger.trace("/updateIndex([{}])", index);
@@ -330,7 +329,7 @@ public class IndexElasticsearchUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static boolean isIndexExist(RestClient client, String index) throws Exception {
-		Response response = client.performRequest("HEAD", "/" + index);
+		Response response = client.performRequest(new Request("HEAD", "/" + index));
 		return response.getStatusLine().getStatusCode() == 200;
 	}
 

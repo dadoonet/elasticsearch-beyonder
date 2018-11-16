@@ -11,7 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 6.3-SNAPSHOT            | 5.x, 6.x      |              |
+| 6.5-SNAPSHOT            | 6.x           |              |
 | 5.1                     | 5.x, 6.x      |  2017-07-12  |
 | 5.0                     | 5.x, 6.x      |  2017-07-11  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
@@ -172,7 +172,7 @@ For example, create the following file `src/main/resources/elasticsearch/twitter
 
 ```javascript
 {
-  "index" : {
+  "settings" : {
     "number_of_shards" : 3,
     "number_of_replicas" : 2
   }
@@ -265,27 +265,12 @@ mvn clean install -DskipUnitTests
 
 ## Integration Tests
 
-Integration tests are launching an elasticsearch server thank to [elasticsearch-maven-plugin](https://github.com/alexcojocaru/elasticsearch-maven-plugin/)
-which makes that super easy to have!
-
-Tests are ran by default on the 5.x series but you can choose to run them against another version by using the following
-maven profiles:
-
-* `es-6x`: runs against an elasticsearch 6.x cluster
-* `es-5x` (default): runs against an elasticsearch 5.x cluster
-
+Integration tests are launching a Docker instance. So you need to have Docker installed.
 
 If you want to disable running integration tests, use `skipIntegTests` option:
 
 ```sh
 mvn clean install -DskipIntegTests
-```
-
-Integration tests can be ran against a cluster secured by [x-pack](https://www.elastic.co/downloads/x-pack).
-You have to activate as well the `es-xpack` profile (not supported yet):
-
-```sh
-mvn clean install -Pes-xpack
 ```
 
 If you wish to run integration tests against a cluster which is already running externally, you can configure the
@@ -297,8 +282,6 @@ following settings to locate your cluster:
 | `tests.cluster.scheme`        | `http`        |
 | `tests.cluster.rest.port`     | `9400`        |
 | `tests.cluster.transport.port`| `9500`        |
-| `tests.cluster.user`          | `elastic`     |
-| `tests.cluster.pass`          | `changeme`    |
 
 For example:
 
@@ -317,6 +300,8 @@ mvn clean install \
     -Dtests.cluster.user=elastic \
     -Dtests.cluster.pass=GENERATEDPASSWORD
 ```
+
+Only Rest Tests will pass in that case.
 
 License
 =======

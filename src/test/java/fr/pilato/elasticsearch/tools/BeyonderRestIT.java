@@ -23,6 +23,7 @@ import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.junit.AfterClass;
@@ -67,7 +68,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Before
     public void cleanCluster() {
         try {
-            client.performRequest("DELETE", "/_all");
+            client.performRequest(new Request("DELETE", "/_all"));
         } catch (IOException e) {
             assumeNoException(e);
         }
@@ -92,7 +93,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @BeforeClass
     public static void setTestBehavior() {
         try {
-            Response response = client.performRequest("GET", "/");
+            Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> responseAsMap = asMap(response);
             logger.trace("get server response: {}", responseAsMap);
             Object oVersion = extractFromPath(responseAsMap, "version").get("number");
@@ -153,7 +154,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     public void testAliases() throws Exception {
         IndexElasticsearchUpdater.createIndex(client, "test_aliases", true);
         AliasElasticsearchUpdater.createAlias(client, "foo", "test_aliases");
-        Map<String, Object> response = asMap(client.performRequest("GET", "/_alias/foo"));
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/_alias/foo")));
         assertThat(response, hasKey("test_aliases"));
     }
 
@@ -176,7 +177,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     }
 
     private String getMapping(String indexName) throws IOException {
-        HttpEntity response = client.performRequest("GET", indexName + "/_mapping").getEntity();
+        HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();
         ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength()));
         IOUtils.copy(response.getContent(), out);
         return new String(out.toByteArray());

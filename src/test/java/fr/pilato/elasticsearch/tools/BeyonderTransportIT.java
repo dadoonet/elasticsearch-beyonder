@@ -27,7 +27,6 @@ import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,20 +51,10 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
 
     @BeforeClass
     public static void startElasticsearch() throws IOException {
-        // This is going to initialize our Rest Client if not initialized yet and will check
-        // if security is activated on this cluster
+        // This is going to initialize our Rest Client if not initialized yet
         restClient();
-        if (securityInstalled) {
-            client = new PreBuiltXPackTransportClient(
-                    Settings.builder()
-                            .put("client.transport.ignore_cluster_name", true)
-                            .put("xpack.security.user", testClusterUser + ":" + testClusterPass)
-                            .build()
-            ).addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
-        } else {
-            client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
-                    .addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
-        }
+        client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
+                .addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
     }
 
     @AfterClass
