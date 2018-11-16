@@ -11,6 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
+| 7.0-SNAPSHOT            | 7.x           |              |
 | 6.5-SNAPSHOT            | 6.x           |              |
 | 5.1                     | 5.x, 6.x      |  2017-07-12  |
 | 5.0                     | 5.x, 6.x      |  2017-07-11  |
@@ -24,7 +25,8 @@ Versions
 Documentation
 =============
 
-* For 6.x elasticsearch versions, you are reading the latest documentation.
+* For 7.x elasticsearch versions, you are reading the latest documentation.
+* For 6.x elasticsearch versions, look at [master branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/master).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
 * For 2.x elasticsearch versions, look at [es-2.1 branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-2.1).
 
