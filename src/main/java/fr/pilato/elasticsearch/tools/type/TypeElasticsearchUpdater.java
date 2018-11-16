@@ -23,6 +23,7 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class TypeElasticsearchUpdater {
     @Deprecated
     public static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge)
             throws Exception {
-        boolean mappingExist = isTypeExist(client, index, type);
+        boolean mappingExist = isTypeExist(client, index);
         if (merge || !mappingExist) {
             if (mappingExist) {
                 logger.debug("Updating type [{}]/[{}].", index, type);
@@ -102,13 +103,11 @@ public class TypeElasticsearchUpdater {
      * Check if a type already exists
      * @param client Elasticsearch client
      * @param index Index name
-     * @param type Type name
-     * @return true if type already exists
-     * @throws Exception if the elasticsearch call is failing
+     * @return true if a mapping already exists
      */
     @Deprecated
-    public static boolean isTypeExist(Client client, String index, String type) throws Exception {
-        return !client.admin().indices().prepareGetMappings(index).setTypes(type).get().getMappings().isEmpty();
+    public static boolean isTypeExist(Client client, String index) {
+        return !client.admin().indices().prepareGetMappings(index).get().getMappings().isEmpty();
     }
 
     /**
@@ -211,8 +210,15 @@ public class TypeElasticsearchUpdater {
      * @throws Exception if the elasticsearch call is failing
      */
     public static boolean isTypeExist(RestClient client, String index, String type) throws Exception {
-        Response response = client.performRequest(new Request("HEAD", "/" + index + "/_mapping/" + type));
-        return response.getStatusLine().getStatusCode() == 200;
+        try {
+            client.performRequest(new Request("GET", "/" + index + "/_mapping/" + type));
+            return true;
+        } catch (ResponseException e) {
+            if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+                return false;
+            }
+            throw e;
+        }
     }
 
     /**

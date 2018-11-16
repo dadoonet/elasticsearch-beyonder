@@ -145,7 +145,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
             for (int iIndex = 0; iIndex < indices.size(); iIndex++) {
                 if (types != null && types.get(iIndex) != null) {
                         for (String type : types.get(iIndex)) {
-                        boolean exists = isTypeExist(client, indices.get(iIndex), type);
+                        boolean exists = isTypeExist(client, indices.get(iIndex));
                         assertThat("type " + type + " should exist in index " + indices.get(iIndex),
                                 exists, is(true));
                     }
