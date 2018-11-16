@@ -19,10 +19,9 @@
 
 package fr.pilato.elasticsearch.tools.template;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -30,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * Manage elasticsearch templates
@@ -110,7 +108,7 @@ public class TemplateElasticsearchUpdater {
 		assert client != null;
 		assert template != null;
 
-		PutIndexTemplateResponse response = client.admin().indices()
+        AcknowledgedResponse response = client.admin().indices()
 				.preparePutTemplate(template)
 				.setSource(json.getBytes(), XContentType.JSON)
 				.get();
@@ -210,9 +208,9 @@ public class TemplateElasticsearchUpdater {
 		assert client != null;
 		assert template != null;
 
-		Response response = client.performRequest("PUT", "/_template/" + template, Collections.<String, String>emptyMap(),
-				new StringEntity(json, ContentType.APPLICATION_JSON));
-
+		Request request = new Request("PUT", "/_template/" + template);
+		request.setJsonEntity(json);
+		Response response = client.performRequest(request);
 
 		if (response.getStatusLine().getStatusCode() != 200) {
 			logger.warn("Could not create template [{}]", template);
@@ -230,7 +228,7 @@ public class TemplateElasticsearchUpdater {
      * @throws IOException if something goes wrong
 	 */
 	public static boolean isTemplateExist(RestClient client, String template) throws IOException {
-		Response response = client.performRequest("HEAD", "/_template/" + template);
+		Response response = client.performRequest(new Request("HEAD", "/_template/" + template));
 		return response.getStatusLine().getStatusCode() == 200;
 	}
 
@@ -242,7 +240,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	public static void removeTemplate(RestClient client, String template) throws Exception {
 		logger.trace("removeTemplate({})", template);
-		client.performRequest("DELETE", "/_template/" + template);
+		client.performRequest(new Request("DELETE", "/_template/" + template));
 		logger.trace("/removeTemplate({})", template);
 	}
 

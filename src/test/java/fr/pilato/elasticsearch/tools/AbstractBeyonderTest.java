@@ -20,25 +20,22 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assume.assumeThat;
@@ -50,8 +47,6 @@ public abstract class AbstractBeyonderTest {
 
     private final static String DEFAULT_TEST_CLUSTER_HOST = "127.0.0.1";
     private final static String DEFAULT_TEST_CLUSTER_SCHEME = "http";
-    private final static String DEFAULT_USERNAME = "elastic";
-    private final static String DEFAULT_PASSWORD = "changeme";
     private final static Integer DEFAULT_TEST_CLUSTER_REST_PORT = 9400;
     private final static Integer DEFAULT_TEST_CLUSTER_TRANSPORT_PORT = 9500;
 
@@ -59,15 +54,11 @@ public abstract class AbstractBeyonderTest {
     private final static String testClusterScheme = System.getProperty("tests.cluster.scheme", DEFAULT_TEST_CLUSTER_SCHEME);
     private final static int testClusterRestPort = Integer.parseInt(System.getProperty("tests.cluster.rest.port", DEFAULT_TEST_CLUSTER_REST_PORT.toString()));
     final static int testClusterTransportPort = Integer.parseInt(System.getProperty("tests.cluster.transport.port", DEFAULT_TEST_CLUSTER_TRANSPORT_PORT.toString()));
-    final static String testClusterUser = System.getProperty("tests.cluster.user", DEFAULT_USERNAME);
-    final static String testClusterPass = System.getProperty("tests.cluster.pass", DEFAULT_PASSWORD);
 
     abstract protected void testBeyonder(String root,
                                 List<String> indices,
                                 List<List<String>> types,
                                 List<String> templates) throws Exception;
-
-    static boolean securityInstalled;
 
     private static RestClient client;
 
@@ -81,53 +72,21 @@ public abstract class AbstractBeyonderTest {
     private static void startRestClient() throws IOException {
         if (client == null) {
             client = RestClient.builder(new HttpHost(testClusterHost, testClusterRestPort, testClusterScheme)).build();
-
-            securityInstalled = testClusterRunning(false);
-            if (securityInstalled) {
-                // We have a secured cluster. So we need to create a secured client
-                // But first we need to close the previous client we built
-                if (client != null) {
-                    client.close();
-                }
-
-                final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(AuthScope.ANY,
-                        new UsernamePasswordCredentials(testClusterUser, testClusterPass));
-
-                client = RestClient.builder(new HttpHost(testClusterHost, testClusterRestPort, testClusterScheme))
-                        .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-                            @Override
-                            public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-                                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                            }
-                        })
-                        .build();
-                securityInstalled = testClusterRunning(true);
-            }
+            testClusterRunning();
         }
     }
 
-    private static boolean testClusterRunning(boolean withSecurity) throws IOException {
+    private static boolean testClusterRunning() throws IOException {
         try {
-            Response response = client.performRequest("GET", "/");
+            Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
-
-            logger.info("Starting integration tests against an external cluster running elasticsearch [{}] with {}",
-                    asMap.get("number"), withSecurity ? "security" : "no security" );
-            return withSecurity;
+            logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
+            return false;
         } catch (ConnectException e) {
             // If we have an exception here, let's ignore the test
             logger.warn("Integration tests are skipped: [{}]", e.getMessage());
             assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-            return withSecurity;
-        } catch (ResponseException e) {
-            if (e.getResponse().getStatusLine().getStatusCode() == 401) {
-                logger.debug("The cluster is secured. So we need to build a client with security", e);
-                return true;
-            } else {
-                logger.error("Full error is", e);
-                throw e;
-            }
+            return false;
         } catch (IOException e) {
             logger.error("Full error is", e);
             throw e;
@@ -140,8 +99,8 @@ public abstract class AbstractBeyonderTest {
     public void testDefaultDir() throws Exception {
         // Default dir es
         testBeyonder(null,
-                asList("twitter"),
-                asList(asList("tweet")),
+                singletonList("twitter"),
+                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -149,18 +108,8 @@ public abstract class AbstractBeyonderTest {
     public void testOneIndexOneType() throws Exception {
         // Single index/single type
         testBeyonder("models/oneindexonetype",
-                asList("twitter"),
-                asList(asList("tweet")),
-                null);
-    }
-
-    @Test
-    public void testTwoIndicesTwoTypesOneType() throws Exception {
-        assumeTrue("Skipping test as current version does not support multiple types.", supportsMultipleTypes);
-        // 2 indices: 2 types and 1 type
-        testBeyonder("models/twoindicestwotypesonetype",
-                asList("rss", "twitter"),
-                asList(asList("doc1", "doc2"), asList("tweet")),
+                singletonList("twitter"),
+                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -168,8 +117,8 @@ public abstract class AbstractBeyonderTest {
     public void testSettingsAnalyzer() throws Exception {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
-                asList("twitter"),
-                asList(asList("tweet")),
+                singletonList("twitter"),
+                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -177,8 +126,8 @@ public abstract class AbstractBeyonderTest {
     public void testOneIndexNoType() throws Exception {
         // 1 index and no type
         testBeyonder("models/oneindexnotype",
-                asList("twitter"),
-                asList((List<String>) null),
+                singletonList("twitter"),
+                singletonList(null),
                 null);
     }
 
@@ -188,19 +137,19 @@ public abstract class AbstractBeyonderTest {
         testBeyonder("models/template",
                 null,
                 null,
-                asList("twitter_template"));
+                singletonList("twitter_template"));
     }
 
     @Test
     public void testUpdateSettings() throws Exception {
         // 1 _update_settings
         testBeyonder("models/update-settings/step1",
-                asList("twitter"),
-                asList(asList("tweet")),
+                singletonList("twitter"),
+                singletonList(singletonList("tweet")),
                 null);
         testBeyonder("models/update-settings/step2",
-                asList("twitter"),
-                asList((List<String>) null),
+                singletonList("twitter"),
+                singletonList(null),
                 null);
     }
 

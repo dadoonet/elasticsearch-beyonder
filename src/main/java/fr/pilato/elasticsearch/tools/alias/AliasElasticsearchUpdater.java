@@ -19,16 +19,13 @@
 
 package fr.pilato.elasticsearch.tools.alias;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
 
 public class AliasElasticsearchUpdater {
 
@@ -44,7 +41,7 @@ public class AliasElasticsearchUpdater {
     @Deprecated
     public static void createAlias(Client client, String alias, String index) throws Exception {
         logger.trace("createAlias({},{})", alias, index);
-        IndicesAliasesResponse response = client.admin().indices().prepareAliases().addAlias(index, alias).get();
+        AcknowledgedResponse response = client.admin().indices().prepareAliases().addAlias(index, alias).get();
         if (!response.isAcknowledged()) throw new Exception("Could not define alias [" + alias + "] for index [" + index + "].");
         logger.trace("/createAlias({},{})", alias, index);
     }
@@ -63,11 +60,9 @@ public class AliasElasticsearchUpdater {
         assert alias != null;
         assert index != null;
 
-        String json = "{\"actions\":[{\"add\":{\"index\":\"" + index +"\",\"alias\":\"" + alias +"\"}}]}";
-
-        Response response = client.performRequest("POST", "/_aliases/", Collections.<String, String>emptyMap(),
-                new StringEntity(json, ContentType.APPLICATION_JSON));
-
+        Request request = new Request("POST", "/_aliases/");
+        request.setJsonEntity("{\"actions\":[{\"add\":{\"index\":\"" + index +"\",\"alias\":\"" + alias +"\"}}]}");
+        Response response = client.performRequest(request);
 
         if (response.getStatusLine().getStatusCode() != 200) {
             logger.warn("Could not create alias [{}] on index [{}]", alias, index);
