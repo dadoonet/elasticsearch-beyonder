@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class TypeFinder extends SettingsFinder {
     private static final Logger logger = LoggerFactory.getLogger(TypeFinder.class);
 

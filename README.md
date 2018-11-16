@@ -183,8 +183,11 @@ By default, Beyonder will not overwrite an index if it already exists.
 This can be overridden by setting `force` to `true` in the expanded factory method
 `ElasticsearchBeyonder.start()`.
 
-Managing types
---------------
+Managing types (deprecated)
+---------------------------
+
+This feature will be removed in the next future. Define your mapping within the index settings (see above)
+or using a template (see below).
 
 If you define a file named `elasticsearch/twitter/tweet.json`, it will be automatically applied as the mapping for
 the `tweet` type in the `twitter` index.

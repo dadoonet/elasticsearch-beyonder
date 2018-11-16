@@ -31,25 +31,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Manage elasticsearch types (mappings)
  * @author David Pilato
+ * @deprecated This class should not be used anymore as we recommend using direct index settings or index templates
  */
+@Deprecated
 public class TypeElasticsearchUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(TypeElasticsearchUpdater.class);
-
-
-    /**
-     * Create a new type in Elasticsearch
-     * @param client Elasticsearch client
-     * @param index Index name
-     * @param type Type name
-     * @param merge Try to merge mapping if type already exists
-     * @throws Exception if the elasticsearch call is failing
-     */
-    @Deprecated
-    public static void createMapping(Client client, String index, String type, boolean merge) throws Exception {
-        String mapping = TypeSettingsReader.readMapping(index, type);
-        createMappingWithJson(client, index, type, mapping, merge);
-    }
 
     /**
      * Create a new type in Elasticsearch
@@ -77,7 +64,7 @@ public class TypeElasticsearchUpdater {
      * @throws Exception if the elasticsearch call is failing
      */
     @Deprecated
-    public static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge)
+    private static void createMappingWithJson(Client client, String index, String type, String mapping, boolean merge)
             throws Exception {
         boolean mappingExist = isTypeExist(client, index, type);
         if (merge || !mappingExist) {
@@ -147,25 +134,13 @@ public class TypeElasticsearchUpdater {
     /**
      * Create a new type in Elasticsearch
      * @param client Elasticsearch client
-     * @param index Index name
-     * @param type Type name
-     * @param merge Try to merge mapping if type already exists
-     * @throws Exception if the elasticsearch call is failing
-     */
-    public static void createMapping(RestClient client, String index, String type, boolean merge) throws Exception {
-        String mapping = TypeSettingsReader.readMapping(index, type);
-        createMappingWithJson(client, index, type, mapping, merge);
-    }
-
-    /**
-     * Create a new type in Elasticsearch
-     * @param client Elasticsearch client
      * @param root dir within the classpath
      * @param index Index name
      * @param type Type name
      * @param merge Try to merge mapping if type already exists
      * @throws Exception if the elasticsearch call is failing
      */
+    @Deprecated
     public static void createMapping(RestClient client, String root, String index, String type, boolean merge)
             throws Exception {
         String mapping = TypeSettingsReader.readMapping(root, index, type);
@@ -181,7 +156,7 @@ public class TypeElasticsearchUpdater {
      * @param merge Try to merge mapping if type already exists
      * @throws Exception if the elasticsearch call is failing
      */
-    public static void createMappingWithJson(RestClient client, String index, String type, String mapping, boolean merge)
+    private static void createMappingWithJson(RestClient client, String index, String type, String mapping, boolean merge)
             throws Exception {
         boolean mappingExist = isTypeExist(client, index, type);
         if (merge || !mappingExist) {
@@ -210,6 +185,7 @@ public class TypeElasticsearchUpdater {
      * @return true if type already exists
      * @throws Exception if the elasticsearch call is failing
      */
+    @Deprecated
     public static boolean isTypeExist(RestClient client, String index, String type) throws Exception {
         Response response = client.performRequest(new Request("HEAD", "/" + index + "/_mapping/" + type));
         return response.getStatusLine().getStatusCode() == 200;

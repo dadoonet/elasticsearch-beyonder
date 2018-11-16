@@ -30,6 +30,7 @@ import java.io.IOException;
  * Manage elasticsearch type (mapping) files
  * @author David Pilato
  */
+@Deprecated
 public class TypeSettingsReader extends SettingsReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(TypeSettingsReader.class);
@@ -47,6 +48,10 @@ public class TypeSettingsReader extends SettingsReader {
 			return readMapping(index, type);
 		}
 		String mappingFile = root + "/" + index + "/" + type + Defaults.JsonFileExtension;
+		logger.warn("Using mapping is now deprecated and will be removed in the future. " +
+				"Instead of defining your mapping in {}, use index settings: {}/{}/{} file " +
+                        "or define a template in {}/{}.",
+				mappingFile, root, index, Defaults.IndexSettingsFileName, root, Defaults.TemplateDir);
 		return readFileFromClasspath(mappingFile);
 	}
 
