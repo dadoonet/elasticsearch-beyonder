@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static fr.pilato.elasticsearch.tools.SettingsFinder.fromClasspath;
-
 /**
  * Manage elasticsearch template files
  * @author David Pilato
@@ -58,6 +56,6 @@ public class TemplateSettingsReader extends SettingsReader {
 	 * @throws IOException if the connection with elasticsearch is failing
 	 */
 	public static String readTemplate(String template) throws IOException {
-		return readTemplate(fromClasspath(Defaults.ConfigDir), template);
+		return readTemplate(Defaults.ConfigDir, template);
 	}
 }

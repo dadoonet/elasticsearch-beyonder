@@ -57,7 +57,6 @@ public abstract class AbstractBeyonderTest {
 
     abstract protected void testBeyonder(String root,
                                 List<String> indices,
-                                List<List<String>> types,
                                 List<String> templates) throws Exception;
 
     private static RestClient client;
@@ -100,7 +99,6 @@ public abstract class AbstractBeyonderTest {
         // Default dir es
         testBeyonder(null,
                 singletonList("twitter"),
-                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -109,7 +107,6 @@ public abstract class AbstractBeyonderTest {
         // Single index/single type
         testBeyonder("models/oneindexonetype",
                 singletonList("twitter"),
-                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -118,7 +115,6 @@ public abstract class AbstractBeyonderTest {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
                 singletonList("twitter"),
-                singletonList(singletonList("tweet")),
                 null);
     }
 
@@ -127,7 +123,6 @@ public abstract class AbstractBeyonderTest {
         // 1 index and no type
         testBeyonder("models/oneindexnotype",
                 singletonList("twitter"),
-                singletonList(null),
                 null);
     }
 
@@ -135,7 +130,6 @@ public abstract class AbstractBeyonderTest {
     public void testTemplate() throws Exception {
         // 1 template
         testBeyonder("models/template",
-                null,
                 null,
                 singletonList("twitter_template"));
     }
@@ -145,18 +139,15 @@ public abstract class AbstractBeyonderTest {
         // 1 _update_settings
         testBeyonder("models/update-settings/step1",
                 singletonList("twitter"),
-                singletonList(singletonList("tweet")),
                 null);
         testBeyonder("models/update-settings/step2",
                 singletonList("twitter"),
-                singletonList(null),
                 null);
     }
 
     @Test
     public void testWrongClasspathDir() throws Exception {
         testBeyonder("models/bad-classpath-7/doesnotexist",
-                null,
                 null,
                 null);
     }

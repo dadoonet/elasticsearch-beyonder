@@ -22,7 +22,6 @@ package fr.pilato.elasticsearch.tools;
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
-import fr.pilato.elasticsearch.tools.type.TypeFinder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -31,11 +30,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-import static fr.pilato.elasticsearch.tools.SettingsFinder.fromClasspath;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.createMapping;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -81,7 +78,7 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client) throws Exception {
-		start(client, fromClasspath(Defaults.ConfigDir));
+		start(client, Defaults.ConfigDir);
 	}
 
 	/**
@@ -117,13 +114,6 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
-
-			// create types
-			List<String> types = TypeFinder.findTypes(root, indexName);
-			for (String typeName : types) {
-				createMapping(client, root, indexName, typeName, merge);
-			}
-
 		}
 		logger.info("start done. Rock & roll!");
 	}
@@ -137,7 +127,7 @@ public class ElasticsearchBeyonder {
 	 */
 	@Deprecated
 	public static void start(Client client) throws Exception {
-		start(client, fromClasspath(Defaults.ConfigDir));
+		start(client, Defaults.ConfigDir);
 	}
 
 	/**
@@ -167,13 +157,6 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
-
-			// create types
-			List<String> types = TypeFinder.findTypes(root, indexName);
-			for (String typeName : types) {
-				createMapping(client, root, indexName, typeName, merge);
-			}
-
 		}
 		logger.info("start done. Rock & roll!");
 	}

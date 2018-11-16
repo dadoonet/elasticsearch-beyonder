@@ -1,22 +1,29 @@
 {
-	"index" : {
-		"analysis":{
-			"analyzer":{
-				"francais":{
-					"type":"custom",
-					"tokenizer":"standard",
-					"filter":["lowercase", "stop_francais", "fr_stemmer", "asciifolding", "elision"]
-				}
-			},
-			"filter":{
-				"stop_francais":{
-					"type":"stop",
-					"stopwords":["_french_"]
-				},
-				"fr_stemmer" : {
-					"type" : "stemmer",
-					"name" : "french"
-				}
+  "settings": {
+      "analysis":{
+          "analyzer":{
+              "francais":{
+                  "type":"custom",
+                  "tokenizer":"standard",
+                  "filter":["lowercase", "stop_francais", "fr_stemmer", "asciifolding", "elision"]
+              }
+          },
+          "filter":{
+              "stop_francais":{
+                  "type":"stop",
+                  "stopwords":["_french_"]
+              },
+              "fr_stemmer" : {
+                  "type" : "stemmer",
+                  "name" : "french"
+              }
+          }
+      }
+  },
+	"mappings": {
+		"tweet" : {
+			"properties" : {
+				"message" : {"type" : "text", "store" : true, "analyzer" : "francais" }
 			}
 		}
 	}

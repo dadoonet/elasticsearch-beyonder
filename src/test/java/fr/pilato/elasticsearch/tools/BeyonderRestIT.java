@@ -41,7 +41,6 @@ import java.util.Map;
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -108,9 +107,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     protected void testBeyonder(String root,
                              List<String> indices,
-                             List<List<String>> types,
                              List<String> templates) throws Exception {
-        logger.info("--> scanning: [{}]", SettingsFinder.fromClasspath(root));
+        logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
         // We can now check if we have the templates created
@@ -135,16 +133,6 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 }
             }
             assertThat(allExists, is(true));
-
-            for (int iIndex = 0; iIndex < indices.size(); iIndex++) {
-                if (types != null && types.get(iIndex) != null) {
-                        for (String type : types.get(iIndex)) {
-                        boolean exists = isTypeExist(client, indices.get(iIndex), type);
-                        assertThat("type " + type + " should exist in index " + indices.get(iIndex),
-                                exists, is(true));
-                    }
-                }
-            }
         }
     }
 

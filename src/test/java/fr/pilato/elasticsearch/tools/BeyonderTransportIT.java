@@ -39,7 +39,6 @@ import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
@@ -88,35 +87,10 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         }
     }
 
-    private static boolean testClusterRunning(boolean withSecurity) throws IOException {
-        try {
-            NodesInfoResponse response = client.admin().cluster().prepareNodesInfo().get();
-            Version version = response.getNodes().get(0).getVersion();
-            logger.info("Starting integration tests against an external cluster running elasticsearch [{}] with {}",
-                    version, withSecurity ? "security" : "no security" );
-            return withSecurity;
-//        } catch (NoNodeAvailableException e) {
-//            // If we have an exception here, let's ignore the test
-//            logger.warn("Integration tests are skipped: [{}]", e.getMessage());
-//            assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-//            return withSecurity;
-        } catch (NoNodeAvailableException e) {
-            if (e.getMessage() == "401") {
-                logger.debug("The cluster is secured. So we need to build a client with security", e);
-                return true;
-            } else {
-                logger.error("Full error is", e);
-                throw e;
-            }
-        }
-    }
-
-
     protected void testBeyonder(String root,
                              List<String> indices,
-                             List<List<String>> types,
                              List<String> templates) throws Exception {
-        logger.info("--> scanning: [{}]", SettingsFinder.fromClasspath(root));
+        logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
         // We can now check if we have the templates created
@@ -141,16 +115,6 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                 }
             }
             assertThat(allExists, is(true));
-
-            for (int iIndex = 0; iIndex < indices.size(); iIndex++) {
-                if (types != null && types.get(iIndex) != null) {
-                        for (String type : types.get(iIndex)) {
-                        boolean exists = isTypeExist(client, indices.get(iIndex));
-                        assertThat("type " + type + " should exist in index " + indices.get(iIndex),
-                                exists, is(true));
-                    }
-                }
-            }
         }
     }
 }
