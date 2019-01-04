@@ -120,7 +120,7 @@ It's the recommended way as the Transport Client is now deprecated and will be r
 Just pass to Beyonder a Rest Client instance:
 
 ```java
-RestClient client = RestClient.builder(new HttpHost("127.0.0.1", 9200)).build();
+RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200")).build();
 ElasticsearchBeyonder.start(client);
 ```
 
@@ -129,7 +129,7 @@ For the record, you can also use X-Pack security with:
 ```java
 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
-RestClient client = RestClient.builder(new HttpHost("127.0.0.1", 9200))
+RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200"))
         .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
             @Override
             public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
@@ -281,32 +281,27 @@ mvn clean install -DskipIntegTests
 If you wish to run integration tests against a cluster which is already running externally, you can configure the
 following settings to locate your cluster:
 
-|            setting            |     default   |
-|:-----------------------------:|:-------------:|
-| `tests.cluster.host`          | `127.0.0.1`   |
-| `tests.cluster.scheme`        | `http`        |
-| `tests.cluster.rest.port`     | `9400`        |
-| `tests.cluster.transport.port`| `9500`        |
+|            setting            |          default        |
+|:-----------------------------:|:-----------------------:|
+| `tests.cluster`               | `http://127.0.0.1:9400` |
+| `tests.cluster.transport.port`| `9500`                  |
 
 For example:
 
 ```sh
-mvn clean install -Dtests.cluster.rest.port=9200 -Dtests.cluster.transport.port=9300
+mvn clean install -Dtests.cluster=http://127.0.0.1:9200 -Dtests.cluster.transport.port=9300
 ```
 
 If you want to run your tests against an [Elastic Cloud](https://cloud.elastic.co/) instance, you can use something like:
 
 ```sh
 mvn clean install \
-    -Dtests.cluster.host=CLUSTERID.eu-west-1.aws.found.io \
-    -Dtests.cluster.scheme=https \
-    -Dtests.cluster.rest.port=9243 \
-    -Dtests.cluster.transport.port=9300 \
+    -Dtests.cluster=https://CLUSTERID.eu-west-1.aws.found.io:9243 \
     -Dtests.cluster.user=elastic \
     -Dtests.cluster.pass=GENERATEDPASSWORD
 ```
 
-Only Rest Tests will pass in that case.
+When user and password are set only Rest Tests are ran.
 
 License
 =======

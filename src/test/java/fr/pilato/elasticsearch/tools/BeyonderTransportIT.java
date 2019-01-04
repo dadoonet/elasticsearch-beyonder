@@ -23,6 +23,7 @@ import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
@@ -43,6 +44,7 @@ import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isType
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeTrue;
 
 public class BeyonderTransportIT extends AbstractBeyonderTest {
 
@@ -51,10 +53,13 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
 
     @BeforeClass
     public static void startElasticsearch() throws IOException {
+        // If a user is defined, we just ignore the tests as we did not bring in the deprecated
+        // transport secured client
+        assumeTrue("Transport tests are not run on a secured cluster", testClusterUser == null);
         // This is going to initialize our Rest Client if not initialized yet
-        restClient();
+        RestClient restClient = restClient();
         client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
-                .addTransportAddress(new TransportAddress(new InetSocketAddress(testClusterHost, testClusterTransportPort)));
+                .addTransportAddress(new TransportAddress(new InetSocketAddress(restClient.getNodes().get(0).getHost().getHostName(), testClusterTransportPort)));
     }
 
     @AfterClass
@@ -87,30 +92,6 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
             assumeNoException(e);
         }
     }
-
-    private static boolean testClusterRunning(boolean withSecurity) throws IOException {
-        try {
-            NodesInfoResponse response = client.admin().cluster().prepareNodesInfo().get();
-            Version version = response.getNodes().get(0).getVersion();
-            logger.info("Starting integration tests against an external cluster running elasticsearch [{}] with {}",
-                    version, withSecurity ? "security" : "no security" );
-            return withSecurity;
-//        } catch (NoNodeAvailableException e) {
-//            // If we have an exception here, let's ignore the test
-//            logger.warn("Integration tests are skipped: [{}]", e.getMessage());
-//            assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-//            return withSecurity;
-        } catch (NoNodeAvailableException e) {
-            if (e.getMessage() == "401") {
-                logger.debug("The cluster is secured. So we need to build a client with security", e);
-                return true;
-            } else {
-                logger.error("Full error is", e);
-                throw e;
-            }
-        }
-    }
-
 
     protected void testBeyonder(String root,
                              List<String> indices,
