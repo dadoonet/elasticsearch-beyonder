@@ -59,18 +59,6 @@ public class SettingsFinder {
 	}
 
 	/**
-	 * Return a classpath:file from a file
-	 * @param file for example "es"
-	 * @return file (no transformation is made)
-	 * @deprecated Will be removed most likely
-	 * TODO REMOVE
-	 */
-	@Deprecated
-	public static String fromClasspath(String file) {
-		return file;
-	}
-
-	/**
 	 * Find all types within an index
 	 * @param root dir within the classpath
 	 * @param subdir subdir name

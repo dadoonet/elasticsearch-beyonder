@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static fr.pilato.elasticsearch.tools.SettingsFinder.fromClasspath;
-
 /**
  * Manage elasticsearch index setting files
  * @author David Pilato
@@ -70,7 +68,7 @@ public class IndexSettingsReader extends SettingsReader {
      * @throws IOException if connection with elasticsearch is failing
 	 */
 	public static String readSettings(String index) throws IOException {
-		return readSettings(fromClasspath(Defaults.ConfigDir), index);
+		return readSettings(Defaults.ConfigDir, index);
 	}
 
 	/**
@@ -89,6 +87,6 @@ public class IndexSettingsReader extends SettingsReader {
      * @return Update Settings
      */
 	public static String readUpdateSettings(String index) {
-		return readUpdateSettings(fromClasspath(Defaults.ConfigDir), index);
+		return readUpdateSettings(Defaults.ConfigDir, index);
 	}
 }
