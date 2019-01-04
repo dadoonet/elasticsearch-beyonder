@@ -11,9 +11,11 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 6.5-SNAPSHOT            | 6.x           |              |
-| 5.1                     | 5.x, 6.x      |  2017-07-12  |
-| 5.0                     | 5.x, 6.x      |  2017-07-11  |
+| 6.5-SNAPSHOT            | 6.5 -> 6.x    |              |
+| 6.3                     | 6.3 -> 6.4    |  2018-07-21  |
+| 6.0                     | 6.0 -> 6.2    |  2018-02-05  |
+| 5.1                     | 5.x           |  2017-07-12  |
+| 5.0                     | 5.x           |  2017-07-11  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
 | 2.0.0                   |      2.0      |  2015-10-24  |
 | 1.5.0                   |      1.5      |  2015-03-27  |
@@ -47,7 +49,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>5.1</version>
+  <version>6.3</version>
 </dependency>
 ```
 
@@ -60,7 +62,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>5.6.7</version>
+    <version>6.3.1</version>
 </dependency>
 ```
 
@@ -70,7 +72,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>5.6.7</version>
+    <version>6.3.1</version>
 </dependency>
 ```
 
@@ -80,7 +82,7 @@ For example, here is how to import the Secured Transport Client to your project 
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>x-pack-transport</artifactId>
-    <version>5.6.7</version>
+    <version>6.3.1</version>
 </dependency>
 ```
 
