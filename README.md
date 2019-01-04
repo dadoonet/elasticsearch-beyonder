@@ -49,7 +49,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>6.3</version>
+  <version>6.5</version>
 </dependency>
 ```
 
@@ -62,7 +62,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>6.3.1</version>
+    <version>6.5.3</version>
 </dependency>
 ```
 
@@ -72,7 +72,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>6.3.1</version>
+    <version>6.5.3</version>
 </dependency>
 ```
 
@@ -82,7 +82,7 @@ For example, here is how to import the Secured Transport Client to your project 
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>x-pack-transport</artifactId>
-    <version>6.3.1</version>
+    <version>6.5.3</version>
 </dependency>
 ```
 
@@ -114,7 +114,7 @@ In that case, Beyonder will search for resources from `models/myelasticsearch`.
 
 ## Using REST Client (recommended)
 
-Elasticsearch now provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/5.4/index.html).
+Elasticsearch now provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/6.5/index.html).
 It's the recommended way as the Transport Client is now deprecated and will be removed in a next major version.
 
 Just pass to Beyonder a Rest Client instance:
@@ -308,7 +308,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2018 David Pilato
+	Copyright 2011-2019 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
