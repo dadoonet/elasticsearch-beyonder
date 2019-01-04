@@ -110,7 +110,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                              List<String> indices,
                              List<List<String>> types,
                              List<String> templates) throws Exception {
-        logger.info("--> scanning: [{}]", SettingsFinder.fromClasspath(root));
+        logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
         // We can now check if we have the templates created

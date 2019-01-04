@@ -39,7 +39,7 @@ public class TemplateFinder extends SettingsFinder {
      * @throws URISyntaxException this should not happen
      */
     public static List<String> findTemplates() throws IOException, URISyntaxException {
-        return findTemplates(fromClasspath(Defaults.ConfigDir));
+        return findTemplates(Defaults.ConfigDir);
     }
 
     /**

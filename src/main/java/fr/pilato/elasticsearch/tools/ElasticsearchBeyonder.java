@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-import static fr.pilato.elasticsearch.tools.SettingsFinder.fromClasspath;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
@@ -81,7 +80,7 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client) throws Exception {
-		start(client, fromClasspath(Defaults.ConfigDir));
+		start(client, Defaults.ConfigDir);
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class ElasticsearchBeyonder {
 	 */
 	@Deprecated
 	public static void start(Client client) throws Exception {
-		start(client, fromClasspath(Defaults.ConfigDir));
+		start(client, Defaults.ConfigDir);
 	}
 
 	/**
