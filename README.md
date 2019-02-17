@@ -26,7 +26,8 @@ Versions
 Documentation
 =============
 
-* For 6.x elasticsearch versions, you are reading the latest documentation.
+* For 7.x elasticsearch versions, you are reading the latest documentation.
+* For 6.x elasticsearch versions, look at [es-6.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-6.x).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
 * For 2.x elasticsearch versions, look at [es-2.1 branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-2.1).
 
