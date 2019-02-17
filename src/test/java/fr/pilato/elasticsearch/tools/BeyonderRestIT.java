@@ -41,7 +41,6 @@ import java.util.Map;
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -74,42 +73,20 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> extractFromPath(Map<String, Object> json, String... path) {
-        Map<String, Object> currentObject = json;
-        for (String fieldName : path) {
-            Object jObject = currentObject.get(fieldName);
-            if (jObject == null) {
-                throw new RuntimeException("incorrect Json. Was expecting field " + fieldName);
-            }
-            if (!(jObject instanceof Map)) {
-                throw new RuntimeException("incorrect datatype in json. Expected Map and got " + jObject.getClass().getName());
-            }
-            currentObject = (Map<String, Object>) jObject;
-        }
-        return currentObject;
-    }
-
     @BeforeClass
     public static void setTestBehavior() {
         try {
             Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> responseAsMap = asMap(response);
             logger.trace("get server response: {}", responseAsMap);
-            Object oVersion = extractFromPath(responseAsMap, "version").get("number");
-            String version = (String) oVersion;
-            if (new VersionComparator().compare(version, "6") > 0) {
-                supportsMultipleTypes = false;
-            }
         } catch (IOException e) {
             assumeNoException(e);
         }
     }
 
     protected void testBeyonder(String root,
-                             List<String> indices,
-                             List<List<String>> types,
-                             List<String> templates) throws Exception {
+                                List<String> indices,
+                                List<String> templates) throws Exception {
         logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
@@ -135,16 +112,6 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 }
             }
             assertThat(allExists, is(true));
-
-            for (int iIndex = 0; iIndex < indices.size(); iIndex++) {
-                if (types != null && types.get(iIndex) != null) {
-                        for (String type : types.get(iIndex)) {
-                        boolean exists = isTypeExist(client, indices.get(iIndex), type);
-                        assertThat("type " + type + " should exist in index " + indices.get(iIndex),
-                                exists, is(true));
-                    }
-                }
-            }
         }
     }
 

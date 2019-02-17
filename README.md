@@ -11,11 +11,10 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 6.5                     | 6.5 -> 6.x    |  2019-01-04  |
-| 6.3                     | 6.3 -> 6.4    |  2018-07-21  |
-| 6.0                     | 6.0 -> 6.2    |  2018-02-05  |
-| 5.1                     | 5.x           |  2017-07-12  |
-| 5.0                     | 5.x           |  2017-07-11  |
+| 7.0-SNAPSHOT            | 7.x           |              |
+| 6.5-SNAPSHOT            | 6.x           |              |
+| 5.1                     | 5.x, 6.x      |  2017-07-12  |
+| 5.0                     | 5.x, 6.x      |  2017-07-11  |
 | 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
 | 2.0.0                   |      2.0      |  2015-10-24  |
 | 1.5.0                   |      1.5      |  2015-03-27  |
@@ -26,7 +25,8 @@ Versions
 Documentation
 =============
 
-* For 6.x elasticsearch versions, you are reading the latest documentation.
+* For 7.x elasticsearch versions, you are reading the latest documentation.
+* For 6.x elasticsearch versions, look at [master branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/master).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
 * For 2.x elasticsearch versions, look at [es-2.1 branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-2.1).
 
@@ -49,7 +49,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>6.5</version>
+  <version>7.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -62,7 +62,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>6.5.3</version>
+    <version>7.0.0-beta1</version>
 </dependency>
 ```
 
@@ -72,20 +72,9 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>6.5.3</version>
+    <version>7.0.0-beta1</version>
 </dependency>
 ```
-
-For example, here is how to import the Secured Transport Client to your project (deprecated):
-
-```xml
-<dependency>
-    <groupId>org.elasticsearch.client</groupId>
-    <artifactId>x-pack-transport</artifactId>
-    <version>6.5.3</version>
-</dependency>
-```
-
 
 
 Adding Beyonder to your client
@@ -114,7 +103,7 @@ In that case, Beyonder will search for resources from `models/myelasticsearch`.
 
 ## Using REST Client (recommended)
 
-Elasticsearch now provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/6.5/index.html).
+Elasticsearch provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.0/index.html).
 It's the recommended way as the Transport Client is now deprecated and will be removed in a next major version.
 
 Just pass to Beyonder a Rest Client instance:
@@ -149,16 +138,6 @@ Client client = new PreBuiltTransportClient(Settings.EMPTY)
 ElasticsearchBeyonder.start(client);
 ```
 
-## Using Secured Transport Client (deprecated)
-
-To use the deprecated TransportClient, just pass it to Beyonder:
-
-```java
-Client client = new PreBuiltXPackTransportClient(Settings.builder().put("xpack.security.user", "elastic:changeme").build())
-           .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
-ElasticsearchBeyonder.start(client);
-```
-
 Managing indices
 ----------------
 
@@ -174,40 +153,22 @@ For example, create the following file `src/main/resources/elasticsearch/twitter
 
 ```javascript
 {
-  "settings" : {
-    "number_of_shards" : 3,
-    "number_of_replicas" : 2
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 2
+  },
+  "mappings": {
+    "properties": {
+      "message": {
+        "type": "text"
+      }
+    }
   }
 }
 ```
 
 By default, Beyonder will not overwrite an index if it already exists.
 This can be overridden by setting `force` to `true` in the expanded factory method
-`ElasticsearchBeyonder.start()`.
-
-Managing types (deprecated)
----------------------------
-
-This feature will be removed in the next future. Define your mapping within the index settings (see above)
-or using a template (see below).
-
-If you define a file named `elasticsearch/twitter/tweet.json`, it will be automatically applied as the mapping for
-the `tweet` type in the `twitter` index.
-
-For example, create the following file `src/main/resources/elasticsearch/twitter/tweet.json` in your project:
-
-```javascript
-{
-  "tweet" : {
-    "properties" : {
-      "message" : {"type" : "string", "store" : "yes"}
-    }
-  }
-}
-```
-
-By default, Beyonder will attempt to merge defined mappings with existing ones.
-This can be overridden by setting `merge` to `false` in the expanded factory method
 `ElasticsearchBeyonder.start()`.
 
 Managing templates
@@ -226,12 +187,9 @@ in your project:
         "number_of_shards" : 1
     },
     "mappings" : {
-        "tweet" : {
-            "properties" : {
-                "message" : {
-                    "type" : "string",
-                    "store" : "yes"
-                }
+        "properties" : {
+            "message" : {
+                "type" : "text"
             }
         }
     }
