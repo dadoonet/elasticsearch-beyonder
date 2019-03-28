@@ -5,7 +5,7 @@
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
     <packaging>jar</packaging>
-    <version>6.6-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -22,7 +22,7 @@ when an elasticsearch client starts.
     </licenses>
 
     <properties>
-        <elasticsearch.version>6.5.3</elasticsearch.version>
+        <elasticsearch.version>7.0.0-rc1</elasticsearch.version>
         <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
         <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>2.11.1</log4j.version>
@@ -49,7 +49,7 @@ when an elasticsearch client starts.
         <connection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</connection>
         <developerConnection>scm:git:git@github.com:dadoonet/elasticsearch-beyonder.git</developerConnection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <issueManagement>
         <system>GitHub</system>
@@ -91,14 +91,6 @@ when an elasticsearch client starts.
             <url>http://snapshots.elastic.co/maven/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-
-        <repository>
-            <id>elastic-lucene-snapshots</id>
-            <name>Elastic Lucene Snapshots</name>
-            <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/6d9c714052</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
         </repository>
     </repositories>
 
@@ -299,6 +291,9 @@ when an elasticsearch client starts.
                             <name>dadoonet/docker-elasticsearch:${project.version}</name>
                             <build>
                                 <from>${integ.elasticsearch.image}:${integ.elasticsearch.version}</from>
+                                <env>
+                                    <discovery.type>single-node</discovery.type>
+                                </env>
                             </build>
                             <run>
                                 <ports>

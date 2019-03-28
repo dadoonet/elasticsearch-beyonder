@@ -22,8 +22,6 @@ package fr.pilato.elasticsearch.tools;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
-import fr.pilato.elasticsearch.tools.type.TypeFinder;
-import fr.pilato.elasticsearch.tools.type.TypeSettingsReader;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,7 +35,6 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
     protected void testBeyonder(String root,
                                 List<String> indices,
-                                List<List<String>> types,
                                 List<String> templates) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
         List<String> indexNames;
@@ -59,23 +56,6 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
                 String settings = IndexSettingsReader.readSettings(root, indexName);
                 logger.debug("    --> Settings: [{}]", settings);
-
-                List<String> typeNames = TypeFinder.findTypes(root, indexName);
-                logger.info("    --> types found for [{}]: {}", indexName, typeNames);
-
-                if (types != null && types.get(iIndex) != null) {
-                    assertThat(typeNames, hasSize(types.get(iIndex).size()));
-                    for (int iType = 0; iType < typeNames.size(); iType++) {
-                        String typeName = typeNames.get(iType);
-                        logger.debug("    --> type [{}]:", typeName);
-                        assertThat(typeName, is(types.get(iIndex).get(iType)));
-
-                        String mapping = TypeSettingsReader.readMapping(root, indexName, typeName);
-                        logger.debug("      --> Mapping: [{}]", mapping);
-                    }
-                } else {
-                    assertThat(typeNames, emptyIterable());
-                }
             }
         } else {
             assertThat(indexNames, emptyIterable());

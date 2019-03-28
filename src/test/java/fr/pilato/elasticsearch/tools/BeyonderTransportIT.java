@@ -19,9 +19,6 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.elasticsearch.Version;
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -31,6 +28,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +38,8 @@ import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.isTypeExist;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
 
@@ -72,13 +69,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
     @BeforeClass
     public static void setTestBehavior() {
         try {
-            NodesInfoResponse response = client.admin().cluster().prepareNodesInfo().get();
-            for (NodeInfo nodeInfo : response.getNodes()) {
-                Version version = nodeInfo.getVersion();
-                if (version.id >= 6000000) {
-                    supportsMultipleTypes = false;
-                }
-            }
+            client.admin().cluster().prepareNodesInfo().get();
         } catch (NoNodeAvailableException e) {
             assumeNoException(e);
         }
@@ -93,12 +84,20 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         }
     }
 
+    @Override
+    @Test
+    public void testDefaultDir() {
+        assumeTrue("We skip the default dir test for transport client as the index " +
+                "settings format is not compatible with rest client (type needs to " +
+                "be provided)", false);
+    }
+
     protected void testBeyonder(String root,
-                             List<String> indices,
-                             List<List<String>> types,
-                             List<String> templates) throws Exception {
-        logger.info("--> scanning: [{}]", root);
-        ElasticsearchBeyonder.start(client, root);
+                                List<String> indices,
+                                List<String> templates) throws Exception {
+        String newRoot = "transport/" + root;
+        logger.info("--> scanning: [{}]", newRoot);
+        ElasticsearchBeyonder.start(client, newRoot);
 
         // We can now check if we have the templates created
         if (templates != null) {
@@ -122,16 +121,6 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                 }
             }
             assertThat(allExists, is(true));
-
-            for (int iIndex = 0; iIndex < indices.size(); iIndex++) {
-                if (types != null && types.get(iIndex) != null) {
-                        for (String type : types.get(iIndex)) {
-                        boolean exists = isTypeExist(client, indices.get(iIndex), type);
-                        assertThat("type " + type + " should exist in index " + indices.get(iIndex),
-                                exists, is(true));
-                    }
-                }
-            }
         }
     }
 }

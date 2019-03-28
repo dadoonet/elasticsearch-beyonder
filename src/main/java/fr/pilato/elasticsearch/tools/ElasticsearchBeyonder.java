@@ -22,7 +22,6 @@ package fr.pilato.elasticsearch.tools;
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
-import fr.pilato.elasticsearch.tools.type.TypeFinder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -34,7 +33,6 @@ import java.util.List;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
-import static fr.pilato.elasticsearch.tools.type.TypeElasticsearchUpdater.createMapping;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -116,13 +114,6 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
-
-			// create types
-			List<String> types = TypeFinder.findTypes(root, indexName);
-			for (String typeName : types) {
-				createMapping(client, root, indexName, typeName, merge);
-			}
-
 		}
 		logger.info("start done. Rock & roll!");
 	}
@@ -166,13 +157,6 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
-
-			// create types
-			List<String> types = TypeFinder.findTypes(root, indexName);
-			for (String typeName : types) {
-				createMapping(client, root, indexName, typeName, merge);
-			}
-
 		}
 		logger.info("start done. Rock & roll!");
 	}
