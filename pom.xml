@@ -22,7 +22,7 @@ when an elasticsearch client starts.
     </licenses>
 
     <properties>
-        <elasticsearch.version>7.0.0-beta1</elasticsearch.version>
+        <elasticsearch.version>7.0.0-rc1</elasticsearch.version>
         <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
         <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>2.11.1</log4j.version>
@@ -92,14 +92,6 @@ when an elasticsearch client starts.
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled></snapshots>
         </repository>
-
-        <repository>
-            <id>elastic-lucene-snapshots</id>
-            <name>Elastic Lucene Snapshots</name>
-            <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/83f9835</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -110,16 +102,6 @@ when an elasticsearch client starts.
             <artifactId>transport</artifactId>
             <version>${elasticsearch.version}</version>
             <optional>true</optional>
-            <!--
-                Temporary workaround to be removed with final 7.0.0
-                See https://github.com/elastic/elasticsearch/issues/38944
-             -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.elasticsearch</groupId>
-                    <artifactId>elasticsearch-ssl-config</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
