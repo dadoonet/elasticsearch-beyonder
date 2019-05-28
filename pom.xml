@@ -287,7 +287,7 @@ when an elasticsearch client starts.
                 <configuration>
                     <images>
                         <image>
-                            <alias>elasticsearch-it</alias>
+                            <alias>elasticsearch-beyonder</alias>
                             <name>dadoonet/elasticsearch-beyonder:${project.version}</name>
                             <build>
                                 <from>${integ.elasticsearch.image}:${integ.elasticsearch.version}</from>
