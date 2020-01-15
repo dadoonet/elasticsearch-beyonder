@@ -162,6 +162,11 @@ when an elasticsearch client starts.
             <version>${jackson.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.8</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -253,6 +258,9 @@ when an elasticsearch client starts.
                     <excludes>
                         <exclude>**/IT*.java</exclude>
                     </excludes>
+                    <environmentVariables>
+                        <numberOfReplicas>2</numberOfReplicas>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
