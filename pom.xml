@@ -258,6 +258,9 @@ when an elasticsearch client starts.
                     <excludes>
                         <exclude>**/IT*.java</exclude>
                     </excludes>
+                    <environmentVariables>
+                        <numberOfReplicas>2</numberOfReplicas>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>

@@ -19,6 +19,7 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -32,14 +33,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assume.assumeThat;
 
 public abstract class AbstractBeyonderTest {
@@ -118,6 +119,24 @@ public abstract class AbstractBeyonderTest {
     }
 
     @Test
+    public void testVariableReplacement() throws Exception {
+
+      // given: A settings json with a variable that should be replaced.
+      //        And an environment variable with matching name (set in configuration of maven-surefire-plugin).
+      String folder = "models/variablereplacement";
+      String indexName = "twitter";
+
+      // when: this settings file is read
+      String settings = IndexSettingsReader.readSettings(folder, indexName);
+      Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
+
+      // then: the variables got replaced by environment variables of the same name
+      String numberOfReplicas = (String) ((Map) settingsMap.get("settings")).get("number_of_replicas");
+      assumeThat(numberOfReplicas, equalTo("2"));
+
+    }
+
+    @Test
     public void testSettingsAnalyzer() throws Exception {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
@@ -158,4 +177,5 @@ public abstract class AbstractBeyonderTest {
                 null,
                 null);
     }
+
 }
