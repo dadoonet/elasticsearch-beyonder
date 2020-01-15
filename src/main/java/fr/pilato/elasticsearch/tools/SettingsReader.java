@@ -20,6 +20,7 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class SettingsReader {
 			logger.warn("Can not read [{}].", file);
 		}
 
-		return content;
+		return StringSubstitutor.replace(content, System.getenv());
 	}
+
 }
