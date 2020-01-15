@@ -11,7 +11,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 7.1-SNAPSHOT            | 7.x           |              |
+| 7.5-SNAPSHOT            | 7.x           |              |
 | 7.0                     | 7.0 -> 7.x    |  2019-04-04  |
 | 6.5                     | 6.5 -> 6.x    |  2019-01-04  |
 | 6.3                     | 6.3 -> 6.4    |  2018-07-21  |
@@ -65,7 +65,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.0.0-rc2</version>
+    <version>7.5.1</version>
 </dependency>
 ```
 
@@ -75,7 +75,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.0.0-rc2</version>
+    <version>7.5.1</version>
 </dependency>
 ```
 
@@ -269,7 +269,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2019 David Pilato
+	Copyright 2011-2020 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
