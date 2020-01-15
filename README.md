@@ -52,7 +52,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>7.0</version>
+  <version>7.5</version>
 </dependency>
 ```
 
