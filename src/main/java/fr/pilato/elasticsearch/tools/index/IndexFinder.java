@@ -19,17 +19,18 @@
 
 package fr.pilato.elasticsearch.tools.index;
 
-import fr.pilato.elasticsearch.tools.ResourceList;
-import fr.pilato.elasticsearch.tools.SettingsFinder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.pilato.elasticsearch.tools.ResourceList;
+import fr.pilato.elasticsearch.tools.SettingsFinder;
 
 public class IndexFinder extends SettingsFinder {
     private static final Logger logger = LoggerFactory.getLogger(IndexFinder.class);
@@ -70,7 +71,7 @@ public class IndexFinder extends SettingsFinder {
                 } else {
                     key = resource;
                 }
-                if (!key.equals(Defaults.TemplateDir) && !keys.contains(key)) {
+				if (!key.equals(Defaults.TemplateDir) && !key.equals(Defaults.PipelineDir) && !keys.contains(key)) {
                     logger.trace(" - found [{}].", key);
                     keys.add(key);
                     indexNames.add(key);

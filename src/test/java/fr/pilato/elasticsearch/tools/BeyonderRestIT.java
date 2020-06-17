@@ -20,6 +20,8 @@ package fr.pilato.elasticsearch.tools;
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
+import fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater;
 
 public class BeyonderRestIT extends AbstractBeyonderTest {
 
@@ -74,6 +77,13 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 	protected void testBeyonder(String root,
 			List<String> indices,
 			List<String> templates) throws Exception {
+		testBeyonder(root, indices, templates, emptyList());
+	}
+
+	protected void testBeyonder(String root,
+			List<String> indices,
+			List<String> templates,
+			List<String> pipelines) throws Exception {
 		logger.info("--> scanning: [{}]", root);
 		ElasticsearchBeyonder.start(client, root);
 
@@ -83,6 +93,17 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
 			for (String template : templates) {
 				if (!isTemplateExist(client, template)) {
+					allExists = false;
+				}
+			}
+			assertThat(allExists, is(true));
+		}
+
+		if (pipelines != null) {
+			boolean allExists = true;
+
+			for (String pipeline : pipelines) {
+				if (!PipelineElasticsearchUpdater.isPipelineExist(client, pipeline)) {
 					allExists = false;
 				}
 			}
@@ -136,5 +157,13 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength()));
 		IOUtils.copy(response.getContent(), out);
 		return new String(out.toByteArray());
+	}
+
+	@Test
+	public void testPipeline() throws Exception {
+		testBeyonder("models/pipeline",
+				null,
+				null,
+				singletonList("twitter_pipeline"));
 	}
 }

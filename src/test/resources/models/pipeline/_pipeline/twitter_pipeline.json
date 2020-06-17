@@ -1,0 +1,11 @@
+{
+  "description" : "Twitter pipeline",
+  "processors" : [
+    {
+      "set" : {
+        "field": "foo",
+        "value": "bar"
+      }
+    }
+  ]
+}

@@ -19,8 +19,7 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.nio.file.FileVisitResult.CONTINUE;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -30,7 +29,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SettingsFinder {
 
@@ -46,6 +46,7 @@ public class SettingsFinder {
 		public static String IndexSettingsFileName = "_settings.json";
 		public static String UpdateIndexSettingsFileName = "_update_settings.json";
 		public static String TemplateDir = "_template";
+		public static String PipelineDir = "_pipeline";
 
 		/**
 		 * Default setting of whether or not to merge mappings on start.

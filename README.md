@@ -200,7 +200,30 @@ in your project:
 }
 ```
 
-By default, Beyonder will not overwrite a template if it already exists.
+Managing pipelines
+------------------
+
+A pipeline is a definition of a series of processors that are to be executed in the same order as they are declared while 
+documents are being indexed. Please note that this feature is only supported when u use the REST client not the Transport client.
+
+For example, setting one fields value based on another field by using an Set Processor you an add a file named `elasticseasrch/_pipeline/set_field_processor`
+in your project:
+
+```javascript
+{
+  "description" : "Twitter pipeline",
+  "processors" : [
+    {
+      "set" : {
+        "field": "foo",
+        "value": "bar"
+      }
+    }
+  ]
+}
+```
+
+By default, Beyonder will not overwrite a pipeline if it already exists.
 This can be overridden by setting `force` to `true` in the expanded factory method
 `ElasticsearchBeyonder.start()`.
 
