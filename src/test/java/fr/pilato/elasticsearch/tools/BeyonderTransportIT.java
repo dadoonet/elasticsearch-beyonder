@@ -19,23 +19,6 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.List;
-
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,33 +26,23 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.List;
+
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BeyonderTransportIT extends AbstractBeyonderTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BeyonderTransportIT.class);
-    private static Client client;
-
-    @BeforeClass
-    public static void startElasticsearch() throws IOException {
-        // If a user is defined, we just ignore the tests as we did not bring in the deprecated
-        // transport secured client
-        assumeTrue("Transport tests are not run on a secured cluster", testClusterUser == null);
-        // This is going to initialize our Rest Client if not initialized yet
-        RestClient restClient = restClient();
-        client = new PreBuiltTransportClient(Settings.builder().put("client.transport.ignore_cluster_name", true).build())
-                .addTransportAddress(new TransportAddress(new InetSocketAddress(restClient.getNodes().get(0).getHost().getHostName(), testClusterTransportPort)));
-    }
-
-    @AfterClass
-    public static void stopElasticsearch() {
-        if (client != null) {
-            client.close();
-        }
-    }
 
     @BeforeClass
     public static void setTestBehavior() {
         try {
-            client.admin().cluster().prepareNodesInfo().get();
+        	transportClient.admin().cluster().prepareNodesInfo().get();
         } catch (NoNodeAvailableException e) {
             assumeNoException(e);
         }
@@ -78,7 +51,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
     @Before
     public void cleanCluster() {
         try {
-            client.admin().indices().prepareDelete("_all").get();
+        	transportClient.admin().indices().prepareDelete("_all").get();
         } catch (NoNodeAvailableException e) {
             assumeNoException(e);
         }
@@ -92,7 +65,8 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                 "be provided)", false);
     }
 
-    protected void testBeyonder(String root,
+    @Override
+	protected void testBeyonder(String root,
                                 List<String> indices,
                                 List<String> templates) throws Exception {
         String newRoot = "transport/" + root;
