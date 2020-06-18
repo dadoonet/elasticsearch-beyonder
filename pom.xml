@@ -266,7 +266,7 @@ when an elasticsearch client starts.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M5</version>
                 <executions>
                     <!--
                         Invokes both the integration-test and the verify goals of the
