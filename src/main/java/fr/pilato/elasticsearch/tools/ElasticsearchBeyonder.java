@@ -20,15 +20,24 @@
 package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
@@ -63,101 +72,157 @@ import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdate
  *   }
  * }
  * </pre>
- *
+ * <p>
  * By convention, the factory will create all settings and mappings found under the /es classpath.<br>
  * You can disable convention and use configuration by setting autoscan to false.
+ *
  * @author David Pilato
  */
 public class ElasticsearchBeyonder {
 
-	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchBeyonder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ElasticsearchBeyonder.class);
 
-	/**
-	 * Automatically scan classpath and creates indices, types, templates... in default dir.
-	 * @param client elasticsearch client
-	 * @throws Exception when beyonder can not start
-	 */
-	public static void start(RestClient client) throws Exception {
-		start(client, Defaults.ConfigDir);
-	}
+    /**
+     * Automatically scan classpath and creates indices, types, templates... in default dir.
+     *
+     * @param client elasticsearch client
+     * @throws Exception when beyonder can not start
+     */
+    public static void start(RestClient client) throws Exception {
+        start(client, Defaults.ConfigDir);
+    }
 
-	/**
-	 * Automatically scan classpath and creates indices, types, templates...
-	 * @param client elasticsearch client
-	 * @param root dir within the classpath
-	 * @throws Exception when beyonder can not start
-	 */
-	public static void start(RestClient client, String root) throws Exception {
-		start(client, root, Defaults.MergeMappings, Defaults.ForceCreation);
-	}
+    /**
+     * Automatically scan classpath and creates indices, types, templates...
+     *
+     * @param client elasticsearch client
+     * @param root   dir within the classpath
+     * @throws Exception when beyonder can not start
+     */
+    public static void start(RestClient client, String root) throws Exception {
+        start(client, root, Defaults.MergeMappings, Defaults.ForceCreation);
+    }
 
-	/**
-	 * Automatically scan classpath and create indices, mappings, templates, and other settings.
-	 * @param client elasticsearch client
-	 * @param root dir within the classpath
-	 * @param merge whether or not to merge mappings
-	 * @param force whether or not to force creation of indices and templates
-	 * @throws Exception when beyonder can not start
-	 * @since 6.1
-	 */
-	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
-		logger.info("starting automatic settings/mappings discovery");
+    /**
+     * Automatically scan classpath and create indices, mappings, templates, and other settings.
+     *
+     * @param client elasticsearch client
+     * @param root   dir within the classpath
+     * @param merge  whether or not to merge mappings
+     * @param force  whether or not to force creation of indices and templates
+     * @throws Exception when beyonder can not start
+     * @since 6.1
+     */
+    public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
+        logger.info("starting automatic settings/mappings discovery");
 
-		// create templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
-		for (String templateName : templateNames) {
-			createTemplate(client, root, templateName, force);
-		}
+        // create templates
+        List<String> templateNames = TemplateFinder.findTemplates(root);
+        for (String templateName : templateNames) {
+            createTemplate(client, root, templateName, force);
+        }
 
-		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
-		for (String indexName : indexNames) {
-			createIndex(client, root, indexName, force);
-			updateSettings(client, root, indexName);
-		}
-		logger.info("start done. Rock & roll!");
-	}
+        // create indices
+        Collection<String> indexNames = IndexFinder.findIndexNames(root);
+        for (String indexName : indexNames) {
+            createIndex(client, root, indexName, force);
+            updateSettings(client, root, indexName);
+        }
+        logger.info("start done. Rock & roll!");
+    }
 
-	/**
-	 * Automatically scan classpath and creates indices, types, templates... in default dir.
-	 * @param client elasticsearch client
-	 * @throws Exception when beyonder can not start
-	 * @deprecated You should use now the RestClient implementation
-	 * @see #start(RestClient) for the RestClient implementation
-	 */
-	@Deprecated
-	public static void start(Client client) throws Exception {
-		start(client, Defaults.ConfigDir);
-	}
+    /**
+     * Automatically scan classpath and creates indices, types, templates... in default dir.
+     *
+     * @param client elasticsearch client
+     * @throws Exception when beyonder can not start
+     * @see #start(RestClient) for the RestClient implementation
+     * @deprecated You should use now the RestClient implementation
+     */
+    @Deprecated
+    public static void start(Client client) throws Exception {
+        start(client, Defaults.ConfigDir);
+    }
 
-	/**
-	 * Automatically scan classpath and creates indices, types, templates...
-	 * @param client elasticsearch client
-	 * @param root dir within the classpath
-	 * @throws Exception when beyonder can not start
-	 * @deprecated You should use now the RestClient implementation
-	 * @see #start(RestClient, String) for the RestClient implementation
-	 */
-	@Deprecated
-	public static void start(Client client, String root) throws Exception {
-		logger.info("starting automatic settings/mappings discovery");
+    /**
+     * Automatically scan classpath and creates indices, types, templates...
+     *
+     * @param client elasticsearch client
+     * @param root   dir within the classpath
+     * @throws Exception when beyonder can not start
+     * @see #start(RestClient, String) for the RestClient implementation
+     * @deprecated You should use now the RestClient implementation
+     */
+    @Deprecated
+    public static void start(Client client, String root) throws Exception {
+        logger.info("starting automatic settings/mappings discovery");
 
-		// TODO make it a parameter
-		boolean merge = Defaults.MergeMappings;
-		boolean force = Defaults.ForceCreation;
+        // TODO make it a parameter
+        boolean merge = Defaults.MergeMappings;
+        boolean force = Defaults.ForceCreation;
 
-		// create templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
-		for (String templateName : templateNames) {
-			createTemplate(client, root, templateName, force);
-		}
+        // create templates
+        List<String> templateNames = TemplateFinder.findTemplates(root);
+        for (String templateName : templateNames) {
+            createTemplate(client, root, templateName, force);
+        }
 
-		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
-		for (String indexName : indexNames) {
-			createIndex(client, root, indexName, force);
-			updateSettings(client, root, indexName);
-		}
-		logger.info("start done. Rock & roll!");
-	}
+        // create indices
+        Collection<String> indexNames = IndexFinder.findIndexNames(root);
+        for (String indexName : indexNames) {
+            createIndex(client, root, indexName, force);
+            updateSettings(client, root, indexName);
+        }
+        logger.info("start done. Rock & roll!");
+    }
+
+    /**
+     * overwritten version of start(). Instead of getting the settings from the resource directory,
+     * the user can choose any directory where _settings.json files are located.
+     *
+     * @param client elasticsearch client
+     * @param path directory of _settings.json files
+     * @param index arbitrary index name
+     * @throws Exception when beyonder can not start
+     */
+    public static void start(RestClient client, String path, String index) throws Exception {
+        List<String> settingFiles = getSettingFiles(path);
+        //String settingFile1 = settingFiles.get(0);
+        for(String settingFile : settingFiles) {
+            String settings = null;
+            // Create index
+            try (InputStream asStream = new FileInputStream(settingFile)) {
+                if (asStream == null) {
+                    logger.trace("Can not find [{}] in class loader.", settingFile);
+                }
+                settings = IOUtils.toString(asStream, "UTF-8");
+            } catch (IOException e) {
+                logger.warn("Can not read [{}].", settingFile);
+            }
+
+            Objects.requireNonNull(settings);
+            settings = StringSubstitutor.replace(settings, System.getenv());
+            IndexElasticsearchUpdater.createIndexWithSettings(client, index, settings, true);
+        }
+    }
+
+    /**
+     * @return List of files with the name _settings.json
+     * @throws NullPointerException if path is invalid
+     */
+    private static List<String> getSettingFiles(String path) throws NullPointerException {
+        String[] pathNames;
+        String absolutePath;
+        ArrayList<String> validPaths = new ArrayList<>();
+
+        File f = new File(path);
+        absolutePath = f.getAbsolutePath();
+        pathNames = f.list();
+        for (String pathname : Objects.requireNonNull(pathNames)) {
+            if (pathname.endsWith(SettingsFinder.Defaults.IndexSettingsFileName)) {
+                validPaths.add(absolutePath + "/" + pathname);
+            }
+        }
+        return validPaths;
+    }
 }
