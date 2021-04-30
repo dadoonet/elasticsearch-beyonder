@@ -12,10 +12,3 @@ updates:
   - dadoonet
   labels:
   - update
-  ignore:
-  - dependency-name: org.elasticsearch.client:elasticsearch-rest-client
-    versions:
-    - 7.11.0
-  - dependency-name: org.elasticsearch.client:transport
-    versions:
-    - 7.11.0
