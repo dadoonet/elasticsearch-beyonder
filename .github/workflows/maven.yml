@@ -31,7 +31,7 @@ jobs:
       run: mvn --batch-mode --update-snapshots verify
 
   deploy:
-
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
