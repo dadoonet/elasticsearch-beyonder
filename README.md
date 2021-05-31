@@ -37,8 +37,7 @@ Documentation
 Build Status
 ============
 
-Thanks to Travis for the [build status](https://travis-ci.org/dadoonet/elasticsearch-beyonder): 
-[![Build Status](https://travis-ci.org/dadoonet/elasticsearch-beyonder.svg)](https://travis-ci.org/dadoonet/elasticsearch-beyonder)
+[![Build Status](https://github.com/dadoonet/elasticsearch-beyonder/actions/workflows/maven.yml/badge.svg)](https://github.com/dadoonet/elasticsearch-beyonder/actions/workflows/maven.yml)
 
 
 Getting Started
