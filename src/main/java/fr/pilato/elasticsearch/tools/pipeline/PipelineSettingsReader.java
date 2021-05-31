@@ -31,28 +31,28 @@ import fr.pilato.elasticsearch.tools.SettingsReader;
  */
 public class PipelineSettingsReader extends SettingsReader {
 
-	/**
-	 * Read a pipeline
-	 * @param root dir within the classpath
-	 * @param pipeline the id of the pipeline (.json will be appended)
-	 * @return The pipeline content
-	 * @throws IOException if the connection with elasticsearch is failing
-	 */
-	public static String readPipeline(String root, String pipeline) throws IOException {
-		if (root == null) {
-			return readPipeline(pipeline);
-		}
-		String settingsFile = root + "/" + Defaults.PipelineDir + "/" + pipeline + Defaults.JsonFileExtension;
-		return readFileFromClasspath(settingsFile);
-	}
+    /**
+     * Read a pipeline
+     * @param root dir within the classpath
+     * @param pipeline the id of the pipeline (.json will be appended)
+     * @return The pipeline content
+     * @throws IOException if the connection with elasticsearch is failing
+     */
+    public static String readPipeline(String root, String pipeline) throws IOException {
+        if (root == null) {
+            return readPipeline(pipeline);
+        }
+        String settingsFile = root + "/" + Defaults.PipelineDir + "/" + pipeline + Defaults.JsonFileExtension;
+        return readFileFromClasspath(settingsFile);
+    }
 
-	/**
-	 * Read a pipeline in default classpath dir
-	 * @param pipeline the id of the pipeline (.json will be appended)
-	 * @return The pipeline content
-	 * @throws IOException if the connection with elasticsearch is failing
-	 */
-	public static String readPipeline(String pipeline) throws IOException {
-		return readPipeline(Defaults.ConfigDir, pipeline);
-	}
+    /**
+     * Read a pipeline in default classpath dir
+     * @param pipeline the id of the pipeline (.json will be appended)
+     * @return The pipeline content
+     * @throws IOException if the connection with elasticsearch is failing
+     */
+    public static String readPipeline(String pipeline) throws IOException {
+        return readPipeline(Defaults.ConfigDir, pipeline);
+    }
 }
