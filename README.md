@@ -13,7 +13,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 7.6-SNAPSHOT            | 7.x           |              |
+| 7.13-SNAPSHOT           | 7.x           |              |
 | 7.5                     | 7.x           |  2020-01-15  |
 | 7.0                     | 7.0 -> 7.x    |  2019-04-04  |
 | 6.5                     | 6.5 -> 6.x    |  2019-01-04  |
