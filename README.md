@@ -5,6 +5,8 @@ Welcome to the [Elasticsearch](http://www.elastic.co/) Beyonder project.
 
 This project comes historically from [spring-elasticsearch](https://github.com/dadoonet/spring-elasticsearch) project.
 
+The goal of this project is to provide a simple Java library which helps to create indices, mappings, etc. when
+you start your application.
 
 Versions
 ========
@@ -57,6 +59,8 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 </dependency>
 ```
 
+Note that it needs Java14+.
+
 You need to import as well the elasticsearch client you want to use by adding one of the following
 dependencies to your `pom.xml` file.
 
@@ -66,7 +70,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.5.1</version>
+    <version>7.13.0</version>
 </dependency>
 ```
 
@@ -76,7 +80,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.5.1</version>
+    <version>7.13.0</version>
 </dependency>
 ```
 
@@ -117,18 +121,14 @@ RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200"))
 ElasticsearchBeyonder.start(client);
 ```
 
-For the record, you can also use X-Pack security with:
+For the record, when your cluster is secured, you can use for example the
+[Basic Authentication](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_basic_authentication.html):
 
 ```java
 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
 RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200"))
-        .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-            @Override
-            public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-            }
-        }).build();
+        .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)).build();
 ElasticsearchBeyonder.start(client);
 ```
 
@@ -232,15 +232,6 @@ This can be overridden by setting `force` to `true` in the expanded factory meth
 `ElasticsearchBeyonder.start()`.
 
 
-Why this name?
-==============
-
-I was actually looking for a cool name in the marvel characters list and found
-that [Beyonder](http://marvel.wikia.com/Beyonder_(Earth-616)) was actually a very
-powerful character.
-
-This project gives some features beyond elasticsearch itself. :)
-
 # Tests
 
 This project comes with unit tests and integration tests.
@@ -293,12 +284,21 @@ mvn clean install \
 
 When user and password are set only Rest Tests are ran.
 
+Why this name?
+==============
+
+I was actually looking for a cool name in the marvel characters list and found
+that [Beyonder](http://marvel.wikia.com/Beyonder_(Earth-616)) was actually a very
+powerful character.
+
+This project gives some features beyond elasticsearch itself. :)
+
 License
 =======
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2020 David Pilato
+	Copyright 2011-2021 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
