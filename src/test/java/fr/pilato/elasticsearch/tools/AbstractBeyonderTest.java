@@ -46,8 +46,8 @@ public abstract class AbstractBeyonderTest {
 
     static final Logger logger = LoggerFactory.getLogger(AbstractBeyonderTest.class);
 
-    private final static String DEFAULT_TEST_CLUSTER = "http://127.0.0.1:9400";
-    private final static Integer DEFAULT_TEST_CLUSTER_TRANSPORT_PORT = 9500;
+    private final static String DEFAULT_TEST_CLUSTER = "http://127.0.0.1:9200";
+    private final static Integer DEFAULT_TEST_CLUSTER_TRANSPORT_PORT = 9300;
 
     final static String testCluster = System.getProperty("tests.cluster", DEFAULT_TEST_CLUSTER);
     final static String testClusterUser = System.getProperty("tests.cluster.user");
