@@ -19,6 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -35,11 +37,16 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
 
@@ -90,6 +97,61 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         assumeTrue("We skip the default dir test for transport client as the index " +
                 "settings format is not compatible with rest client (type needs to " +
                 "be provided)", false);
+    }
+
+    @Test
+    public void testUpdateSettings() throws Exception {
+        // 1 _settings
+        {
+            testBeyonder("models/update-settings/step1",
+                    singletonList("twitter"),
+                    null);
+            GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
+            String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
+            assertThat(numberOfReplicas, equalTo("0"));
+        }
+
+        // 2 _update_settings
+        {
+            testBeyonder("models/update-settings/step2",
+                    singletonList("twitter"),
+                    null);
+            GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
+            String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
+            assertThat(numberOfReplicas, equalTo("1"));
+        }
+    }
+
+    @Test
+    public void testUpdateMapping() throws Exception {
+        // 1 _settings
+        {
+            testBeyonder("models/update-mapping/step1",
+                    singletonList("twitter"),
+                    null);
+            Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
+            String bar = BeanUtils.getProperty(properties, "properties.bar");
+            String foo = BeanUtils.getProperty(properties, "properties.foo");
+            String message = BeanUtils.getProperty(properties, "properties.message.search_analyzer");
+            assertThat(bar, nullValue());
+            assertThat(foo, notNullValue());
+            assertThat(message, nullValue());
+        }
+
+        // 2 _update_mapping
+        {
+            testBeyonder("models/update-mapping/step2",
+                    singletonList("twitter"),
+                    null);
+
+            Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
+            String bar = BeanUtils.getProperty(properties, "properties.bar");
+            String foo = BeanUtils.getProperty(properties, "properties.foo");
+            String message = BeanUtils.getProperty(properties, "properties.message.search_analyzer");
+            assertThat(bar, notNullValue());
+            assertThat(foo, notNullValue());
+            assertThat(message, notNullValue());
+        }
     }
 
     protected void testBeyonder(String root,

@@ -1,0 +1,8 @@
+{
+  "mappings" : {
+    "properties" : {
+      "message" : {"type" : "text", "store" : true, "analyzer" : "simple" },
+      "foo" : { "type" : "text" }
+    }
+  }
+}

@@ -41,7 +41,7 @@ public class IndexSettingsReader extends SettingsReader {
 	 * @param jsonFile json file to read
 	 * @return Settings
 	 */
-	public static String readSettings(String root, String index, String jsonFile) {
+	public static String readFile(String root, String index, String jsonFile) {
 		logger.trace("Reading [{}] for [{}] in [{}]...", jsonFile, index, root);
 		String settingsFile = root + "/" + index + "/" + jsonFile;
 		return readFileFromClasspath(settingsFile);
@@ -58,7 +58,7 @@ public class IndexSettingsReader extends SettingsReader {
 		if (root == null) {
 			return readSettings(index);
 		}
-		return readSettings(root, index, Defaults.IndexSettingsFileName);
+		return readFile(root, index, Defaults.IndexSettingsFileName);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class IndexSettingsReader extends SettingsReader {
      * @return Update Settings
 	 */
 	public static String readUpdateSettings(String root, String index) {
-		return readSettings(root, index, Defaults.UpdateIndexSettingsFileName);
+		return readFile(root, index, Defaults.UpdateIndexSettingsFileName);
 	}
 
 	/**
@@ -88,5 +88,24 @@ public class IndexSettingsReader extends SettingsReader {
      */
 	public static String readUpdateSettings(String index) {
 		return readUpdateSettings(Defaults.ConfigDir, index);
+	}
+
+	/**
+	 * Read index mapping
+	 * @param root dir within the classpath
+	 * @param index index name
+     * @return Update Mapping
+	 */
+	public static String readUpdateMapping(String root, String index) {
+		return readFile(root, index, Defaults.UpdateIndexMappingFileName);
+	}
+
+	/**
+	 * Read index mapping in default classpath dir
+	 * @param index index name
+     * @return Update Mapping
+     */
+	public static String readUpdateMapping(String index) {
+		return readUpdateMapping(Defaults.ConfigDir, index);
 	}
 }

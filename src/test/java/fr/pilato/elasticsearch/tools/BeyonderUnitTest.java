@@ -22,14 +22,21 @@ package fr.pilato.elasticsearch.tools;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
+import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 public class BeyonderUnitTest extends AbstractBeyonderTest {
 
@@ -77,5 +84,49 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         } else {
             assertThat(templateNames, emptyIterable());
         }
+    }
+
+    @Test
+    public void testVariableReplacement() throws Exception {
+
+        // given: A settings json with a variable that should be replaced.
+        //        And an environment variable with matching name (set in configuration of maven-surefire-plugin).
+        String folder = "models/variablereplacement";
+        String indexName = "twitter";
+
+        // when: this settings file is read
+        String settings = IndexSettingsReader.readSettings(folder, indexName);
+        Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
+
+        // then: the variables got replaced by environment variables of the same name
+        String numberOfReplicas = (String) ((Map) settingsMap.get("settings")).get("number_of_replicas");
+        assertThat(numberOfReplicas, equalTo("2"));
+
+    }
+
+    @Test
+    public void testUpdateMapping() throws Exception {
+        // 1 _settings
+        testBeyonder("models/update-mapping/step1",
+                singletonList("twitter"),
+                null);
+
+        // 2 _update_mapping
+        testBeyonder("models/update-mapping/step2",
+                singletonList("twitter"),
+                null);
+    }
+
+    @Test
+    public void testUpdateSettings() throws Exception {
+        // 1 _settings
+        testBeyonder("models/update-settings/step1",
+                singletonList("twitter"),
+                null);
+
+        // 2 _update_settings
+        testBeyonder("models/update-settings/step2",
+                singletonList("twitter"),
+                null);
     }
 }

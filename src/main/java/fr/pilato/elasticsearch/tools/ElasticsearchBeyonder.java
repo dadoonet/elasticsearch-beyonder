@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
+import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateMapping;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
 import static fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater.createPipeline;
@@ -122,6 +123,7 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
+			updateMapping(client, root, indexName);
 		}
 		logger.info("start done. Rock & roll!");
 	}
@@ -165,6 +167,7 @@ public class ElasticsearchBeyonder {
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
+			updateMapping(client, root, indexName);
 		}
 		logger.info("start done. Rock & roll!");
 	}

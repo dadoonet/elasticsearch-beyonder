@@ -22,7 +22,7 @@ package fr.pilato.elasticsearch.tools;
 import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater;
-
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Request;
@@ -43,10 +43,14 @@ import java.util.Map;
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assume.assumeNoException;
 
 public class BeyonderRestIT extends AbstractBeyonderTest {
@@ -150,6 +154,62 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 		ElasticsearchBeyonder.start(client, "models/pipeline");
 		assertThat(PipelineElasticsearchUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
 	}
+
+    @Test
+    public void testUpdateSettings() throws Exception {
+        // 1 _settings
+        {
+            testBeyonder("models/update-settings/step1",
+                    singletonList("twitter"),
+                    null);
+            Map<String, Object> oldSettings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
+            String numberOfReplicas = BeanUtils.getProperty(oldSettings, "twitter.settings.index.number_of_replicas");
+            assertThat(numberOfReplicas, equalTo("0"));
+        }
+
+        // 2 _update_settings
+        {
+            testBeyonder("models/update-settings/step2",
+                    singletonList("twitter"),
+                    null);
+            Map<String, Object> settings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
+            String numberOfReplicas = BeanUtils.getProperty(settings, "twitter.settings.index.number_of_replicas");
+            assertThat(numberOfReplicas, equalTo("1"));
+        }
+    }
+
+    @Test
+    public void testUpdateMapping() throws Exception {
+        // 1 _settings
+        {
+            testBeyonder("models/update-mapping/step1",
+                    singletonList("twitter"),
+                    null);
+
+            Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
+            String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
+            String foo = BeanUtils.getProperty(mapping, "twitter.mappings.properties.foo");
+            String message = BeanUtils.getProperty(mapping, "twitter.mappings.properties.message.search_analyzer");
+            assertThat(bar, nullValue());
+            assertThat(foo, notNullValue());
+            assertThat(message, nullValue());
+        }
+
+        // 2 _update_mapping
+        {
+            testBeyonder("models/update-mapping/step2",
+                    singletonList("twitter"),
+                    null);
+
+            Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
+            String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
+            String foo = BeanUtils.getProperty(mapping, "twitter.mappings.properties.foo");
+            String message = BeanUtils.getProperty(mapping, "twitter.mappings.properties.message.search_analyzer");
+            assertThat(bar, notNullValue());
+            assertThat(foo, notNullValue());
+            assertThat(message, notNullValue());
+        }
+    }
 
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();

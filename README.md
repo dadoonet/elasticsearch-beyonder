@@ -155,17 +155,16 @@ settings for your `twitter` index.
 
 For example, create the following file `src/main/resources/elasticsearch/twitter/_settings.json` in your project:
 
-```javascript
+```json
 {
   "settings": {
     "number_of_shards": 3,
-    "number_of_replicas": 2
+    "number_of_replicas": 0
   },
   "mappings": {
     "properties": {
-      "message": {
-        "type": "text"
-      }
+      "message": { "type": "text" },
+      "foo": { "type": "text" }
     }
   }
 }
@@ -174,6 +173,36 @@ For example, create the following file `src/main/resources/elasticsearch/twitter
 By default, Beyonder will not overwrite an index if it already exists.
 This can be overridden by setting `force` to `true` in the expanded factory method
 `ElasticsearchBeyonder.start()`.
+
+You can also provide a file named `_update_settings.json` to update your index settings 
+and a file named `_update_mapping.json` if you want to update an existing mapping. 
+Note that Elasticsearch do not allow updating all settings and mappings.
+
+You can for example add a new field, or change the `search_analyzer` for a given field but you can not modify
+the field `type`.
+
+Considering the previous example we saw, you can create a `elasticsearch/twitter/_update_settings.json` to update the
+number of replicas:
+
+```json
+{
+    "number_of_replicas" : 1
+}
+```
+
+And you can create `elasticsearch/twitter/_update_mapping.json`:
+
+```json
+{
+  "properties": {
+    "message" : {"type" : "text", "search_analyzer": "keyword" },
+    "bar" : { "type" : "text" }
+  }
+}
+```
+
+This will change the `search_analyzer` for the `message` field and will add a new field named `bar`.
+All other existing fields (like `foo` in the previous example) won't be changed.
 
 Managing templates
 ------------------
@@ -184,7 +213,7 @@ For example, if you planned to have indexes per year for twitter feeds (twitter2
 to define a template named `twitter_template`, you can add a file named `elasticsearch/_template/twitter_template.json`
 in your project:
 
-```javascript
+```json
 {
     "template" : "twitter*",
     "settings" : {
@@ -213,7 +242,7 @@ documents are being indexed. Please note that this feature is only supported whe
 For example, setting one fields value based on another field by using an Set Processor you an add a file named `elasticsearch/_pipeline/set_field_processor`
 in your project:
 
-```javascript
+```json
 {
   "description" : "Twitter pipeline",
   "processors" : [

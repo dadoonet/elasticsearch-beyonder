@@ -164,6 +164,28 @@ public class IndexElasticsearchUpdater {
 	}
 
 	/**
+	 * Update mapping in Elasticsearch
+	 * @param client Elasticsearch client
+	 * @param index Index name
+	 * @param mapping Mapping if any, null if no update mapping
+	 */
+	@Deprecated
+	private static void updateMappingInElasticsearch(Client client, String index, String mapping) {
+		logger.trace("updateMapping([{}])", index);
+
+		assert client != null;
+		assert index != null;
+
+		if (mapping != null) {
+			logger.trace("Found update mapping for index [{}]: [{}]", index, mapping);
+			logger.debug("updating mapping for index [{}]", index);
+			client.admin().indices().preparePutMapping(index).setType("_doc").setSource(mapping, XContentType.JSON).get();
+		}
+
+		logger.trace("/updateMapping([{}])", index);
+	}
+
+	/**
 	 * Check if an index already exists
 	 * @param client Elasticsearch client
 	 * @param index Index name
@@ -197,6 +219,30 @@ public class IndexElasticsearchUpdater {
 	public static void updateSettings(Client client, String index) throws Exception {
 		String settings = IndexSettingsReader.readUpdateSettings(index);
 		updateIndexWithSettingsInElasticsearch(client, index, settings);
+	}
+
+
+	/**
+	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists.
+	 * @param client Elasticsearch client
+	 * @param root dir within the classpath
+	 * @param index Index name
+	 */
+	@Deprecated
+	public static void updateMapping(Client client, String root, String index) {
+		String mapping = IndexSettingsReader.readUpdateMapping(root, index);
+		updateMappingInElasticsearch(client, index, mapping);
+	}
+
+	/**
+	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists in default classpath dir.
+	 * @param client Elasticsearch client
+	 * @param index Index name
+	 */
+	@Deprecated
+	public static void updateMapping(Client client, String index) {
+		String mapping = IndexSettingsReader.readUpdateMapping(index);
+		updateMappingInElasticsearch(client, index, mapping);
 	}
 
 	/**
@@ -322,6 +368,31 @@ public class IndexElasticsearchUpdater {
 	}
 
 	/**
+	 * Update mapping in Elasticsearch
+	 * @param client Elasticsearch client
+	 * @param index Index name
+	 * @param mapping Mapping if any, null if no update mapping
+	 * @throws Exception if the elasticsearch API call is failing
+	 */
+	private static void updateMappingInElasticsearch(RestClient client, String index, String mapping) throws Exception {
+		logger.trace("updateMapping([{}])", index);
+
+		assert client != null;
+		assert index != null;
+
+
+		if (mapping != null) {
+			logger.trace("Found update mapping for index [{}]: [{}]", index, mapping);
+			logger.debug("updating mapping for index [{}]", index);
+            Request request = new Request("PUT", "/" + index + "/_mapping");
+            request.setJsonEntity(mapping);
+			client.performRequest(request);
+		}
+
+		logger.trace("/updateMapping([{}])", index);
+	}
+
+	/**
 	 * Check if an index already exists
 	 * @param client Elasticsearch client
 	 * @param index Index name
@@ -354,5 +425,28 @@ public class IndexElasticsearchUpdater {
 	public static void updateSettings(RestClient client, String index) throws Exception {
 		String settings = IndexSettingsReader.readUpdateSettings(index);
 		updateIndexWithSettingsInElasticsearch(client, index, settings);
+	}
+
+	/**
+	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists.
+	 * @param client Elasticsearch client
+	 * @param root dir within the classpath
+	 * @param index Index name
+	 * @throws Exception if the elasticsearch API call is failing
+	 */
+	public static void updateMapping(RestClient client, String root, String index) throws Exception {
+		String mapping = IndexSettingsReader.readUpdateMapping(root, index);
+		updateMappingInElasticsearch(client, index, mapping);
+	}
+
+	/**
+	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists in default classpath dir.
+	 * @param client Elasticsearch client
+	 * @param index Index name
+	 * @throws Exception if the elasticsearch API call is failing
+	 */
+	public static void updateMapping(RestClient client, String index) throws Exception {
+		String mapping = IndexSettingsReader.readUpdateMapping(index);
+		updateMappingInElasticsearch(client, index, mapping);
 	}
 }
