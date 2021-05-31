@@ -29,3 +29,5 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots verify
+    - name: Deploy with Maven
+      run: mvn deploy -DskipTests --settings deploy-settings.xml
