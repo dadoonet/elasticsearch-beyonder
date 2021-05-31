@@ -37,6 +37,7 @@ Documentation
 Build Status
 ============
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.pilato.elasticsearch/elasticsearch-beyonder/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/fr.pilato.elasticsearch/elasticsearch-beyonder/)
 [![Build Status](https://github.com/dadoonet/elasticsearch-beyonder/actions/workflows/maven.yml/badge.svg)](https://github.com/dadoonet/elasticsearch-beyonder/actions/workflows/maven.yml)
 
 
