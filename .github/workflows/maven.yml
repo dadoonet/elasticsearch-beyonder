@@ -24,16 +24,16 @@ jobs:
         server-id: sonatype-nexus-snapshots
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
-    - name: Cache Maven packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+#    - name: Cache Maven packages
+#      uses: actions/cache@v2
+#      with:
+#        path: ~/.m2
+#        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#        restore-keys: ${{ runner.os }}-m2
 #    - name: Build with Maven
 #      run: mvn --batch-mode --update-snapshots verify
     - name: Deploy with Maven
-      run: mvn -X --batch-mode deploy -DskipTests
+      run: mvn deploy -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
