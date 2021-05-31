@@ -19,22 +19,7 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-
-import static java.nio.file.FileVisitResult.CONTINUE;
-
 public class SettingsFinder {
-
-	private static final Logger logger = LoggerFactory.getLogger(SettingsFinder.class);
 
 	public static class Defaults {
 		/**
@@ -45,6 +30,7 @@ public class SettingsFinder {
 		public static String JsonFileExtension = ".json";
 		public static String IndexSettingsFileName = "_settings.json";
 		public static String UpdateIndexSettingsFileName = "_update_settings.json";
+		public static String UpdateIndexMappingFileName = "_update_mapping.json";
 		public static String TemplateDir = "_template";
 		public static String PipelineDir = "_pipeline";
 
@@ -57,45 +43,5 @@ public class SettingsFinder {
 		 * Default setting of whether or not to force creation of indices and templates on start.
 		 */
 		public static boolean ForceCreation = false;
-	}
-
-	/**
-	 * Find all types within an index
-	 * @param root dir within the classpath
-	 * @param subdir subdir name
-     * @return A list of found JSON files
-     * @deprecated Sounds like it's not used. We will remove it
-     * @throws IOException if something goes wrong
-	 */
-	@Deprecated
-	protected static ArrayList<String> findJsonFiles(Path root, String subdir) throws IOException {
-		logger.debug("Looking for json files in classpath under [{}/{}].", root, subdir);
-
-		final ArrayList<String> jsonFiles = new ArrayList<>();
-		final Path indexDir = root.resolve(subdir);
-		if (Files.exists(indexDir)) {
-			Files.walkFileTree(indexDir, new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					// We have now files. They could be type, settings, templates...
-					String jsonFile = indexDir.relativize(file).toString();
-
-					if (jsonFile.equals(Defaults.IndexSettingsFileName) ||
-							jsonFile.equals(Defaults.UpdateIndexSettingsFileName)) {
-						logger.trace("ignoring: [{}]", jsonFile);
-						return CONTINUE;
-					}
-					jsonFile = jsonFile.substring(0, jsonFile.lastIndexOf(Defaults.JsonFileExtension));
-
-					jsonFiles.add(jsonFile);
-					logger.trace("json found: [{}]", jsonFile);
-					return CONTINUE;
-				}
-			});
-		} else {
-			logger.trace("[{}] does not exist in [{}].", subdir, root);
-		}
-
-		return jsonFiles;
 	}
 }
