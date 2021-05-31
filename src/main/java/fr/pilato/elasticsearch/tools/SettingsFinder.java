@@ -46,6 +46,7 @@ public class SettingsFinder {
 		public static String IndexSettingsFileName = "_settings.json";
 		public static String UpdateIndexSettingsFileName = "_update_settings.json";
 		public static String TemplateDir = "_template";
+		public static String PipelineDir = "_pipeline";
 
 		/**
 		 * Default setting of whether or not to merge mappings on start.

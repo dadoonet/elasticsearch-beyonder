@@ -21,6 +21,8 @@ package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
 import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
+import fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Request;
@@ -142,6 +144,12 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         String newMapping = getMapping("twitter");
         assertThat(newMapping, is(not(oldMapping)));
     }
+    
+    @Test
+	public void testPipeline() throws Exception {
+		ElasticsearchBeyonder.start(client, "models/pipeline");
+		assertThat(PipelineElasticsearchUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
+	}
 
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();
