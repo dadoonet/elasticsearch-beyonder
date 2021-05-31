@@ -30,8 +30,8 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
-    - name: Build with Maven
-      run: mvn --batch-mode --update-snapshots verify
+#    - name: Build with Maven
+#      run: mvn --batch-mode --update-snapshots verify
     - name: Deploy with Maven
       run: mvn --batch-mode deploy -DskipTests
       env:
