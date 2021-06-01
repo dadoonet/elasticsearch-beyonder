@@ -32,6 +32,8 @@ public class SettingsFinder {
 		public static String UpdateIndexSettingsFileName = "_update_settings.json";
 		public static String UpdateIndexMappingFileName = "_update_mapping.json";
 		public static String TemplateDir = "_template";
+		public static String IndexTemplatesDir = "_index_templates";
+		public static String ComponentTemplatesDir = "_component_templates";
 		public static String PipelineDir = "_pipeline";
 
 		/**

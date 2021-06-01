@@ -70,7 +70,11 @@ public class IndexFinder extends SettingsFinder {
                 } else {
                     key = resource;
                 }
-                if (!key.equals(Defaults.TemplateDir) && !key.equals(Defaults.PipelineDir) && !keys.contains(key)) {
+                if (!key.equals(Defaults.IndexTemplatesDir) &&
+                        !key.equals(Defaults.ComponentTemplatesDir) &&
+                        !key.equals(Defaults.TemplateDir) &&
+                        !key.equals(Defaults.PipelineDir) &&
+                        !keys.contains(key)) {
                     logger.trace(" - found [{}].", key);
                     keys.add(key);
                     indexNames.add(key);

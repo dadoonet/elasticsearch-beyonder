@@ -19,7 +19,11 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateFinder;
+import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateSettingsReader;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
+import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateFinder;
+import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateSettingsReader;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
 import org.junit.Test;
@@ -29,8 +33,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -42,7 +49,9 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
     protected void testBeyonder(String root,
                                 List<String> indices,
-                                List<String> templates) throws IOException, URISyntaxException {
+                                List<String> templates,
+                                List<String> componentTemplates,
+                                List<String> indexTemplates) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
         List<String> indexNames;
         if (root == null) {
@@ -68,22 +77,47 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
             assertThat(indexNames, emptyIterable());
         }
 
-        List<String> templateNames = TemplateFinder.findTemplates(root);
-        logger.info("  --> templates found: {}", templateNames);
+        check(TemplateFinder.findTemplates(root), templates, (name) -> {
+            try {
+                return TemplateSettingsReader.readTemplate(root, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+        check(ComponentTemplateFinder.findComponentTemplates(root), componentTemplates, (name) -> {
+            try {
+                return ComponentTemplateSettingsReader.readComponentTemplate(root, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+        check(IndexTemplateFinder.findIndexTemplates(root), indexTemplates, (name) -> {
+            try {
+                return IndexTemplateSettingsReader.readIndexTemplate(root, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+    }
 
-        if (templates != null) {
-            assertThat(templateNames, hasSize(templates.size()));
-            for (int iTemplate = 0; iTemplate < templateNames.size(); iTemplate++) {
-                String templateName = templateNames.get(iTemplate);
-                logger.debug("    --> template: [{}]", templateName);
-                assertThat(templateName, is(templates.get(iTemplate)));
+    private void check(List<String> names, List<String> expectedNames,
+                       Function<String, String> reader) {
+        logger.info("  --> names found: {}", names);
 
-                String template = TemplateSettingsReader.readTemplate(root, templateName);
-                logger.debug("      --> Template: [{}]", template);
+        if (expectedNames != null) {
+            assertThat(names, hasSize(expectedNames.size()));
+            for (int iTemplate = 0; iTemplate < names.size(); iTemplate++) {
+                String name = names.get(iTemplate);
+                logger.debug("    --> name: [{}]", name);
+                assertThat(name, is(expectedNames.get(iTemplate)));
+
+                String json = reader.apply(name);
+                logger.debug("      --> Json: [{}]", json);
             }
         } else {
-            assertThat(templateNames, emptyIterable());
+            assertThat(names, emptyIterable());
         }
+
     }
 
     @Test
@@ -109,12 +143,12 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-mapping/step1",
                 singletonList("twitter"),
-                null);
+                null, null, null);
 
         // 2 _update_mapping
         testBeyonder("models/update-mapping/step2",
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -122,11 +156,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-settings/step1",
                 singletonList("twitter"),
-                null);
+                null, null, null);
 
         // 2 _update_settings
         testBeyonder("models/update-settings/step2",
                 singletonList("twitter"),
-                null);
+                null, null, null);
+    }
+
+    @Test
+    public void testIndexTemplates() throws Exception {
+        // 1 template
+        testBeyonder("models/templatev2",
+                null,
+                null,
+                asList("component1", "component2"),
+                singletonList("template_1"));
     }
 }

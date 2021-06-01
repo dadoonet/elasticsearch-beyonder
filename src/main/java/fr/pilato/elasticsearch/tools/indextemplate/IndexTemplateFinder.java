@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.template;
+package fr.pilato.elasticsearch.tools.indextemplate;
 
 import fr.pilato.elasticsearch.tools.ResourceList;
 import fr.pilato.elasticsearch.tools.SettingsFinder;
@@ -26,17 +26,15 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-@Deprecated
-public class TemplateFinder extends SettingsFinder {
+public class IndexTemplateFinder extends SettingsFinder {
     /**
-     * Find all legacy templates ("elasticsearch/_template/")
+     * Find all index templates ("elasticsearch/_index_templates/")
      * @param root dir within the classpath
-     * @return a list of templates
+     * @return a list of index templates
      * @throws IOException if connection with elasticsearch is failing
      * @throws URISyntaxException this should not happen
      */
-    @Deprecated
-    public static List<String> findTemplates(String root) throws IOException, URISyntaxException {
-        return ResourceList.getResourceNames(root, Defaults.TemplateDir);
+    public static List<String> findIndexTemplates(String root) throws IOException, URISyntaxException {
+        return ResourceList.getResourceNames(root, Defaults.IndexTemplatesDir);
     }
 }

@@ -20,7 +20,9 @@
 package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateFinder;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
+import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.pipeline.PipelineFinder;
 import org.elasticsearch.client.Client;
@@ -31,11 +33,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
+import static fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateElasticsearchUpdater.createComponentTemplate;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateMapping;
 import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
-import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
+import static fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateElasticsearchUpdater.createIndexTemplate;
 import static fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater.createPipeline;
+import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -106,10 +110,24 @@ public class ElasticsearchBeyonder {
 	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
 
-		// create templates
+		// create legacy templates
 		List<String> templateNames = TemplateFinder.findTemplates(root);
 		for (String templateName : templateNames) {
+			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
+					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
 			createTemplate(client, root, templateName, force);
+		}
+
+		// create component templates
+		List<String> componentTemplates = ComponentTemplateFinder.findComponentTemplates(root);
+		for (String componentTemplateName : componentTemplates) {
+			createComponentTemplate(client, root, componentTemplateName, force);
+		}
+
+		// create index templates
+		List<String> indexTemplateNames = IndexTemplateFinder.findIndexTemplates(root);
+		for (String indexTemplateName : indexTemplateNames) {
+			createIndexTemplate(client, root, indexTemplateName, force);
 		}
 
 		// create pipelines
