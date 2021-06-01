@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.indextemplate;
+package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
  * Manage elasticsearch index templates
  * @author David Pilato
  */
-public class IndexTemplateElasticsearchUpdater {
+public class ElasticsearchIndexTemplateUpdater {
 
-	private static final Logger logger = LoggerFactory.getLogger(IndexTemplateElasticsearchUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndexTemplateUpdater.class);
 
 	/**
 	 * Create an index template in Elasticsearch.

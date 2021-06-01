@@ -19,10 +19,10 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
-import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateElasticsearchUpdater;
-import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
-import fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -42,10 +42,10 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
-import static fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateElasticsearchUpdater.isComponentTemplateExist;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
-import static fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateElasticsearchUpdater.isIndexTemplateExist;
-import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -155,8 +155,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     // See https://github.com/dadoonet/elasticsearch-beyonder/issues/2
     @Test
     public void testAliases() throws Exception {
-        IndexElasticsearchUpdater.createIndex(client, "test_aliases", true);
-        AliasElasticsearchUpdater.createAlias(client, "foo", "test_aliases");
+        ElasticsearchIndexUpdater.createIndex(client, SettingsFinder.Defaults.ConfigDir, "test_aliases", true);
+        ElasticsearchAliasUpdater.createAlias(client, "foo", "test_aliases");
         Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/_alias/foo")));
         assertThat(response, hasKey("test_aliases"));
     }
@@ -182,7 +182,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Test
 	public void testPipeline() throws Exception {
 		ElasticsearchBeyonder.start(client, "models/pipeline");
-		assertThat(PipelineElasticsearchUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
+		assertThat(ElasticsearchPipelineUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
 	}
 
     @Test

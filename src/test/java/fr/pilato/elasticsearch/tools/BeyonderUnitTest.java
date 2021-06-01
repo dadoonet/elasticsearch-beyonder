@@ -19,7 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
+import fr.pilato.elasticsearch.tools.util.ResourceList;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -29,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
-import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,12 +47,8 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                                 List<String> componentTemplates,
                                 List<String> indexTemplates) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
-        List<String> indexNames;
-        if (root == null) {
-            indexNames = findIndexNames();
-        } else {
-            indexNames = findIndexNames(root);
-        }
+
+        List<String> indexNames = ResourceList.findIndexNames(root);
         logger.info("  --> indices found: {}", indexNames);
 
         if (indices != null) {
@@ -64,7 +60,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                 logger.debug("  --> index [{}]:", indexName);
                 assertThat(indexName, is(indices.get(iIndex)));
 
-                String settings = IndexSettingsReader.readSettings(root, indexName);
+                String settings = getJsonContent(root, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
                 logger.debug("    --> Settings: [{}]", settings);
             }
         } else {
@@ -123,7 +119,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         String indexName = "twitter";
 
         // when: this settings file is read
-        String settings = IndexSettingsReader.readSettings(folder, indexName);
+        String settings = getJsonContent(folder, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
         Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
 
         // then: the variables got replaced by environment variables of the same name

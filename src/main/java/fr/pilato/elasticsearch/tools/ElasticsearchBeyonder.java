@@ -19,8 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
-import fr.pilato.elasticsearch.tools.index.IndexFinder;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.util.ResourceList;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-import static fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateElasticsearchUpdater.createComponentTemplate;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateMapping;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
-import static fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateElasticsearchUpdater.createIndexTemplate;
-import static fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater.createPipeline;
-import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.createComponentTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.createIndex;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateMapping;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateSettings;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.createIndexTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.createPipeline;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.createTemplate;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -133,7 +133,7 @@ public class ElasticsearchBeyonder {
 		}
 
 		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
+		Collection<String> indexNames = ResourceList.findIndexNames(root);
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
@@ -177,7 +177,7 @@ public class ElasticsearchBeyonder {
 		}
 
 		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
+		Collection<String> indexNames = ResourceList.findIndexNames(root);
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);

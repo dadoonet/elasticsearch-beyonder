@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.template;
+package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Request;
@@ -31,16 +31,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
  * Manage elasticsearch templates
  * @author David Pilato
  */
 @Deprecated
-public class TemplateElasticsearchUpdater {
+public class ElasticsearchTemplateUpdater {
 
-	private static final Logger logger = LoggerFactory.getLogger(TemplateElasticsearchUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchTemplateUpdater.class);
 
 	/**
 	 * Create a template in Elasticsearch.

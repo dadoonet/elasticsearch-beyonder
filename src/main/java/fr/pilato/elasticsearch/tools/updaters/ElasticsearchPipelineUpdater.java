@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.pipeline;
+package fr.pilato.elasticsearch.tools.updaters;
 
 import java.io.IOException;
 
-import fr.pilato.elasticsearch.tools.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
@@ -29,7 +29,7 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
  * Handles ingest pipeline creation.
@@ -37,9 +37,9 @@ import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
  * @author hjk181
  *
  */
-public class PipelineElasticsearchUpdater {
+public class ElasticsearchPipelineUpdater {
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineElasticsearchUpdater.class);
+    private static final Logger logger = LoggerFactory.getLogger(ElasticsearchPipelineUpdater.class);
 
     /**
      * Create a pipeline in Elasticsearch.
