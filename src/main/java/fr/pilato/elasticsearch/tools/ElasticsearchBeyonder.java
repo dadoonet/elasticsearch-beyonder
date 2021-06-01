@@ -20,11 +20,7 @@
 package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
-import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateFinder;
 import fr.pilato.elasticsearch.tools.index.IndexFinder;
-import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateFinder;
-import fr.pilato.elasticsearch.tools.template.TemplateFinder;
-import fr.pilato.elasticsearch.tools.pipeline.PipelineFinder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -111,7 +107,7 @@ public class ElasticsearchBeyonder {
 		logger.info("starting automatic settings/mappings discovery");
 
 		// create legacy templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
 		for (String templateName : templateNames) {
 			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
 					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
@@ -119,19 +115,19 @@ public class ElasticsearchBeyonder {
 		}
 
 		// create component templates
-		List<String> componentTemplates = ComponentTemplateFinder.findComponentTemplates(root);
+		List<String> componentTemplates = ResourceList.getResourceNames(root, Defaults.ComponentTemplatesDir);
 		for (String componentTemplateName : componentTemplates) {
 			createComponentTemplate(client, root, componentTemplateName, force);
 		}
 
 		// create index templates
-		List<String> indexTemplateNames = IndexTemplateFinder.findIndexTemplates(root);
+		List<String> indexTemplateNames = ResourceList.getResourceNames(root, Defaults.IndexTemplatesDir);
 		for (String indexTemplateName : indexTemplateNames) {
 			createIndexTemplate(client, root, indexTemplateName, force);
 		}
 
 		// create pipelines
-		List<String> pipelineNames = PipelineFinder.findPipelines(root);
+		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelineDir);
 		for (String pipelineName : pipelineNames) {
 			createPipeline(client, root, pipelineName, force);
 		}
@@ -175,7 +171,7 @@ public class ElasticsearchBeyonder {
 		boolean force = Defaults.ForceCreation;
 
 		// create templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
 		for (String templateName : templateNames) {
 			createTemplate(client, root, templateName, force);
 		}

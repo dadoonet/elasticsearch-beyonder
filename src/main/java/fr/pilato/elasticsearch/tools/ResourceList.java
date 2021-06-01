@@ -19,7 +19,6 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

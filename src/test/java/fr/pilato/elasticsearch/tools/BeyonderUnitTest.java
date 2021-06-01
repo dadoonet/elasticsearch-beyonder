@@ -19,12 +19,9 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateFinder;
 import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateSettingsReader;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
-import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateFinder;
 import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateSettingsReader;
-import fr.pilato.elasticsearch.tools.template.TemplateFinder;
 import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
 import org.junit.Test;
 
@@ -33,7 +30,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
@@ -77,21 +73,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
             assertThat(indexNames, emptyIterable());
         }
 
-        check(TemplateFinder.findTemplates(root), templates, (name) -> {
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplateDir), templates, (name) -> {
             try {
                 return TemplateSettingsReader.readTemplate(root, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
-        check(ComponentTemplateFinder.findComponentTemplates(root), componentTemplates, (name) -> {
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates, (name) -> {
             try {
                 return ComponentTemplateSettingsReader.readComponentTemplate(root, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
-        check(IndexTemplateFinder.findIndexTemplates(root), indexTemplates, (name) -> {
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
             try {
                 return IndexTemplateSettingsReader.readIndexTemplate(root, name);
             } catch (IOException e) {
