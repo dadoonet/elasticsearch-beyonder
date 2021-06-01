@@ -21,12 +21,15 @@ package fr.pilato.elasticsearch.tools.pipeline;
 
 import java.io.IOException;
 
+import fr.pilato.elasticsearch.tools.SettingsFinder;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
 
 /**
  * Handles ingest pipeline creation.
@@ -48,20 +51,7 @@ public class PipelineElasticsearchUpdater {
      * @throws Exception if something goes wrong
      */
     public static void createPipeline(RestClient client, String root, String pipeline, boolean force) throws Exception {
-        String json = PipelineReader.readPipeline(root, pipeline);
-        createPipelineWithJson(client, pipeline, json, force);
-    }
-
-    /**
-     * Create a pipeline in Elasticsearch. Read content from default classpath dir.
-     * 
-     * @param client Elasticsearch client
-     * @param pipeline the id of the pipeline
-     * @param force set it to true if you want to force cleaning pipeline before adding it
-     * @throws Exception if something goes wrong
-     */
-    public static void createPipeline(RestClient client, String pipeline, boolean force) throws Exception {
-        String json = PipelineReader.readPipeline(pipeline);
+        String json = getJsonContent(root, SettingsFinder.Defaults.PipelineDir, pipeline);
         createPipelineWithJson(client, pipeline, json, force);
     }
 

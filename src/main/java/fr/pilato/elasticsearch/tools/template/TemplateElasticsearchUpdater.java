@@ -19,6 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.template;
 
+import fr.pilato.elasticsearch.tools.SettingsFinder;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Request;
@@ -29,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
 
 /**
  * Manage elasticsearch templates
@@ -50,21 +53,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String root, String template, boolean force) throws Exception {
-		String json = TemplateReader.readTemplate(root, template);
-		createTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create a template in Elasticsearch. Read read content from default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param template Template name
-     * @param force set it to true if you want to force cleaning template before adding it
-     * @throws Exception if something goes wrong
-     * @deprecated Will be removed when we don't support TransportClient anymore
-	 */
-	@Deprecated
-	public static void createTemplate(Client client, String template, boolean force) throws Exception {
-		String json = TemplateReader.readTemplate(template);
+		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
 		createTemplateWithJson(client, template, json, force);
 	}
 
@@ -157,20 +146,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(RestClient client, String root, String template, boolean force) throws Exception {
-		String json = TemplateReader.readTemplate(root, template);
-		createTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create a legacy template in Elasticsearch. Read read content from default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param template Template name
-     * @param force set it to true if you want to force cleaning template before adding it
-     * @throws Exception if something goes wrong
-	 */
-	@Deprecated
-	public static void createTemplate(RestClient client, String template, boolean force) throws Exception {
-		String json = TemplateReader.readTemplate(template);
+		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
 		createTemplateWithJson(client, template, json, force);
 	}
 

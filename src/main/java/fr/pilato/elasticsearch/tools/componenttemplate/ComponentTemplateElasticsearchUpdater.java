@@ -19,6 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.componenttemplate;
 
+import fr.pilato.elasticsearch.tools.SettingsFinder;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -26,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
 
 /**
  * Manage elasticsearch component templates
@@ -44,19 +47,7 @@ public class ComponentTemplateElasticsearchUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createComponentTemplate(RestClient client, String root, String template, boolean force) throws Exception {
-		String json = ComponentTemplateReader.readComponentTemplate(root, template);
-		createComponentTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create an component template in Elasticsearch. Read read content from default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param template Template name
-	 * @param force set it to true if you want to force cleaning template before adding it
-	 * @throws Exception if something goes wrong
-	 */
-	public static void createComponentTemplate(RestClient client, String template, boolean force) throws Exception {
-		String json = ComponentTemplateReader.readComponentTemplate(template);
+		String json = getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, template);
 		createComponentTemplateWithJson(client, template, json, force);
 	}
 

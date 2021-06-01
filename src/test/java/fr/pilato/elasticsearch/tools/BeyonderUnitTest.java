@@ -19,10 +19,7 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateReader;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
-import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateReader;
-import fr.pilato.elasticsearch.tools.template.TemplateReader;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -32,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static fr.pilato.elasticsearch.tools.SettingsReader.getJsonContent;
 import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -75,21 +73,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplateDir), templates, (name) -> {
             try {
-                return TemplateReader.readTemplate(root, name);
+                return getJsonContent(root, SettingsFinder.Defaults.TemplateDir, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates, (name) -> {
             try {
-                return ComponentTemplateReader.readComponentTemplate(root, name);
+                return getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
             try {
-                return IndexTemplateReader.readIndexTemplate(root, name);
+                return getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
