@@ -29,7 +29,7 @@ import fr.pilato.elasticsearch.tools.SettingsReader;
  * 
  * @author hjk181
  */
-public class PipelineSettingsReader extends SettingsReader {
+public class PipelineReader extends SettingsReader {
 
     /**
      * Read a pipeline

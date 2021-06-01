@@ -48,7 +48,7 @@ public class PipelineElasticsearchUpdater {
      * @throws Exception if something goes wrong
      */
     public static void createPipeline(RestClient client, String root, String pipeline, boolean force) throws Exception {
-        String json = PipelineSettingsReader.readPipeline(root, pipeline);
+        String json = PipelineReader.readPipeline(root, pipeline);
         createPipelineWithJson(client, pipeline, json, force);
     }
 
@@ -61,7 +61,7 @@ public class PipelineElasticsearchUpdater {
      * @throws Exception if something goes wrong
      */
     public static void createPipeline(RestClient client, String pipeline, boolean force) throws Exception {
-        String json = PipelineSettingsReader.readPipeline(pipeline);
+        String json = PipelineReader.readPipeline(pipeline);
         createPipelineWithJson(client, pipeline, json, force);
     }
 

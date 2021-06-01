@@ -50,7 +50,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String root, String template, boolean force) throws Exception {
-		String json = TemplateSettingsReader.readTemplate(root, template);
+		String json = TemplateReader.readTemplate(root, template);
 		createTemplateWithJson(client, template, json, force);
 	}
 
@@ -64,7 +64,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String template, boolean force) throws Exception {
-		String json = TemplateSettingsReader.readTemplate(template);
+		String json = TemplateReader.readTemplate(template);
 		createTemplateWithJson(client, template, json, force);
 	}
 
@@ -157,7 +157,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(RestClient client, String root, String template, boolean force) throws Exception {
-		String json = TemplateSettingsReader.readTemplate(root, template);
+		String json = TemplateReader.readTemplate(root, template);
 		createTemplateWithJson(client, template, json, force);
 	}
 
@@ -170,7 +170,7 @@ public class TemplateElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(RestClient client, String template, boolean force) throws Exception {
-		String json = TemplateSettingsReader.readTemplate(template);
+		String json = TemplateReader.readTemplate(template);
 		createTemplateWithJson(client, template, json, force);
 	}
 

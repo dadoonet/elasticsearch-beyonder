@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.template;
+package fr.pilato.elasticsearch.tools.indextemplate;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.SettingsReader;
@@ -27,38 +27,36 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * Manage elasticsearch template files
+ * Manage elasticsearch index template files in _index_templates dir
+ * and component template files in _component_templates dir.
  * @author David Pilato
  */
-@Deprecated
-public class TemplateSettingsReader extends SettingsReader {
+public class IndexTemplateReader extends SettingsReader {
 
-	private static final Logger logger = LoggerFactory.getLogger(TemplateSettingsReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(IndexTemplateReader.class);
 
 	/**
-	 * Read a legacy template
+	 * Read an index template
 	 * @param root dir within the classpath
-	 * @param template template name (.json will be appended)
-	 * @return The template content
-	 * @throws IOException if the connection with elasticsearch is failing
+	 * @param template index template name (.json will be appended)
+	 * @return The index template content
+	 * @throws IOException if we can not read the file
 	 */
-	@Deprecated
-	public static String readTemplate(String root, String template) throws IOException {
+	public static String readIndexTemplate(String root, String template) throws IOException {
 		if (root == null) {
-			return readTemplate(template);
+			return readIndexTemplate(template);
 		}
-		String settingsFile = root + "/" + Defaults.TemplateDir + "/" + template + Defaults.JsonFileExtension;
+		String settingsFile = root + "/" + Defaults.IndexTemplatesDir + "/" + template + Defaults.JsonFileExtension;
 		return readFileFromClasspath(settingsFile);
 	}
 
 	/**
-	 * Read a legacy template in default classpath dir
-	 * @param template template name (.json will be appended)
-	 * @return The template content
-	 * @throws IOException if the connection with elasticsearch is failing
+	 * Read an index template in default classpath dir
+	 * @param template index template name (.json will be appended)
+	 * @return The index template content
+	 * @throws IOException if we can not read the file
 	 */
-	@Deprecated
-	public static String readTemplate(String template) throws IOException {
-		return readTemplate(Defaults.ConfigDir, template);
+	public static String readIndexTemplate(String template) throws IOException {
+		return readIndexTemplate(Defaults.ConfigDir, template);
 	}
 }

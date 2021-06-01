@@ -44,7 +44,7 @@ public class ComponentTemplateElasticsearchUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createComponentTemplate(RestClient client, String root, String template, boolean force) throws Exception {
-		String json = ComponentTemplateSettingsReader.readComponentTemplate(root, template);
+		String json = ComponentTemplateReader.readComponentTemplate(root, template);
 		createComponentTemplateWithJson(client, template, json, force);
 	}
 
@@ -56,7 +56,7 @@ public class ComponentTemplateElasticsearchUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createComponentTemplate(RestClient client, String template, boolean force) throws Exception {
-		String json = ComponentTemplateSettingsReader.readComponentTemplate(template);
+		String json = ComponentTemplateReader.readComponentTemplate(template);
 		createComponentTemplateWithJson(client, template, json, force);
 	}
 

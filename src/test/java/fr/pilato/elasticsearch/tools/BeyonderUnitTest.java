@@ -19,10 +19,10 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateSettingsReader;
+import fr.pilato.elasticsearch.tools.componenttemplate.ComponentTemplateReader;
 import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
-import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateSettingsReader;
-import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
+import fr.pilato.elasticsearch.tools.indextemplate.IndexTemplateReader;
+import fr.pilato.elasticsearch.tools.template.TemplateReader;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -75,21 +75,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplateDir), templates, (name) -> {
             try {
-                return TemplateSettingsReader.readTemplate(root, name);
+                return TemplateReader.readTemplate(root, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates, (name) -> {
             try {
-                return ComponentTemplateSettingsReader.readComponentTemplate(root, name);
+                return ComponentTemplateReader.readComponentTemplate(root, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
         });
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
             try {
-                return IndexTemplateSettingsReader.readIndexTemplate(root, name);
+                return IndexTemplateReader.readIndexTemplate(root, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }

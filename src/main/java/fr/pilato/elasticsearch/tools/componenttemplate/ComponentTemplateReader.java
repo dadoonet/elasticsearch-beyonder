@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.indextemplate;
+package fr.pilato.elasticsearch.tools.componenttemplate;
 
 import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.SettingsReader;
@@ -31,32 +31,32 @@ import java.io.IOException;
  * and component template files in _component_templates dir.
  * @author David Pilato
  */
-public class IndexTemplateSettingsReader extends SettingsReader {
+public class ComponentTemplateReader extends SettingsReader {
 
-	private static final Logger logger = LoggerFactory.getLogger(IndexTemplateSettingsReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(ComponentTemplateReader.class);
 
 	/**
-	 * Read an index template
+	 * Read a component template
 	 * @param root dir within the classpath
-	 * @param template index template name (.json will be appended)
-	 * @return The index template content
+	 * @param template template name (.json will be appended)
+	 * @return The component template content
 	 * @throws IOException if we can not read the file
 	 */
-	public static String readIndexTemplate(String root, String template) throws IOException {
+	public static String readComponentTemplate(String root, String template) throws IOException {
 		if (root == null) {
-			return readIndexTemplate(template);
+			return readComponentTemplate(template);
 		}
-		String settingsFile = root + "/" + Defaults.IndexTemplatesDir + "/" + template + Defaults.JsonFileExtension;
+		String settingsFile = root + "/" + Defaults.ComponentTemplatesDir + "/" + template + Defaults.JsonFileExtension;
 		return readFileFromClasspath(settingsFile);
 	}
 
 	/**
-	 * Read an index template in default classpath dir
-	 * @param template index template name (.json will be appended)
-	 * @return The index template content
+	 * Read a component template in default classpath dir
+	 * @param componentTemplate component template name (.json will be appended)
+	 * @return The component template content
 	 * @throws IOException if we can not read the file
 	 */
-	public static String readIndexTemplate(String template) throws IOException {
-		return readIndexTemplate(Defaults.ConfigDir, template);
+	public static String readComponentTemplate(String componentTemplate) throws IOException {
+		return readComponentTemplate(Defaults.ConfigDir, componentTemplate);
 	}
 }

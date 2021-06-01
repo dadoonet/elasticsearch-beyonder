@@ -44,7 +44,7 @@ public class IndexTemplateElasticsearchUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createIndexTemplate(RestClient client, String root, String template, boolean force) throws Exception {
-		String json = IndexTemplateSettingsReader.readIndexTemplate(root, template);
+		String json = IndexTemplateReader.readIndexTemplate(root, template);
 		createIndexTemplateWithJson(client, template, json, force);
 	}
 
@@ -56,7 +56,7 @@ public class IndexTemplateElasticsearchUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createIndexTemplate(RestClient client, String template, boolean force) throws Exception {
-		String json = IndexTemplateSettingsReader.readIndexTemplate(template);
+		String json = IndexTemplateReader.readIndexTemplate(template);
 		createIndexTemplateWithJson(client, template, json, force);
 	}
 
