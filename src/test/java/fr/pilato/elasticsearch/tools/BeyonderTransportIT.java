@@ -26,7 +26,9 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.removeIndexInElasticsearch;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,13 +85,10 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         }
     }
 
-    @Before
-    public void cleanCluster() {
-        try {
-            client.admin().indices().prepareDelete("_all").get();
-        } catch (NoNodeAvailableException e) {
-            assumeNoException(e);
-        }
+    @Before @After
+    public void cleanCluster() throws Exception {
+        removeIndexInElasticsearch(client, "twitter");
+        removeIndexInElasticsearch(client, "test_aliases");
     }
 
     @Override

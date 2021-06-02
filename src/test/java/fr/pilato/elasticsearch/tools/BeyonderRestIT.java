@@ -29,6 +29,7 @@ import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,6 +46,7 @@ import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.removeIndexInElasticsearch;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -74,13 +76,10 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         }
     }
 
-    @Before
-    public void cleanCluster() {
-        try {
-            client.performRequest(new Request("DELETE", "/_all"));
-        } catch (IOException e) {
-            assumeNoException(e);
-        }
+    @Before @After
+    public void cleanCluster() throws Exception {
+        ElasticsearchIndexUpdater.removeIndexInElasticsearch(client, "twitter");
+        ElasticsearchIndexUpdater.removeIndexInElasticsearch(client, "test_aliases");
     }
 
     @BeforeClass

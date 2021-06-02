@@ -26,8 +26,10 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,16 +88,20 @@ public class ElasticsearchIndexUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
-	private static void removeIndexInElasticsearch(Client client, String index) throws Exception {
+	public static void removeIndexInElasticsearch(Client client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
 
 		assert client != null;
 		assert index != null;
 
-        AcknowledgedResponse response = client.admin().indices().prepareDelete(index).get();
-		if (!response.isAcknowledged()) {
-			logger.warn("Could not delete index [{}]", index);
-			throw new Exception("Could not delete index ["+index+"].");
+		try {
+			AcknowledgedResponse response = client.admin().indices().prepareDelete(index).get();
+			if (!response.isAcknowledged()) {
+				logger.warn("Could not delete index [{}]", index);
+				throw new Exception("Could not delete index ["+index+"].");
+			}
+		} catch (IndexNotFoundException e) {
+			// This is expected
 		}
 
 		logger.trace("/removeIndex([{}])", index);
@@ -251,14 +257,21 @@ public class ElasticsearchIndexUpdater {
 	 * @param index Index name
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	private static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
+	public static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
 
 		assert client != null;
 		assert index != null;
 
-		Response response = client.performRequest(new Request("DELETE", "/" + index));
-		if (response.getStatusLine().getStatusCode() != 200) {
+		int statusCode;
+
+		try {
+			Response response = client.performRequest(new Request("DELETE", "/" + index));
+			statusCode = response.getStatusLine().getStatusCode();
+		} catch (ResponseException e) {
+			statusCode = e.getResponse().getStatusLine().getStatusCode();
+		}
+		if (statusCode != 200 && statusCode != 404) {
 			logger.warn("Could not delete index [{}]", index);
 			throw new Exception("Could not delete index ["+index+"].");
 		}
