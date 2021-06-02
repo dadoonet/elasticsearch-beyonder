@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsString;
@@ -100,6 +101,20 @@ public abstract class AbstractBeyonderTest {
         } catch (IOException e) {
             logger.error("Full error is", e);
             throw e;
+        }
+    }
+
+    @FunctionalInterface
+    public interface ThrowingConsumer<E extends Exception> {
+        void run() throws E;
+    }
+
+    protected void launchAndIgnoreFailure(ThrowingConsumer<Exception> code) {
+        try {
+            code.run();
+        } catch (Exception e) {
+            logger.debug("Got an error while calling the cleanup method: {}", e.getMessage());
+            logger.trace("StackTrace:", e);
         }
     }
 

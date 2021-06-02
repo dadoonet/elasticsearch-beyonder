@@ -20,7 +20,9 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteComponentTemplateAction;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
@@ -40,6 +42,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.removeIndexInElasticsearch;
@@ -86,9 +90,17 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
     }
 
     @Before @After
-    public void cleanCluster() throws Exception {
-        removeIndexInElasticsearch(client, "twitter");
-        removeIndexInElasticsearch(client, "test_aliases");
+    public void cleanCluster() {
+        // DELETE /twitter
+        launchAndIgnoreFailure(() -> client.admin().indices().prepareDelete("twitter").get());
+        // DELETE /test_aliases
+        launchAndIgnoreFailure(() -> client.admin().indices().prepareDelete("test_aliases").get());
+
+        // DELETE /_ingest/pipeline/twitter_pipeline
+        launchAndIgnoreFailure(() -> client.admin().cluster().prepareDeletePipeline("twitter_pipeline").get());
+
+        // DELETE /_template/twitter_template
+        launchAndIgnoreFailure(() -> client.admin().indices().prepareDeleteTemplate("twitter_template").get());
     }
 
     @Override

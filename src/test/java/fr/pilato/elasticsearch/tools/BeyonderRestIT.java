@@ -44,9 +44,8 @@ import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.removeIndexInElasticsearch;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -78,8 +77,24 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Before @After
     public void cleanCluster() throws Exception {
-        ElasticsearchIndexUpdater.removeIndexInElasticsearch(client, "twitter");
-        ElasticsearchIndexUpdater.removeIndexInElasticsearch(client, "test_aliases");
+        // DELETE /twitter
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/twitter")));
+        // DELETE /test_aliases
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_aliases")));
+
+        // DELETE /_ingest/pipeline/twitter_pipeline
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ingest/pipeline/twitter_pipeline")));
+
+        // DELETE /_template/twitter_template
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_template/twitter_template")));
+
+        // DELETE /_index_template/template_1
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_index_template/template_1")));
+
+        // DELETE /_component_template/component1
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component1")));
+        // DELETE /_component_template/component2
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component2")));
     }
 
     @BeforeClass
