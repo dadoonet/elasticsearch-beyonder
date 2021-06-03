@@ -42,6 +42,12 @@ when an elasticsearch client starts.
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.compiler.version>14</java.compiler.version>
+
+        <!-- Smtp Settings for announcements -->
+        <changes.smtpHost>smtp.ionos.fr</changes.smtpHost>
+        <changes.smtpPort implementation="java.lang.Integer">465</changes.smtpPort>
+        <changes.username>${env.SMTP_USERNAME}</changes.username>
+        <changes.password>${env.SMTP_PASSWORD}</changes.password>
     </properties>
 
     <scm>
@@ -213,8 +219,6 @@ when an elasticsearch client starts.
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.12.1</version>
                 <configuration>
-                    <smtpHost>auth.smtp.1and1.fr</smtpHost>
-                    <smtpPort implementation="java.lang.Integer">465</smtpPort>
                     <sslMode>true</sslMode>
                     <fromDeveloperId>dadoonet</fromDeveloperId>
                     <toAddresses>
