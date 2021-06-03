@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsString;
@@ -56,7 +57,9 @@ public abstract class AbstractBeyonderTest {
 
     abstract protected void testBeyonder(String root,
                                          List<String> indices,
-                                         List<String> templates) throws Exception;
+                                         List<String> templates,
+                                         List<String> componentTemplates,
+                                         List<String> indexTemplates) throws Exception;
 
     private static RestClient client;
 
@@ -101,12 +104,26 @@ public abstract class AbstractBeyonderTest {
         }
     }
 
+    @FunctionalInterface
+    public interface ThrowingConsumer<E extends Exception> {
+        void run() throws E;
+    }
+
+    protected void launchAndIgnoreFailure(ThrowingConsumer<Exception> code) {
+        try {
+            code.run();
+        } catch (Exception e) {
+            logger.debug("Got an error while calling the cleanup method: {}", e.getMessage());
+            logger.trace("StackTrace:", e);
+        }
+    }
+
     @Test
     public void testDefaultDir() throws Exception {
         // Default dir es
         testBeyonder(null,
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -114,7 +131,7 @@ public abstract class AbstractBeyonderTest {
         // Single index/single type
         testBeyonder("models/oneindexonetype",
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -122,7 +139,7 @@ public abstract class AbstractBeyonderTest {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -130,7 +147,7 @@ public abstract class AbstractBeyonderTest {
         // 1 index and no type
         testBeyonder("models/oneindexnotype",
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -138,13 +155,12 @@ public abstract class AbstractBeyonderTest {
         // 1 template
         testBeyonder("models/template",
                 null,
-                singletonList("twitter_template"));
+                singletonList("twitter_template"), null, null);
     }
 
     @Test
     public void testWrongClasspathDir() throws Exception {
         testBeyonder("models/bad-classpath-7/doesnotexist",
-                null,
-                null);
+                null, null, null, null);
     }
 }

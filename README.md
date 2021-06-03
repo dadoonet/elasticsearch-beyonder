@@ -204,8 +204,111 @@ And you can create `elasticsearch/twitter/_update_mapping.json`:
 This will change the `search_analyzer` for the `message` field and will add a new field named `bar`.
 All other existing fields (like `foo` in the previous example) won't be changed.
 
-Managing templates
-------------------
+Managing index templates (aka templates V2)
+-------------------------------------------
+
+Since version 7.13, the [new index template management API](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html) is supported.
+It allows to define both [component templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-component-template.html)
+and [index templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-template.html).
+
+### Component templates
+
+To define component templates, you can create json files within the `elasticsearch/_component_templates/` dir.
+
+Let's first create a `elasticsearch/_component_templates/component1.json`:
+
+```json
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
+```
+
+Then a second component template as `elasticsearch/_component_templates/component2.json`:
+
+```json
+{
+  "template": {
+    "mappings": {
+      "runtime": {
+        "day_of_week": {
+          "type": "keyword",
+          "script": {
+            "source": "emit(doc['@timestamp'].value.dayOfWeekEnum.getDisplayName(TextStyle.FULL, Locale.ROOT))"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+When Beyonder starts, it will create 2 component templates into elasticsearch, named respectively `component1`
+and `component2`.
+
+By default, Beyonder will not overwrite a component template if it already exists.
+This can be overridden by setting `force` to `true` in the expanded factory method
+`ElasticsearchBeyonder.start()`.
+
+### Index templates
+
+To define index templates, you can create json files within the `elasticsearch/_index_templates/` dir.
+
+Let's create a `elasticsearch/_index_templates/template_1.json`:
+
+```json
+{
+  "index_patterns": ["te*", "bar*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1
+    },
+    "mappings": {
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "host_name": {
+          "type": "keyword"
+        },
+        "created_at": {
+          "type": "date",
+          "format": "EEE MMM dd HH:mm:ss Z yyyy"
+        }
+      }
+    },
+    "aliases": {
+      "mydata": { }
+    }
+  },
+  "priority": 500,
+  "composed_of": ["component1", "component2"],
+  "version": 3,
+  "_meta": {
+    "description": "my custom"
+  }
+}
+```
+
+When Beyonder starts, it will create the index templates named `template_1` into elasticsearch. 
+Note that this index template references 2 component templates that must be available before Beyonder starts
+or defined within the `component_templates` dir as we saw just before.
+
+By default, Beyonder will not overwrite an index template if it already exists.
+This can be overridden by setting `force` to `true` in the expanded factory method
+`ElasticsearchBeyonder.start()`.
+
+Managing legacy templates (deprecated)
+--------------------------------------
+
+This method is deprecated as Elasticsearch has deprecated [legacy templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates-v1.html).
 
 Sometimes it's useful to define a template mapping that will automatically be applied to new indices created. 
 

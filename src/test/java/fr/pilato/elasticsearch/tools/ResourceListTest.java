@@ -19,6 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
+import fr.pilato.elasticsearch.tools.util.ResourceList;
+import fr.pilato.elasticsearch.tools.util.SettingsReader;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools;
+package fr.pilato.elasticsearch.tools.util;
 
 public class SettingsFinder {
 
@@ -28,10 +28,12 @@ public class SettingsFinder {
 		public static String ConfigDir = "elasticsearch";
 
 		public static String JsonFileExtension = ".json";
-		public static String IndexSettingsFileName = "_settings.json";
-		public static String UpdateIndexSettingsFileName = "_update_settings.json";
-		public static String UpdateIndexMappingFileName = "_update_mapping.json";
+		public static String IndexSettingsFileName = "_settings";
+		public static String UpdateIndexSettingsFileName = "_update_settings";
+		public static String UpdateIndexMappingFileName = "_update_mapping";
 		public static String TemplateDir = "_template";
+		public static String IndexTemplatesDir = "_index_templates";
+		public static String ComponentTemplatesDir = "_component_templates";
 		public static String PipelineDir = "_pipeline";
 
 		/**

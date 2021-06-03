@@ -19,15 +19,17 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.alias.AliasElasticsearchUpdater;
-import fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater;
-import fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater;
+import fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,8 +43,11 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.isIndexExist;
-import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.isTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,13 +75,26 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         }
     }
 
-    @Before
-    public void cleanCluster() {
-        try {
-            client.performRequest(new Request("DELETE", "/_all"));
-        } catch (IOException e) {
-            assumeNoException(e);
-        }
+    @Before @After
+    public void cleanCluster() throws Exception {
+        // DELETE /twitter
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/twitter")));
+        // DELETE /test_aliases
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_aliases")));
+
+        // DELETE /_ingest/pipeline/twitter_pipeline
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ingest/pipeline/twitter_pipeline")));
+
+        // DELETE /_template/twitter_template
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_template/twitter_template")));
+
+        // DELETE /_index_template/template_1
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_index_template/template_1")));
+
+        // DELETE /_component_template/component1
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component1")));
+        // DELETE /_component_template/component2
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component2")));
     }
 
     @BeforeClass
@@ -92,7 +110,9 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     protected void testBeyonder(String root,
                                 List<String> indices,
-                                List<String> templates) throws Exception {
+                                List<String> templates,
+                                List<String> componentTemplates,
+                                List<String> indexTemplates) throws Exception {
         logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
@@ -102,6 +122,30 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
             for (String template : templates) {
                 if (!isTemplateExist(client, template)) {
+                    allExists = false;
+                }
+            }
+            assertThat(allExists, is(true));
+        }
+
+        // We can now check if we have the component templates created
+        if (componentTemplates != null) {
+            boolean allExists = true;
+
+            for (String template : componentTemplates) {
+                if (!isComponentTemplateExist(client, template)) {
+                    allExists = false;
+                }
+            }
+            assertThat(allExists, is(true));
+        }
+
+        // We can now check if we have the index templates created
+        if (indexTemplates != null) {
+            boolean allExists = true;
+
+            for (String template : indexTemplates) {
+                if (!isIndexTemplateExist(client, template)) {
                     allExists = false;
                 }
             }
@@ -125,8 +169,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     // See https://github.com/dadoonet/elasticsearch-beyonder/issues/2
     @Test
     public void testAliases() throws Exception {
-        IndexElasticsearchUpdater.createIndex(client, "test_aliases", true);
-        AliasElasticsearchUpdater.createAlias(client, "foo", "test_aliases");
+        ElasticsearchIndexUpdater.createIndex(client, SettingsFinder.Defaults.ConfigDir, "test_aliases", true);
+        ElasticsearchAliasUpdater.createAlias(client, "foo", "test_aliases");
         Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/_alias/foo")));
         assertThat(response, hasKey("test_aliases"));
     }
@@ -152,7 +196,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Test
 	public void testPipeline() throws Exception {
 		ElasticsearchBeyonder.start(client, "models/pipeline");
-		assertThat(PipelineElasticsearchUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
+		assertThat(ElasticsearchPipelineUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
 	}
 
     @Test
@@ -161,7 +205,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step1",
                     singletonList("twitter"),
-                    null);
+                    null, null, null);
             Map<String, Object> oldSettings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(oldSettings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("0"));
@@ -171,7 +215,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step2",
                     singletonList("twitter"),
-                    null);
+                    null, null, null);
             Map<String, Object> settings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(settings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("1"));
@@ -184,7 +228,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step1",
                     singletonList("twitter"),
-                    null);
+                    null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -199,7 +243,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step2",
                     singletonList("twitter"),
-                    null);
+                    null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -210,6 +254,17 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             assertThat(message, notNullValue());
         }
     }
+
+    @Test
+    public void testIndexTemplates() throws Exception {
+        // 1 template
+        testBeyonder("models/templatev2",
+                null,
+                null,
+                asList("component1", "component2"),
+                singletonList("template_1"));
+    }
+
 
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();

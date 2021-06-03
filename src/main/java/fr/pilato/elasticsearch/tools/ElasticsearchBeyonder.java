@@ -19,10 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.SettingsFinder.Defaults;
-import fr.pilato.elasticsearch.tools.index.IndexFinder;
-import fr.pilato.elasticsearch.tools.template.TemplateFinder;
-import fr.pilato.elasticsearch.tools.pipeline.PipelineFinder;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.util.ResourceList;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -31,11 +29,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.createIndex;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateMapping;
-import static fr.pilato.elasticsearch.tools.index.IndexElasticsearchUpdater.updateSettings;
-import static fr.pilato.elasticsearch.tools.template.TemplateElasticsearchUpdater.createTemplate;
-import static fr.pilato.elasticsearch.tools.pipeline.PipelineElasticsearchUpdater.createPipeline;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.createComponentTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.createIndex;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateMapping;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateSettings;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.createIndexTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.createPipeline;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.createTemplate;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -106,20 +106,34 @@ public class ElasticsearchBeyonder {
 	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
 
-		// create templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
+		// create legacy templates
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
 		for (String templateName : templateNames) {
+			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
+					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
 			createTemplate(client, root, templateName, force);
 		}
 
+		// create component templates
+		List<String> componentTemplates = ResourceList.getResourceNames(root, Defaults.ComponentTemplatesDir);
+		for (String componentTemplateName : componentTemplates) {
+			createComponentTemplate(client, root, componentTemplateName, force);
+		}
+
+		// create index templates
+		List<String> indexTemplateNames = ResourceList.getResourceNames(root, Defaults.IndexTemplatesDir);
+		for (String indexTemplateName : indexTemplateNames) {
+			createIndexTemplate(client, root, indexTemplateName, force);
+		}
+
 		// create pipelines
-		List<String> pipelineNames = PipelineFinder.findPipelines(root);
+		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelineDir);
 		for (String pipelineName : pipelineNames) {
 			createPipeline(client, root, pipelineName, force);
 		}
 
 		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
+		Collection<String> indexNames = ResourceList.findIndexNames(root);
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);
@@ -157,13 +171,13 @@ public class ElasticsearchBeyonder {
 		boolean force = Defaults.ForceCreation;
 
 		// create templates
-		List<String> templateNames = TemplateFinder.findTemplates(root);
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
 		for (String templateName : templateNames) {
 			createTemplate(client, root, templateName, force);
 		}
 
 		// create indices
-		Collection<String> indexNames = IndexFinder.findIndexNames(root);
+		Collection<String> indexNames = ResourceList.findIndexNames(root);
 		for (String indexName : indexNames) {
 			createIndex(client, root, indexName, force);
 			updateSettings(client, root, indexName);

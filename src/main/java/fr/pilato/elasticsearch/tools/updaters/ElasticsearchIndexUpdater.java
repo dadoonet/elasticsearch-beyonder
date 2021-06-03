@@ -17,26 +17,33 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.index;
+package fr.pilato.elasticsearch.tools.updaters;
 
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
  * Manage elasticsearch index settings
  * @author David Pilato
  */
-public class IndexElasticsearchUpdater {
+public class ElasticsearchIndexUpdater {
 
-	private static final Logger logger = LoggerFactory.getLogger(IndexElasticsearchUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndexUpdater.class);
 
 	/**
 	 * Create a new index in Elasticsearch. Read also _settings.json if exists.
@@ -48,21 +55,8 @@ public class IndexElasticsearchUpdater {
 	 */
 	@Deprecated
 	public static void createIndex(Client client, String root, String index, boolean force) throws Exception {
-		String settings = IndexSettingsReader.readSettings(root, index);
-		createIndexWithSettings(client, index, settings, force);
-	}
-
-	/**
-	 * Create a new index in Elasticsearch. Read also _settings.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception if the elasticsearch API call is failing
-	 */
-	@Deprecated
-	public static void createIndex(Client client, String index, boolean force) throws Exception {
-		String settings = IndexSettingsReader.readSettings(index);
-		createIndexWithSettings(client, index, settings, force);
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.IndexSettingsFileName);
+		createIndexWithSettings(client, index, json, force);
 	}
 
 	/**
@@ -94,16 +88,20 @@ public class IndexElasticsearchUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
-	private static void removeIndexInElasticsearch(Client client, String index) throws Exception {
+	public static void removeIndexInElasticsearch(Client client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
 
 		assert client != null;
 		assert index != null;
 
-        AcknowledgedResponse response = client.admin().indices().prepareDelete(index).get();
-		if (!response.isAcknowledged()) {
-			logger.warn("Could not delete index [{}]", index);
-			throw new Exception("Could not delete index ["+index+"].");
+		try {
+			AcknowledgedResponse response = client.admin().indices().prepareDelete(index).get();
+			if (!response.isAcknowledged()) {
+				logger.warn("Could not delete index [{}]", index);
+				throw new Exception("Could not delete index ["+index+"].");
+			}
+		} catch (IndexNotFoundException e) {
+			// This is expected
 		}
 
 		logger.trace("/removeIndex([{}])", index);
@@ -145,10 +143,9 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param index Index name
 	 * @param settings Settings if any, null if no update settings
-	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
-	private static void updateIndexWithSettingsInElasticsearch(Client client, String index, String settings) throws Exception {
+	private static void updateIndexWithSettingsInElasticsearch(Client client, String index, String settings) {
 		logger.trace("updateIndex([{}])", index);
 
 		assert client != null;
@@ -201,26 +198,12 @@ public class IndexElasticsearchUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param index Index name
-	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	@Deprecated
-	public static void updateSettings(Client client, String root, String index) throws Exception {
-		String settings = IndexSettingsReader.readUpdateSettings(root, index);
-		updateIndexWithSettingsInElasticsearch(client, index, settings);
+	public static void updateSettings(Client client, String root, String index) throws IOException {
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexSettingsFileName);
+		updateIndexWithSettingsInElasticsearch(client, index, json);
 	}
-
-	/**
-	 * Update index settings in Elasticsearch. Read also _update_settings.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 * @throws Exception if the elasticsearch API call is failing
-	 */
-	@Deprecated
-	public static void updateSettings(Client client, String index) throws Exception {
-		String settings = IndexSettingsReader.readUpdateSettings(index);
-		updateIndexWithSettingsInElasticsearch(client, index, settings);
-	}
-
 
 	/**
 	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists.
@@ -229,20 +212,9 @@ public class IndexElasticsearchUpdater {
 	 * @param index Index name
 	 */
 	@Deprecated
-	public static void updateMapping(Client client, String root, String index) {
-		String mapping = IndexSettingsReader.readUpdateMapping(root, index);
-		updateMappingInElasticsearch(client, index, mapping);
-	}
-
-	/**
-	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 */
-	@Deprecated
-	public static void updateMapping(Client client, String index) {
-		String mapping = IndexSettingsReader.readUpdateMapping(index);
-		updateMappingInElasticsearch(client, index, mapping);
+	public static void updateMapping(Client client, String root, String index) throws IOException {
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexMappingFileName);
+		updateMappingInElasticsearch(client, index, json);
 	}
 
 	/**
@@ -254,20 +226,8 @@ public class IndexElasticsearchUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void createIndex(RestClient client, String root, String index, boolean force) throws Exception {
-		String settings = IndexSettingsReader.readSettings(root, index);
-		createIndexWithSettings(client, index, settings, force);
-	}
-
-	/**
-	 * Create a new index in Elasticsearch. Read also _settings.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 * @param force Remove index if exists (Warning: remove all data)
-	 * @throws Exception if the elasticsearch API call is failing
-	 */
-	public static void createIndex(RestClient client, String index, boolean force) throws Exception {
-		String settings = IndexSettingsReader.readSettings(index);
-		createIndexWithSettings(client, index, settings, force);
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.IndexSettingsFileName);
+		createIndexWithSettings(client, index, json, force);
 	}
 
 	/**
@@ -297,14 +257,21 @@ public class IndexElasticsearchUpdater {
 	 * @param index Index name
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	private static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
+	public static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
 
 		assert client != null;
 		assert index != null;
 
-		Response response = client.performRequest(new Request("DELETE", "/" + index));
-		if (response.getStatusLine().getStatusCode() != 200) {
+		int statusCode;
+
+		try {
+			Response response = client.performRequest(new Request("DELETE", "/" + index));
+			statusCode = response.getStatusLine().getStatusCode();
+		} catch (ResponseException e) {
+			statusCode = e.getResponse().getStatusLine().getStatusCode();
+		}
+		if (statusCode != 200 && statusCode != 404) {
 			logger.warn("Could not delete index [{}]", index);
 			throw new Exception("Could not delete index ["+index+"].");
 		}
@@ -412,19 +379,8 @@ public class IndexElasticsearchUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateSettings(RestClient client, String root, String index) throws Exception {
-		String settings = IndexSettingsReader.readUpdateSettings(root, index);
-		updateIndexWithSettingsInElasticsearch(client, index, settings);
-	}
-
-	/**
-	 * Update index settings in Elasticsearch. Read also _update_settings.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 * @throws Exception if the elasticsearch API call is failing
-	 */
-	public static void updateSettings(RestClient client, String index) throws Exception {
-		String settings = IndexSettingsReader.readUpdateSettings(index);
-		updateIndexWithSettingsInElasticsearch(client, index, settings);
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexSettingsFileName);
+		updateIndexWithSettingsInElasticsearch(client, index, json);
 	}
 
 	/**
@@ -435,18 +391,7 @@ public class IndexElasticsearchUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateMapping(RestClient client, String root, String index) throws Exception {
-		String mapping = IndexSettingsReader.readUpdateMapping(root, index);
-		updateMappingInElasticsearch(client, index, mapping);
-	}
-
-	/**
-	 * Update index mapping in Elasticsearch. Read also _update_mapping.json if exists in default classpath dir.
-	 * @param client Elasticsearch client
-	 * @param index Index name
-	 * @throws Exception if the elasticsearch API call is failing
-	 */
-	public static void updateMapping(RestClient client, String index) throws Exception {
-		String mapping = IndexSettingsReader.readUpdateMapping(index);
-		updateMappingInElasticsearch(client, index, mapping);
+		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexMappingFileName);
+		updateMappingInElasticsearch(client, index, json);
 	}
 }

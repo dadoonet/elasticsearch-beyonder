@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools;
+package fr.pilato.elasticsearch.tools.util;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -53,4 +53,13 @@ public class SettingsReader {
 		return StringSubstitutor.replace(content, System.getenv());
 	}
 
+	public static String getJsonContent(String root, String subdir, String name) throws IOException {
+		String path = root;
+		if (root == null) {
+			path = SettingsFinder.Defaults.ConfigDir;
+		}
+		path += "/" + subdir + "/" + name + SettingsFinder.Defaults.JsonFileExtension;
+		logger.debug("Reading file [{}] from the classpath.", path);
+		return readFileFromClasspath(path);
+	}
 }

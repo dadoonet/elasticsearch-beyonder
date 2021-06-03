@@ -19,9 +19,8 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.index.IndexSettingsReader;
-import fr.pilato.elasticsearch.tools.template.TemplateFinder;
-import fr.pilato.elasticsearch.tools.template.TemplateSettingsReader;
+import fr.pilato.elasticsearch.tools.util.ResourceList;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -29,8 +28,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-import static fr.pilato.elasticsearch.tools.index.IndexFinder.findIndexNames;
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -42,14 +43,12 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
 
     protected void testBeyonder(String root,
                                 List<String> indices,
-                                List<String> templates) throws IOException, URISyntaxException {
+                                List<String> templates,
+                                List<String> componentTemplates,
+                                List<String> indexTemplates) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
-        List<String> indexNames;
-        if (root == null) {
-            indexNames = findIndexNames();
-        } else {
-            indexNames = findIndexNames(root);
-        }
+
+        List<String> indexNames = ResourceList.findIndexNames(root);
         logger.info("  --> indices found: {}", indexNames);
 
         if (indices != null) {
@@ -61,29 +60,54 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                 logger.debug("  --> index [{}]:", indexName);
                 assertThat(indexName, is(indices.get(iIndex)));
 
-                String settings = IndexSettingsReader.readSettings(root, indexName);
+                String settings = getJsonContent(root, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
                 logger.debug("    --> Settings: [{}]", settings);
             }
         } else {
             assertThat(indexNames, emptyIterable());
         }
 
-        List<String> templateNames = TemplateFinder.findTemplates(root);
-        logger.info("  --> templates found: {}", templateNames);
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplateDir), templates, (name) -> {
+            try {
+                return getJsonContent(root, SettingsFinder.Defaults.TemplateDir, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates, (name) -> {
+            try {
+                return getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
+            try {
+                return getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+    }
 
-        if (templates != null) {
-            assertThat(templateNames, hasSize(templates.size()));
-            for (int iTemplate = 0; iTemplate < templateNames.size(); iTemplate++) {
-                String templateName = templateNames.get(iTemplate);
-                logger.debug("    --> template: [{}]", templateName);
-                assertThat(templateName, is(templates.get(iTemplate)));
+    private void check(List<String> names, List<String> expectedNames,
+                       Function<String, String> reader) {
+        logger.info("  --> names found: {}", names);
 
-                String template = TemplateSettingsReader.readTemplate(root, templateName);
-                logger.debug("      --> Template: [{}]", template);
+        if (expectedNames != null) {
+            assertThat(names, hasSize(expectedNames.size()));
+            for (int iTemplate = 0; iTemplate < names.size(); iTemplate++) {
+                String name = names.get(iTemplate);
+                logger.debug("    --> name: [{}]", name);
+                assertThat(name, is(expectedNames.get(iTemplate)));
+
+                String json = reader.apply(name);
+                logger.debug("      --> Json: [{}]", json);
             }
         } else {
-            assertThat(templateNames, emptyIterable());
+            assertThat(names, emptyIterable());
         }
+
     }
 
     @Test
@@ -95,7 +119,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         String indexName = "twitter";
 
         // when: this settings file is read
-        String settings = IndexSettingsReader.readSettings(folder, indexName);
+        String settings = getJsonContent(folder, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
         Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
 
         // then: the variables got replaced by environment variables of the same name
@@ -109,12 +133,12 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-mapping/step1",
                 singletonList("twitter"),
-                null);
+                null, null, null);
 
         // 2 _update_mapping
         testBeyonder("models/update-mapping/step2",
                 singletonList("twitter"),
-                null);
+                null, null, null);
     }
 
     @Test
@@ -122,11 +146,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-settings/step1",
                 singletonList("twitter"),
-                null);
+                null, null, null);
 
         // 2 _update_settings
         testBeyonder("models/update-settings/step2",
                 singletonList("twitter"),
-                null);
+                null, null, null);
+    }
+
+    @Test
+    public void testIndexTemplates() throws Exception {
+        // 1 template
+        testBeyonder("models/templatev2",
+                null,
+                null,
+                asList("component1", "component2"),
+                singletonList("template_1"));
     }
 }

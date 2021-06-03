@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package fr.pilato.elasticsearch.tools.alias;
+package fr.pilato.elasticsearch.tools.updaters;
 
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Client;
@@ -27,9 +27,9 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AliasElasticsearchUpdater {
+public class ElasticsearchAliasUpdater {
 
-    private static final Logger logger = LoggerFactory.getLogger(AliasElasticsearchUpdater.class);
+    private static final Logger logger = LoggerFactory.getLogger(ElasticsearchAliasUpdater.class);
 
     /**
      * Create an alias if needed
