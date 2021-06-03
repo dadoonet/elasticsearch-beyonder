@@ -13,7 +13,8 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 7.13-SNAPSHOT           | 7.x           |              |
+| 7.14-SNAPSHOT           | 7.x           |              |
+| 7.13                    | 7.x           |  2021-06-03  |
 | 7.5                     | 7.x           |  2020-01-15  |
 | 7.0                     | 7.0 -> 7.x    |  2019-04-04  |
 | 6.5                     | 6.5 -> 6.x    |  2019-01-04  |
@@ -55,7 +56,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>7.5</version>
+  <version>7.13</version>
 </dependency>
 ```
 
