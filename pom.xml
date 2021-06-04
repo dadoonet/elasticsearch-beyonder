@@ -46,8 +46,6 @@ when an elasticsearch client starts.
         <!-- Smtp Settings for announcements -->
         <changes.smtpHost>smtp.ionos.fr</changes.smtpHost>
         <changes.smtpPort implementation="java.lang.Integer">465</changes.smtpPort>
-        <changes.username>${env.SMTP_USERNAME}</changes.username>
-        <changes.password>${env.SMTP_PASSWORD}</changes.password>
     </properties>
 
     <scm>
