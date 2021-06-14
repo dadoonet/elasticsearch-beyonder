@@ -47,38 +47,17 @@ public class ElasticsearchPipelineUpdater {
      * @param client Elasticsearch client
      * @param root dir within the classpath
      * @param pipeline the id of the pipeline
-     * @param force set it to true if you want to force cleaning pipeline before adding it
      * @throws Exception if something goes wrong
      */
-    public static void createPipeline(RestClient client, String root, String pipeline, boolean force) throws Exception {
-        String json = getJsonContent(root, SettingsFinder.Defaults.PipelineDir, pipeline);
-        createPipelineWithJson(client, pipeline, json, force);
-    }
-
-    /**
-     * Create a new pipeline in Elasticsearch
-     * 
-     * @param client Elasticsearch client
-     * @param pipeline the id of the pipeline
-     * @param json JSon content for the pipeline
-     * @param force set it to true if you want to force cleaning pipeline before adding it
-     * @throws Exception if something goes wrong
-     */
-    public static void createPipelineWithJson(RestClient client, String pipeline, String json, boolean force) throws Exception {
-        if (isPipelineExist(client, pipeline)) {
-            if (force) {
-                logger.debug("Pipeline [{}] already exists. Force is set. Overriding it.", pipeline);
-                createPipelineWithJsonInElasticsearch(client, pipeline, json);
-            }
-            else {
-                logger.debug("Pipeline [{}] already exists.", pipeline);
-            }
+    public static void createPipeline(RestClient client, String root, String pipeline) throws Exception {
+        String json = getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, pipeline);
+        if (json == null) {
+            logger.warn("Please rename [{}/{}/{}{}] to [{}/{}/{}{}].",
+                    root, SettingsFinder.Defaults.PipelineDir, pipeline, SettingsFinder.Defaults.JsonFileExtension,
+                    root, SettingsFinder.Defaults.PipelinesDir, pipeline, SettingsFinder.Defaults.JsonFileExtension);
+            json = getJsonContent(root, SettingsFinder.Defaults.PipelineDir, pipeline);
         }
-
-        if (!isPipelineExist(client, pipeline)) {
-            logger.debug("Pipeline [{}] doesn't exist. Creating it.", pipeline);
-            createPipelineWithJsonInElasticsearch(client, pipeline, json);
-        }
+        createPipelineWithJsonInElasticsearch(client, pipeline, json);
     }
 
     /**

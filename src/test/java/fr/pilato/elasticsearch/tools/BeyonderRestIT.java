@@ -46,6 +46,7 @@ import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.isPipelineExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -112,7 +113,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                                 List<String> indices,
                                 List<String> templates,
                                 List<String> componentTemplates,
-                                List<String> indexTemplates) throws Exception {
+                                List<String> indexTemplates,
+                                List<String> pipelines) throws Exception {
         logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
@@ -163,6 +165,18 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             }
             assertThat(allExists, is(true));
         }
+
+        // We can check if we have created the pipelines
+        if (pipelines != null) {
+            boolean allExists = true;
+
+            for (String pipeline : pipelines) {
+                if (!isPipelineExist(client, pipeline)) {
+                    allExists = false;
+                }
+            }
+            assertThat(allExists, is(true));
+        }
     }
 
     // This is a manual test as we don't have a real support of this in Beyonder yet
@@ -196,7 +210,12 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Test
 	public void testPipeline() throws Exception {
 		ElasticsearchBeyonder.start(client, "models/pipeline");
-		assertThat(ElasticsearchPipelineUpdater.isPipelineExist(client, "twitter_pipeline"), is(true));
+		assertThat(isPipelineExist(client, "twitter_pipeline"), is(true));
+	}
+
+    @Test
+	public void testPipelines() throws Exception {
+        testBeyonder("models/pipelines", null, null, null, null, singletonList("twitter_pipeline"));
 	}
 
     @Test
@@ -205,7 +224,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step1",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
             Map<String, Object> oldSettings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(oldSettings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("0"));
@@ -215,7 +234,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step2",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
             Map<String, Object> settings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(settings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("1"));
@@ -228,7 +247,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step1",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -243,7 +262,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step2",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -262,7 +281,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 null,
                 null,
                 asList("component1", "component2"),
-                singletonList("template_1"));
+                singletonList("template_1"), null);
     }
 
 
