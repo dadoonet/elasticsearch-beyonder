@@ -45,7 +45,8 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                                 List<String> indices,
                                 List<String> templates,
                                 List<String> componentTemplates,
-                                List<String> indexTemplates) throws IOException, URISyntaxException {
+                                List<String> indexTemplates,
+                                List<String> pipelines) throws IOException, URISyntaxException {
         logger.info("--> scanning: [{}]", root);
 
         List<String> indexNames = ResourceList.findIndexNames(root);
@@ -84,6 +85,13 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
             try {
                 return getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name);
+            } catch (IOException e) {
+                throw new RuntimeException("Our test is failing...");
+            }
+        });
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.PipelinesDir), pipelines, (name) -> {
+            try {
+                return getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
@@ -133,12 +141,12 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-mapping/step1",
                 singletonList("twitter"),
-                null, null, null);
+                null, null, null, null);
 
         // 2 _update_mapping
         testBeyonder("models/update-mapping/step2",
                 singletonList("twitter"),
-                null, null, null);
+                null, null, null, null);
     }
 
     @Test
@@ -146,12 +154,12 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         // 1 _settings
         testBeyonder("models/update-settings/step1",
                 singletonList("twitter"),
-                null, null, null);
+                null, null, null, null);
 
         // 2 _update_settings
         testBeyonder("models/update-settings/step2",
                 singletonList("twitter"),
-                null, null, null);
+                null, null, null, null);
     }
 
     @Test
@@ -161,6 +169,18 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                 null,
                 null,
                 asList("component1", "component2"),
-                singletonList("template_1"));
+                singletonList("template_1"),
+                null);
+    }
+
+    @Test
+    public void testPipelines() throws Exception {
+        // 1 template
+        testBeyonder("models/pipelines",
+                null,
+                null,
+                null,
+                null,
+                singletonList("twitter_pipeline"));
     }
 }

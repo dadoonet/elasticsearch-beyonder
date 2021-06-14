@@ -127,9 +127,16 @@ public class ElasticsearchBeyonder {
 		}
 
 		// create pipelines
-		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelineDir);
+		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelinesDir);
+		if (pipelineNames.isEmpty()) {
+			// We check for deprecated resources
+			pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelineDir);
+			if (!pipelineNames.isEmpty()) {
+				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.PipelineDir, Defaults.PipelinesDir);
+			}
+		}
 		for (String pipelineName : pipelineNames) {
-			createPipeline(client, root, pipelineName, force);
+			createPipeline(client, root, pipelineName);
 		}
 
 		// create indices

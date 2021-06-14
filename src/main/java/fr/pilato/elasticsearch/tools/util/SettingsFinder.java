@@ -34,6 +34,8 @@ public class SettingsFinder {
 		public static String TemplateDir = "_template";
 		public static String IndexTemplatesDir = "_index_templates";
 		public static String ComponentTemplatesDir = "_component_templates";
+		public static String PipelinesDir = "_pipelines";
+		@Deprecated
 		public static String PipelineDir = "_pipeline";
 
 		/**

@@ -20,15 +20,12 @@
 package fr.pilato.elasticsearch.tools;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.elasticsearch.action.admin.indices.template.delete.DeleteComponentTemplateAction;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -42,11 +39,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.removeIndexInElasticsearch;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -117,7 +111,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step1",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
             GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
             String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("0"));
@@ -127,7 +121,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step2",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
             GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
             String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("1"));
@@ -140,7 +134,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step1",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
             Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
             String bar = BeanUtils.getProperty(properties, "properties.bar");
             String foo = BeanUtils.getProperty(properties, "properties.foo");
@@ -154,7 +148,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step2",
                     singletonList("twitter"),
-                    null, null, null);
+                    null, null, null, null);
 
             Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
             String bar = BeanUtils.getProperty(properties, "properties.bar");
@@ -170,7 +164,8 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                                 List<String> indices,
                                 List<String> templates,
                                 List<String> componentTemplates,
-                                List<String> indexTemplates) throws Exception {
+                                List<String> indexTemplates,
+                                List<String> pipelines) throws Exception {
         String newRoot = "transport/" + root;
         logger.info("--> scanning: [{}]", newRoot);
         ElasticsearchBeyonder.start(client, newRoot);
