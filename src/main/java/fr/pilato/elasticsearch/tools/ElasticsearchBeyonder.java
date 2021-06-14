@@ -111,7 +111,7 @@ public class ElasticsearchBeyonder {
 		for (String templateName : templateNames) {
 			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
 					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
-			createTemplate(client, root, templateName, force);
+			createTemplate(client, root, templateName);
 		}
 
 		// create component templates
@@ -180,7 +180,7 @@ public class ElasticsearchBeyonder {
 		// create templates
 		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
 		for (String templateName : templateNames) {
-			createTemplate(client, root, templateName, force);
+			createTemplate(client, root, templateName);
 		}
 
 		// create indices

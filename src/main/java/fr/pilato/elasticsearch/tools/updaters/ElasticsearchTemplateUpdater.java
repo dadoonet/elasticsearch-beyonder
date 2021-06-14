@@ -47,40 +47,13 @@ public class ElasticsearchTemplateUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-     * @param force set it to true if you want to force cleaning template before adding it
 	 * @throws Exception if something goes wrong
 	 * @deprecated Will be removed when we don't support TransportClient anymore
 	 */
 	@Deprecated
-	public static void createTemplate(Client client, String root, String template, boolean force) throws Exception {
+	public static void createTemplate(Client client, String root, String template) throws Exception {
 		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
-		createTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create a new template in Elasticsearch
-	 * @param client Elasticsearch client
-	 * @param template Template name
-	 * @param json JSon content for the template
-	 * @param force set it to true if you want to force cleaning template before adding it
-     * @throws Exception if something goes wrong
-     * @deprecated Will be removed when we don't support TransportClient anymore
-	 */
-	@Deprecated
-	public static void createTemplateWithJson(Client client, String template, String json, boolean force) throws Exception {
-		if (isTemplateExist(client, template)) {
-			if (force) {
-				logger.debug("Template [{}] already exists. Force is set. Removing it.", template);
-				removeTemplate(client, template);
-			} else {
-				logger.debug("Template [{}] already exists.", template);
-			}
-		}
-
-		if (!isTemplateExist(client, template)) {
-			logger.debug("Template [{}] doesn't exist. Creating it.", template);
-			createTemplateWithJsonInElasticsearch(client, template, json);
-		}
+		createTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
 	/**
@@ -112,42 +85,16 @@ public class ElasticsearchTemplateUpdater {
 	}
 
 	/**
-	 * Check if a template exists
-     * @param client Elasticsearch client
-	 * @param template template name
-     * @return true if the template exists
-     * @deprecated Will be removed when we don't support TransportClient anymore
-	 */
-	@Deprecated
-	public static boolean isTemplateExist(Client client, String template) {
-		return !client.admin().indices().prepareGetTemplates(template).get().getIndexTemplates().isEmpty();
-	}
-
-	/**
-	 * Remove a template
-     * @param client Elasticsearch client
-	 * @param template template name
-     * @deprecated Will be removed when we don't support TransportClient anymore
-	 */
-	@Deprecated
-	public static void removeTemplate(Client client, String template) {
-		logger.trace("removeTemplate({})", template);
-		client.admin().indices().prepareDeleteTemplate(template).get();
-		logger.trace("/removeTemplate({})", template);
-	}
-
-	/**
 	 * Create a legacy template in Elasticsearch.
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-     * @param force set it to true if you want to force cleaning template before adding it
      * @throws Exception if something goes wrong
 	 */
 	@Deprecated
-	public static void createTemplate(RestClient client, String root, String template, boolean force) throws Exception {
+	public static void createTemplate(RestClient client, String root, String template) throws Exception {
 		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
-		createTemplateWithJson(client, template, json, force);
+		createTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
 	/**
@@ -160,19 +107,7 @@ public class ElasticsearchTemplateUpdater {
 	 */
 	@Deprecated
 	public static void createTemplateWithJson(RestClient client, String template, String json, boolean force) throws Exception {
-		if (isTemplateExist(client, template)) {
-			if (force) {
-				logger.debug("Template [{}] already exists. Force is set. Removing it.", template);
-				removeTemplate(client, template);
-			} else {
-				logger.debug("Template [{}] already exists.", template);
-			}
-		}
-
-		if (!isTemplateExist(client, template)) {
-			logger.debug("Template [{}] doesn't exist. Creating it.", template);
-			createTemplateWithJsonInElasticsearch(client, template, json);
-		}
+		createTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
 	/**

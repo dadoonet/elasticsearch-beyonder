@@ -47,7 +47,6 @@ import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTempl
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.isPipelineExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -123,7 +122,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             boolean allExists = true;
 
             for (String template : templates) {
-                if (!isTemplateExist(client, template)) {
+                if (client.performRequest(new Request("HEAD", "/_template/" + template)).getStatusLine().getStatusCode() != 200) {
                     allExists = false;
                 }
             }

@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.isTemplateExist;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -175,7 +174,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
             boolean allExists = true;
 
             for (String template : templates) {
-                if (!isTemplateExist(client, template)) {
+                if (client.admin().indices().prepareGetTemplates(template).get().getIndexTemplates().isEmpty()) {
                     allExists = false;
                 }
             }
