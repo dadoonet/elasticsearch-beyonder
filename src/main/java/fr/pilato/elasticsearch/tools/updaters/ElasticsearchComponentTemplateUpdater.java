@@ -43,36 +43,11 @@ public class ElasticsearchComponentTemplateUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-	 * @param force set it to true if you want to force cleaning template before adding it
 	 * @throws Exception if something goes wrong
 	 */
-	public static void createComponentTemplate(RestClient client, String root, String template, boolean force) throws Exception {
+	public static void createComponentTemplate(RestClient client, String root, String template) throws Exception {
 		String json = getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, template);
-		createComponentTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create a new component template in Elasticsearch
-	 * @param client Elasticsearch client
-	 * @param template Template name
-	 * @param json JSon content for the template
-	 * @param force set it to true if you want to force cleaning template before adding it
-	 * @throws Exception if something goes wrong
-	 */
-	public static void createComponentTemplateWithJson(RestClient client, String template, String json, boolean force) throws Exception {
-		if (isComponentTemplateExist(client, template)) {
-			if (force) {
-				logger.debug("Component Template [{}] already exists. Force is set. Removing it.", template);
-				removeComponentTemplate(client, template);
-			} else {
-				logger.debug("Component Template [{}] already exists.", template);
-			}
-		}
-
-		if (!isComponentTemplateExist(client, template)) {
-			logger.debug("Component Template [{}] doesn't exist. Creating it.", template);
-			createComponentTemplateWithJsonInElasticsearch(client, template, json);
-		}
+		createComponentTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
 	/**
@@ -98,29 +73,5 @@ public class ElasticsearchComponentTemplateUpdater {
 		}
 
 		logger.trace("/createComponentTemplate([{}])", template);
-	}
-
-	/**
-	 * Check if an component template exists
-	 * @param client Elasticsearch client
-	 * @param template template name
-	 * @return true if the template exists
-	 * @throws IOException if something goes wrong
-	 */
-	public static boolean isComponentTemplateExist(RestClient client, String template) throws IOException {
-		Response response = client.performRequest(new Request("HEAD", "/_component_template/" + template));
-		return response.getStatusLine().getStatusCode() == 200;
-	}
-
-	/**
-	 * Remove an component template
-	 * @param client Elasticsearch client
-	 * @param template template name
-	 * @throws Exception if something goes wrong
-	 */
-	public static void removeComponentTemplate(RestClient client, String template) throws Exception {
-		logger.trace("removeComponentTemplate({})", template);
-		client.performRequest(new Request("DELETE", "/_component_template/" + template));
-		logger.trace("/removeComponentTemplate({})", template);
 	}
 }
