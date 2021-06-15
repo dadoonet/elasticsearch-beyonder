@@ -26,8 +26,6 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
@@ -43,36 +41,11 @@ public class ElasticsearchIndexTemplateUpdater {
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name
-	 * @param force set it to true if you want to force cleaning template before adding it
 	 * @throws Exception if something goes wrong
 	 */
-	public static void createIndexTemplate(RestClient client, String root, String template, boolean force) throws Exception {
+	public static void createIndexTemplate(RestClient client, String root, String template) throws Exception {
 		String json = getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, template);
-		createIndexTemplateWithJson(client, template, json, force);
-	}
-
-	/**
-	 * Create a new index template in Elasticsearch
-	 * @param client Elasticsearch client
-	 * @param template Template name
-	 * @param json JSon content for the template
-	 * @param force set it to true if you want to force cleaning template before adding it
-	 * @throws Exception if something goes wrong
-	 */
-	public static void createIndexTemplateWithJson(RestClient client, String template, String json, boolean force) throws Exception {
-		if (isIndexTemplateExist(client, template)) {
-			if (force) {
-				logger.debug("Index Template [{}] already exists. Force is set. Removing it.", template);
-				removeIndexTemplate(client, template);
-			} else {
-				logger.debug("Index Template [{}] already exists.", template);
-			}
-		}
-
-		if (!isIndexTemplateExist(client, template)) {
-			logger.debug("Index Template [{}] doesn't exist. Creating it.", template);
-			createIndexTemplateWithJsonInElasticsearch(client, template, json);
-		}
+		createIndexTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
 	/**
@@ -98,29 +71,5 @@ public class ElasticsearchIndexTemplateUpdater {
 		}
 
 		logger.trace("/createIndexTemplate([{}])", template);
-	}
-
-	/**
-	 * Check if an index template exists
-	 * @param client Elasticsearch client
-	 * @param template template name
-	 * @return true if the template exists
-	 * @throws IOException if something goes wrong
-	 */
-	public static boolean isIndexTemplateExist(RestClient client, String template) throws IOException {
-		Response response = client.performRequest(new Request("HEAD", "/_index_template/" + template));
-		return response.getStatusLine().getStatusCode() == 200;
-	}
-
-	/**
-	 * Remove an index template
-	 * @param client Elasticsearch client
-	 * @param template template name
-	 * @throws Exception if something goes wrong
-	 */
-	public static void removeIndexTemplate(RestClient client, String template) throws Exception {
-		logger.trace("removeIndexTemplate({})", template);
-		client.performRequest(new Request("DELETE", "/_index_template/" + template));
-		logger.trace("/removeIndexTemplate({})", template);
 	}
 }

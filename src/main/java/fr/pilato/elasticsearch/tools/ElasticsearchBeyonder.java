@@ -117,13 +117,13 @@ public class ElasticsearchBeyonder {
 		// create component templates
 		List<String> componentTemplates = ResourceList.getResourceNames(root, Defaults.ComponentTemplatesDir);
 		for (String componentTemplateName : componentTemplates) {
-			createComponentTemplate(client, root, componentTemplateName, force);
+			createComponentTemplate(client, root, componentTemplateName);
 		}
 
 		// create index templates
 		List<String> indexTemplateNames = ResourceList.getResourceNames(root, Defaults.IndexTemplatesDir);
 		for (String indexTemplateName : indexTemplateNames) {
-			createIndexTemplate(client, root, indexTemplateName, force);
+			createIndexTemplate(client, root, indexTemplateName);
 		}
 
 		// create pipelines

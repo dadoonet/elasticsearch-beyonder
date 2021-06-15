@@ -21,7 +21,6 @@ package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater;
 import fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater;
-import fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater;
 import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
@@ -43,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.isComponentTemplateExist;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.isIndexTemplateExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.isPipelineExist;
 import static java.util.Arrays.asList;
@@ -122,7 +119,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             boolean allExists = true;
 
             for (String template : templates) {
-                if (client.performRequest(new Request("HEAD", "/_template/" + template)).getStatusLine().getStatusCode() != 200) {
+                if (!existObjectInElasticsearch("/_template/" + template)) {
                     allExists = false;
                 }
             }
@@ -134,7 +131,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             boolean allExists = true;
 
             for (String template : componentTemplates) {
-                if (!isComponentTemplateExist(client, template)) {
+                if (!existObjectInElasticsearch("/_component_template/" + template)) {
                     allExists = false;
                 }
             }
@@ -146,7 +143,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             boolean allExists = true;
 
             for (String template : indexTemplates) {
-                if (!isIndexTemplateExist(client, template)) {
+                if (!existObjectInElasticsearch("/_index_template/" + template)) {
                     allExists = false;
                 }
             }
@@ -176,6 +173,10 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             }
             assertThat(allExists, is(true));
         }
+    }
+
+    private boolean existObjectInElasticsearch(String url) throws IOException {
+        return client.performRequest(new Request("HEAD", url)).getStatusLine().getStatusCode() == 200;
     }
 
     // This is a manual test as we don't have a real support of this in Beyonder yet
