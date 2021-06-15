@@ -114,7 +114,6 @@ public class ElasticsearchBeyonder {
 	 * @param root dir within the classpath
 	 * @param force whether or not to force creation of indices and templates
 	 * @throws Exception when beyonder can not start
-	 * @since 6.1
 	 */
 	public static void start(RestClient client, String root, boolean force) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");

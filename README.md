@@ -121,6 +121,14 @@ ElasticsearchBeyonder.start(client, "models/myelasticsearch");
 
 In that case, Beyonder will search for resources from `models/myelasticsearch`.
 
+There is also a more complete version of the `start` method with:
+
+```java
+ElasticsearchBeyonder.start(client, "models/myelasticsearch", true);
+```
+
+This last parameter is known as `force`. It removes any existing index which is managed by Beyonder.
+It is super useful for integration testing but it is **super dangerous** in production.
 
 ## Using REST Client (recommended)
 
