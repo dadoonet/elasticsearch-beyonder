@@ -53,6 +53,8 @@ Release notes
 * `_pipeline` dir has been deprecated by `_pipelines` dir.
 * `force` parameter is not applied anymore to pipelines. So pipelines are always updated.
 * `force` parameter is not applied anymore to templates, component templates and index templates. So they are always updated.
+* method `start(RestClient client, String root, boolean merge, boolean force)` is now deprecated as the `merge` parameter
+  is not used anymore. Use instead the `start(RestClient client, String root, boolean force)` method.
 
 Getting Started
 ===============
