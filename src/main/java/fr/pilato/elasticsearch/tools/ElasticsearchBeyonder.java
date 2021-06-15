@@ -98,12 +98,25 @@ public class ElasticsearchBeyonder {
 	 * Automatically scan classpath and create indices, mappings, templates, and other settings.
 	 * @param client elasticsearch client
 	 * @param root dir within the classpath
-	 * @param merge whether or not to merge mappings
+	 * @param merge whether or not to merge mappings (not used anymore)
 	 * @param force whether or not to force creation of indices and templates
 	 * @throws Exception when beyonder can not start
 	 * @since 6.1
 	 */
+	@Deprecated
 	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
+		start(client, root, force);
+	}
+
+	/**
+	 * Automatically scan classpath and create indices, mappings, templates, and other settings.
+	 * @param client elasticsearch client
+	 * @param root dir within the classpath
+	 * @param force whether or not to force creation of indices and templates
+	 * @throws Exception when beyonder can not start
+	 * @since 6.1
+	 */
+	public static void start(RestClient client, String root, boolean force) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
 
 		// create legacy templates
