@@ -264,10 +264,6 @@ Then a second component template as `elasticsearch/_component_templates/componen
 When Beyonder starts, it will create 2 component templates into elasticsearch, named respectively `component1`
 and `component2`.
 
-By default, Beyonder will not overwrite a component template if it already exists.
-This can be overridden by setting `force` to `true` in the expanded factory method
-`ElasticsearchBeyonder.start()`.
-
 ### Index templates
 
 To define index templates, you can create json files within the `elasticsearch/_index_templates/` dir.
@@ -312,10 +308,6 @@ When Beyonder starts, it will create the index templates named `template_1` into
 Note that this index template references 2 component templates that must be available before Beyonder starts
 or defined within the `component_templates` dir as we saw just before.
 
-By default, Beyonder will not overwrite an index template if it already exists.
-This can be overridden by setting `force` to `true` in the expanded factory method
-`ElasticsearchBeyonder.start()`.
-
 Managing legacy templates (deprecated)
 --------------------------------------
 
@@ -342,10 +334,6 @@ in your project:
     }
 }
 ```
-
-By default, Beyonder will not overwrite a template if it already exists.
-This can be overridden by setting `force` to `true` in the expanded factory method
-`ElasticsearchBeyonder.start()`.
 
 Managing pipelines
 ------------------
