@@ -151,9 +151,9 @@ public abstract class AbstractBeyonderTest {
     }
 
     @Test
-    public void testTemplate() throws Exception {
+    public void testTemplates() throws Exception {
         // 1 template
-        testBeyonder("models/template",
+        testBeyonder("models/templates",
                 null,
                 singletonList("twitter_template"), null, null, null);
     }

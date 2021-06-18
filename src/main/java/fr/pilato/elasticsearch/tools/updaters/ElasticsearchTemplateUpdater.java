@@ -52,7 +52,13 @@ public class ElasticsearchTemplateUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(Client client, String root, String template) throws Exception {
-		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
+		String json = getJsonContent(root, SettingsFinder.Defaults.TemplatesDir, template);
+		if (json == null) {
+			logger.warn("Please rename [{}/{}/{}{}] to [{}/{}/{}{}].",
+					root, SettingsFinder.Defaults.TemplateDir, template, SettingsFinder.Defaults.JsonFileExtension,
+					root, SettingsFinder.Defaults.TemplatesDir, template, SettingsFinder.Defaults.JsonFileExtension);
+			json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
+		}
 		createTemplateWithJsonInElasticsearch(client, template, json);
 	}
 
@@ -93,20 +99,14 @@ public class ElasticsearchTemplateUpdater {
 	 */
 	@Deprecated
 	public static void createTemplate(RestClient client, String root, String template) throws Exception {
-		String json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
-		createTemplateWithJsonInElasticsearch(client, template, json);
-	}
+		String json = getJsonContent(root, SettingsFinder.Defaults.TemplatesDir, template);
+		if (json == null) {
+			logger.warn("Please rename [{}/{}/{}{}] to [{}/{}/{}{}].",
+					root, SettingsFinder.Defaults.TemplateDir, template, SettingsFinder.Defaults.JsonFileExtension,
+					root, SettingsFinder.Defaults.TemplatesDir, template, SettingsFinder.Defaults.JsonFileExtension);
+			json = getJsonContent(root, SettingsFinder.Defaults.TemplateDir, template);
+		}
 
-	/**
-	 * Create a new legacy template in Elasticsearch
-	 * @param client Elasticsearch client
-	 * @param template Template name
-	 * @param json JSon content for the template
-	 * @param force set it to true if you want to force cleaning template before adding it
-     * @throws Exception if something goes wrong
-	 */
-	@Deprecated
-	public static void createTemplateWithJson(RestClient client, String template, String json, boolean force) throws Exception {
 		createTemplateWithJsonInElasticsearch(client, template, json);
 	}
 

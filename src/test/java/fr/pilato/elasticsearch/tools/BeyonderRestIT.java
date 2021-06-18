@@ -284,6 +284,10 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 singletonList("template_1"), null);
     }
 
+    @Test
+    public void testDeprecatedTemplate() throws Exception {
+        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null);
+    }
 
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();

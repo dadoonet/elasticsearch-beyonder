@@ -159,6 +159,11 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         }
     }
 
+    @Test
+    public void testDeprecatedTemplate() throws Exception {
+        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null);
+    }
+
     protected void testBeyonder(String root,
                                 List<String> indices,
                                 List<String> templates,

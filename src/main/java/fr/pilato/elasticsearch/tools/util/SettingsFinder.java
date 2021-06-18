@@ -31,7 +31,9 @@ public class SettingsFinder {
 		public static String IndexSettingsFileName = "_settings";
 		public static String UpdateIndexSettingsFileName = "_update_settings";
 		public static String UpdateIndexMappingFileName = "_update_mapping";
+		@Deprecated
 		public static String TemplateDir = "_template";
+		public static String TemplatesDir = "_templates";
 		public static String IndexTemplatesDir = "_index_templates";
 		public static String ComponentTemplatesDir = "_component_templates";
 		public static String PipelinesDir = "_pipelines";

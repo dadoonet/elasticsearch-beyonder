@@ -1,0 +1,14 @@
+{
+    "template" : "twee*",
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "properties" : {
+            "message" : {
+                "type" : "text",
+                "store" : true
+            }
+        }
+    }
+}
