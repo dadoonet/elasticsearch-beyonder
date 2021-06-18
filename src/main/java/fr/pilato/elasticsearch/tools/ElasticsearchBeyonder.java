@@ -119,7 +119,14 @@ public class ElasticsearchBeyonder {
 		logger.info("starting automatic settings/mappings discovery");
 
 		// create legacy templates
-		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplatesDir);
+		if (templateNames.isEmpty()) {
+			// We check for deprecated resources
+			templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
+			if (!templateNames.isEmpty()) {
+				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.TemplateDir, Defaults.TemplatesDir);
+			}
+		}
 		for (String templateName : templateNames) {
 			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
 					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
@@ -185,13 +192,20 @@ public class ElasticsearchBeyonder {
 	public static void start(Client client, String root) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
 
-		// TODO make it a parameter
-		boolean merge = Defaults.MergeMappings;
 		boolean force = Defaults.ForceCreation;
 
-		// create templates
-		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
+		// create legacy templates
+		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplatesDir);
+		if (templateNames.isEmpty()) {
+			// We check for deprecated resources
+			templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
+			if (!templateNames.isEmpty()) {
+				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.TemplateDir, Defaults.TemplatesDir);
+			}
+		}
 		for (String templateName : templateNames) {
+			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
+					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
 			createTemplate(client, root, templateName);
 		}
 

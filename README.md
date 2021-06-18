@@ -51,6 +51,7 @@ Release notes
 ------
 
 * `_pipeline` dir has been deprecated by `_pipelines` dir.
+* `_template` dir has been deprecated by `_templates` dir.
 * `force` parameter is not applied anymore to pipelines. So pipelines are always updated.
 * `force` parameter is not applied anymore to templates, component templates and index templates. So they are always updated.
 * method `start(RestClient client, String root, boolean merge, boolean force)` is now deprecated as the `merge` parameter
@@ -326,7 +327,7 @@ This method is deprecated as Elasticsearch has deprecated [legacy templates](htt
 Sometimes it's useful to define a template mapping that will automatically be applied to new indices created. 
 
 For example, if you planned to have indexes per year for twitter feeds (twitter2012, twitter2013, twitter2014) and you want
-to define a template named `twitter_template`, you can add a file named `elasticsearch/_template/twitter_template.json`
+to define a template named `twitter_template`, you can add a file named `elasticsearch/_templates/twitter_template.json`
 in your project:
 
 ```json

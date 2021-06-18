@@ -183,6 +183,7 @@ public class ResourceList {
                 if (!key.equals(SettingsFinder.Defaults.IndexTemplatesDir) &&
                         !key.equals(SettingsFinder.Defaults.ComponentTemplatesDir) &&
                         !key.equals(SettingsFinder.Defaults.TemplateDir) &&
+                        !key.equals(SettingsFinder.Defaults.TemplatesDir) &&
                         !key.equals(SettingsFinder.Defaults.PipelineDir) &&
                         !key.equals(SettingsFinder.Defaults.PipelinesDir) &&
                         !keys.contains(key)) {

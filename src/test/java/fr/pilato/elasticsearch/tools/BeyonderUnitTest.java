@@ -68,9 +68,9 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
             assertThat(indexNames, emptyIterable());
         }
 
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplateDir), templates, (name) -> {
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.TemplatesDir), templates, (name) -> {
             try {
-                return getJsonContent(root, SettingsFinder.Defaults.TemplateDir, name);
+                return getJsonContent(root, SettingsFinder.Defaults.TemplatesDir, name);
             } catch (IOException e) {
                 throw new RuntimeException("Our test is failing...");
             }
