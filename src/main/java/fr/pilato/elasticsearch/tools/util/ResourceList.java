@@ -186,6 +186,7 @@ public class ResourceList {
                         !key.equals(SettingsFinder.Defaults.TemplatesDir) &&
                         !key.equals(SettingsFinder.Defaults.PipelineDir) &&
                         !key.equals(SettingsFinder.Defaults.PipelinesDir) &&
+                        !key.equals(SettingsFinder.Defaults.AliasesFile + SettingsFinder.Defaults.JsonFileExtension) &&
                         !keys.contains(key)) {
                     logger.trace(" - found [{}].", key);
                     keys.add(key);

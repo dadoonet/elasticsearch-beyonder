@@ -39,6 +39,7 @@ public class SettingsFinder {
 		public static String PipelinesDir = "_pipelines";
 		@Deprecated
 		public static String PipelineDir = "_pipeline";
+		public static String AliasesFile = "_aliases";
 
 		/**
 		 * Default setting of whether or not to merge mappings on start.

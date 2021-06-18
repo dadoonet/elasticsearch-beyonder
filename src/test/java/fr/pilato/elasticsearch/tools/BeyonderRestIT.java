@@ -73,11 +73,13 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     }
 
     @Before @After
-    public void cleanCluster() throws Exception {
+    public void cleanCluster() {
         // DELETE /twitter
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/twitter")));
-        // DELETE /test_aliases
-        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_aliases")));
+        // DELETE /test_1
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_1")));
+        // DELETE /test_2
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_2")));
 
         // DELETE /_ingest/pipeline/twitter_pipeline
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ingest/pipeline/twitter_pipeline")));
@@ -179,14 +181,12 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         return client.performRequest(new Request("HEAD", url)).getStatusLine().getStatusCode() == 200;
     }
 
-    // This is a manual test as we don't have a real support of this in Beyonder yet
-    // See https://github.com/dadoonet/elasticsearch-beyonder/issues/2
     @Test
     public void testAliases() throws Exception {
-        ElasticsearchIndexUpdater.createIndex(client, SettingsFinder.Defaults.ConfigDir, "test_aliases", true);
-        ElasticsearchAliasUpdater.createAlias(client, "foo", "test_aliases");
-        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/_alias/foo")));
-        assertThat(response, hasKey("test_aliases"));
+        ElasticsearchBeyonder.start(client, "models/aliases");
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/_alias/test")));
+        assertThat(response, not(hasKey("test_1")));
+        assertThat(response, hasKey("test_2"));
     }
 
     @Test

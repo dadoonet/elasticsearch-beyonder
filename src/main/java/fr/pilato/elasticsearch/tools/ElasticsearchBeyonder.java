@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater.manageAliases;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.createComponentTemplate;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateMapping;
@@ -165,6 +166,10 @@ public class ElasticsearchBeyonder {
 			updateSettings(client, root, indexName);
 			updateMapping(client, root, indexName);
 		}
+
+		// Manage aliases
+		manageAliases(client, root);
+
 		logger.info("start done. Rock & roll!");
 	}
 

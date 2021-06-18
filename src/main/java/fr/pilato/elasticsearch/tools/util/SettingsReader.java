@@ -58,7 +58,10 @@ public class SettingsReader {
 		if (root == null) {
 			path = SettingsFinder.Defaults.ConfigDir;
 		}
-		path += "/" + subdir + "/" + name + SettingsFinder.Defaults.JsonFileExtension;
+		if (subdir != null) {
+			path += "/" + subdir;
+		}
+		path += "/" + name + SettingsFinder.Defaults.JsonFileExtension;
 		logger.debug("Reading file [{}] from the classpath.", path);
 		return readFileFromClasspath(path);
 	}
