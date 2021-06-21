@@ -19,55 +19,55 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.Client;
+import fr.pilato.elasticsearch.tools.util.SettingsFinder;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
+
 public class ElasticsearchAliasUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchAliasUpdater.class);
 
     /**
-     * Create an alias if needed
-     * @param client Client to use
-     * @param alias Alias name
-     * @param index Index name
-     * @throws Exception When alias can not be set
+     * Create an component template in Elasticsearch.
+     * @param client Elasticsearch client
+     * @param root dir within the classpath
+     * @throws Exception if something goes wrong
      */
-    @Deprecated
-    public static void createAlias(Client client, String alias, String index) throws Exception {
-        logger.trace("createAlias({},{})", alias, index);
-        AcknowledgedResponse response = client.admin().indices().prepareAliases().addAlias(index, alias).get();
-        if (!response.isAcknowledged()) throw new Exception("Could not define alias [" + alias + "] for index [" + index + "].");
-        logger.trace("/createAlias({},{})", alias, index);
+    public static void manageAliases(RestClient client, String root) throws Exception {
+        String json = getJsonContent(root, null, SettingsFinder.Defaults.AliasesFile);
+        if (json != null) {
+            logger.debug("Found [{}/{}.{}] file", root, SettingsFinder.Defaults.AliasesFile, SettingsFinder.Defaults.JsonFileExtension);
+            manageAliasesWithJsonInElasticsearch(client, json);
+        }
     }
 
     /**
-     * Create an alias if needed
+     *
      * @param client Client to use
-     * @param alias Alias name
-     * @param index Index name
-     * @throws Exception When alias can not be set
+     * @param json JSon content for the aliases
+     * @throws Exception if something goes wrong
      */
-    public static void createAlias(RestClient client, String alias, String index) throws Exception {
-        logger.trace("createAlias({},{})", alias, index);
+    public static void manageAliasesWithJsonInElasticsearch(RestClient client, String json) throws Exception {
+        logger.trace("manageAliases()");
 
         assert client != null;
-        assert alias != null;
-        assert index != null;
+        assert json != null;
 
         Request request = new Request("POST", "/_aliases/");
-        request.setJsonEntity("{\"actions\":[{\"add\":{\"index\":\"" + index +"\",\"alias\":\"" + alias +"\"}}]}");
+        request.setJsonEntity(json);
         Response response = client.performRequest(request);
 
         if (response.getStatusLine().getStatusCode() != 200) {
-            logger.warn("Could not create alias [{}] on index [{}]", alias, index);
-            throw new Exception("Could not create alias ["+alias+"] on index ["+index+"].");
+            logger.warn("Could not manage aliases. Got error: {}: {}",
+                    response.getStatusLine().getStatusCode(),
+                    response.getStatusLine().getReasonPhrase());
+            throw new Exception("Could not manage aliases.");
         }
-        logger.trace("/createAlias({},{})", alias, index);
+        logger.trace("/manageAliases()");
     }
 }

@@ -56,6 +56,7 @@ Release notes
 * `force` parameter is not applied anymore to templates, component templates and index templates. So they are always updated.
 * method `start(RestClient client, String root, boolean merge, boolean force)` is now deprecated as the `merge` parameter
   is not used anymore. Use instead the `start(RestClient client, String root, boolean force)` method.
+* support for the aliases API has been added.
 
 Getting Started
 ===============
@@ -225,6 +226,23 @@ And you can create `elasticsearch/twitter/_update_mapping.json`:
 
 This will change the `search_analyzer` for the `message` field and will add a new field named `bar`.
 All other existing fields (like `foo` in the previous example) won't be changed.
+
+Managing aliases
+----------------
+
+An alias is helpful to define or remove an alias to a given index. You could also use index templates to do that 
+automatically when the index is created, but you can also define a file `elasticsearch/_aliases.json`:
+
+```json
+{
+  "actions" : [
+    { "remove": { "index": "test_1", "alias": "test" } },
+    { "add":  { "index": "test_2", "alias": "test" } }
+  ]
+}
+```
+
+When Beyonder starts, it will automatically send the content to the [Aliases API](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html).
 
 Managing index templates (aka templates V2)
 -------------------------------------------
