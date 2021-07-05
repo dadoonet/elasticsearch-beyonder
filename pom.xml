@@ -41,7 +41,8 @@ when an elasticsearch client starts.
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.compiler.version>14</java.compiler.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- Smtp Settings for announcements -->
         <changes.smtpHost>smtp.ionos.fr</changes.smtpHost>
@@ -193,8 +194,6 @@ when an elasticsearch client starts.
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.compiler.version}</source>
-                    <target>${java.compiler.version}</target>
                     <encoding>UTF-8</encoding>
                     <optimize>true</optimize>
                     <showDeprecation>true</showDeprecation>
