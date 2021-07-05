@@ -75,8 +75,6 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 </dependency>
 ```
 
-Note that it needs Java14+.
-
 You need to import as well the elasticsearch client you want to use by adding one of the following
 dependencies to your `pom.xml` file.
 

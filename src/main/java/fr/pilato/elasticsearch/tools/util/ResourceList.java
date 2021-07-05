@@ -91,7 +91,7 @@ public class ResourceList {
                         // remove leading slash that is not part of the JarEntry::getName
                         .substring(1);
             Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
-            try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8))) {
+            try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"))) {
                 Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
                 while(entries.hasMoreElements()) {
                     String name = entries.nextElement().getName();

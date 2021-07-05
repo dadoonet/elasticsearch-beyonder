@@ -30,6 +30,8 @@ import java.util.Map;
 public class JsonUtil {
 
     static final ObjectMapper mapper = new ObjectMapper();
+    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE =
+        new TypeReference<Map<String, Object>>() {};
 
     public static Map<String, Object> asMap(Response response) {
         try {
@@ -44,7 +46,7 @@ public class JsonUtil {
 
     public static Map<String, Object> asMap(InputStream stream) {
         try {
-            return mapper.readValue(stream, new TypeReference<>() {});
+            return mapper.readValue(stream, MAP_TYPE_REFERENCE);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
