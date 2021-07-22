@@ -49,6 +49,11 @@ Build Status
 Release notes
 =============
 
+7.13.2
+------
+
+* Added back support for Java 8
+
 7.13.1
 ------
 
