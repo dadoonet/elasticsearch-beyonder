@@ -26,7 +26,7 @@ when an elasticsearch client starts.
         <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
         <slf4j.version>1.7.32</slf4j.version>
         <log4j.version>2.14.1</log4j.version>
-        <commons.io.version>2.10.0</commons.io.version>
+        <commons.io.version>2.11.0</commons.io.version>
         <jackson.version>2.12.4</jackson.version>
 
         <!-- For integration tests using Docker or external cluster -->
