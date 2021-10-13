@@ -13,7 +13,7 @@ Versions
 
 | elasticsearch-beyonder  | elasticsearch | Release date |
 |:-----------------------:|:-------------:|:------------:|
-| 7.14-SNAPSHOT           | 7.x           |              |
+| 7.15-SNAPSHOT           | 7.x           |              |
 | 7.13.2                  | 7.x           |  2021-07-22  |
 | 7.13.1                  | 7.x           |  2021-06-21  |
 | 7.13                    | 7.x           |  2021-06-03  |
@@ -48,6 +48,11 @@ Build Status
 
 Release notes
 =============
+
+7.15.0
+------
+
+* Add support for Index Lifecycles.
 
 7.13.2
 ------
@@ -90,7 +95,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.13.4</version>
+    <version>7.15.0</version>
 </dependency>
 ```
 
@@ -100,7 +105,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.13.4</version>
+    <version>7.15.0</version>
 </dependency>
 ```
 
@@ -392,11 +397,13 @@ in your project:
 }
 ```
 
-### Index lifecycles
+Index lifecycles
+----------------
 
-To define [index lifecycle](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-lifecycle-management.html), you can create json files within the `elasticsearch/_index_lifecycles/` dir.
+To define an [index lifecycle](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-lifecycle-management.html), 
+you can create json files within the `elasticsearch/_index_lifecycles/` dir.
 
-Let's create a `elasticsearch/_index_lifecycles/index_lifecycle.json`:
+Let's create a `elasticsearch/_index_lifecycles/my_lifecycle.json`:
 
 ```json
 {
@@ -421,7 +428,7 @@ Let's create a `elasticsearch/_index_lifecycles/index_lifecycle.json`:
 }
 ```
 
-When Beyonder starts, it will create the index templates named `index_lifecycle` into elasticsearch.
+When Beyonder starts, it will create the index templates named `my_lifecycle` into elasticsearch.
 
 # Tests
 
