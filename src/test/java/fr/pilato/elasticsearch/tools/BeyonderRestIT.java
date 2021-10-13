@@ -94,6 +94,9 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component1")));
         // DELETE /_component_template/component2
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_component_template/component2")));
+
+        // DELETE /_ilm/policy/index_lifecycle
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ilm/policy/index_lifecycle")));
     }
 
     @BeforeClass
@@ -112,7 +115,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                                 List<String> templates,
                                 List<String> componentTemplates,
                                 List<String> indexTemplates,
-                                List<String> pipelines) throws Exception {
+                                List<String> pipelines,
+                                List<String> indexLifecycles) throws Exception {
         logger.info("--> scanning: [{}]", root);
         ElasticsearchBeyonder.start(client, root);
 
@@ -175,10 +179,26 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             }
             assertThat(allExists, is(true));
         }
+
+        // We can check if we have the index lifecycle policies created
+        if (indexLifecycles != null) {
+            boolean allExists = true;
+
+            for (String policy : indexLifecycles) {
+                if (!existObjectInElasticsearch("/_ilm/policy/" + policy, "GET")) {
+                    allExists = false;
+                }
+            }
+            assertThat(allExists, is(true));
+        }
     }
 
     private boolean existObjectInElasticsearch(String url) throws IOException {
-        return client.performRequest(new Request("HEAD", url)).getStatusLine().getStatusCode() == 200;
+        return existObjectInElasticsearch(url, "HEAD");
+    }
+
+    private boolean existObjectInElasticsearch(String url, String method) throws IOException {
+        return client.performRequest(new Request(method, url)).getStatusLine().getStatusCode() == 200;
     }
 
     @Test
@@ -215,7 +235,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Test
 	public void testPipelines() throws Exception {
-        testBeyonder("models/pipelines", null, null, null, null, singletonList("twitter_pipeline"));
+        testBeyonder("models/pipelines", null, null, null, null, singletonList("twitter_pipeline"), null);
 	}
 
     @Test
@@ -224,7 +244,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step1",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
             Map<String, Object> oldSettings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(oldSettings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("0"));
@@ -234,7 +254,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step2",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
             Map<String, Object> settings = asMap(client.performRequest(new Request("GET", "/twitter/_settings")));
             String numberOfReplicas = BeanUtils.getProperty(settings, "twitter.settings.index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("1"));
@@ -247,7 +267,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step1",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -262,7 +282,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step2",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             Map<String, Object> mapping = asMap(client.performRequest(new Request("GET", "/twitter/_mappings")));
             String bar = BeanUtils.getProperty(mapping, "twitter.mappings.properties.bar");
@@ -281,12 +301,24 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 null,
                 null,
                 asList("component1", "component2"),
-                singletonList("template_1"), null);
+                singletonList("template_1"), null, null);
+    }
+
+    @Test
+    public void testIndexLifecycles() throws Exception {
+        // 1 policy
+        testBeyonder("models/index-lifecycle",
+                null,
+                null,
+                null,
+                null,
+                null,
+                singletonList("index_lifecycle"));
     }
 
     @Test
     public void testDeprecatedTemplate() throws Exception {
-        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null);
+        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null, null);
     }
 
     private String getMapping(String indexName) throws IOException {

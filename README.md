@@ -392,6 +392,37 @@ in your project:
 }
 ```
 
+### Index lifecycles
+
+To define [index lifecycle](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-lifecycle-management.html), you can create json files within the `elasticsearch/_index_lifecycles/` dir.
+
+Let's create a `elasticsearch/_index_lifecycles/index_lifecycle.json`:
+
+```json
+{
+  "policy": {
+    "phases": {
+      "warm": {
+        "min_age": "10d",
+        "actions": {
+          "forcemerge": {
+            "max_num_segments": 1
+          }
+        }
+      },
+      "delete": {
+        "min_age": "30d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}
+```
+
+When Beyonder starts, it will create the index templates named `index_lifecycle` into elasticsearch.
+
 # Tests
 
 This project comes with unit tests and integration tests.

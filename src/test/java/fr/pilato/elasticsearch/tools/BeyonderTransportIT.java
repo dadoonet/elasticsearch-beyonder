@@ -110,7 +110,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step1",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
             GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
             String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("0"));
@@ -120,7 +120,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-settings/step2",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
             GetSettingsResponse settings = client.admin().indices().prepareGetSettings("twitter").get();
             String numberOfReplicas = settings.getSetting("twitter", "index.number_of_replicas");
             assertThat(numberOfReplicas, equalTo("1"));
@@ -133,7 +133,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step1",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
             Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
             String bar = BeanUtils.getProperty(properties, "properties.bar");
             String foo = BeanUtils.getProperty(properties, "properties.foo");
@@ -147,7 +147,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
         {
             testBeyonder("models/update-mapping/step2",
                     singletonList("twitter"),
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             Map<String, Object> properties = client.admin().indices().prepareGetMappings("twitter").get().getMappings().get("twitter").get("_doc").getSourceAsMap();
             String bar = BeanUtils.getProperty(properties, "properties.bar");
@@ -161,7 +161,7 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
 
     @Test
     public void testDeprecatedTemplate() throws Exception {
-        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null);
+        testBeyonder("models/template", null, singletonList("twitter_template"), null, null, null, null);
     }
 
     protected void testBeyonder(String root,
@@ -169,7 +169,8 @@ public class BeyonderTransportIT extends AbstractBeyonderTest {
                                 List<String> templates,
                                 List<String> componentTemplates,
                                 List<String> indexTemplates,
-                                List<String> pipelines) throws Exception {
+                                List<String> pipelines,
+                                List<String> indexLifecycles) throws Exception {
         String newRoot = "transport/" + root;
         logger.info("--> scanning: [{}]", newRoot);
         ElasticsearchBeyonder.start(client, newRoot);
