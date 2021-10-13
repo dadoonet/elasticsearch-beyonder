@@ -40,6 +40,7 @@ public class SettingsFinder {
 		@Deprecated
 		public static String PipelineDir = "_pipeline";
 		public static String AliasesFile = "_aliases";
+		public static String IndexLifecyclesDir = "_index_lifecycles";
 
 		/**
 		 * Default setting of whether or not to merge mappings on start.

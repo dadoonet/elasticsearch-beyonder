@@ -31,6 +31,7 @@ import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater.manageAliases;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.createComponentTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexLifecycleUpdater.createIndexLifecycle;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateMapping;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateSettings;
@@ -132,6 +133,12 @@ public class ElasticsearchBeyonder {
 			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
 					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
 			createTemplate(client, root, templateName);
+		}
+
+		// create index lifecycles
+		List<String> indexLifecycles = ResourceList.getResourceNames(root, Defaults.IndexLifecyclesDir);
+		for (String indexLifecycleName : indexLifecycles) {
+			createIndexLifecycle(client, root, indexLifecycleName);
 		}
 
 		// create component templates

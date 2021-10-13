@@ -59,7 +59,8 @@ public abstract class AbstractBeyonderTest {
                                          List<String> templates,
                                          List<String> componentTemplates,
                                          List<String> indexTemplates,
-                                         List<String> pipelines) throws Exception;
+                                         List<String> pipelines,
+                                         List<String> indexLifecycles) throws Exception;
 
     private static RestClient client;
 
@@ -123,7 +124,7 @@ public abstract class AbstractBeyonderTest {
         // Default dir es
         testBeyonder(null,
                 singletonList("twitter"),
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Test
@@ -131,7 +132,7 @@ public abstract class AbstractBeyonderTest {
         // Single index/single type
         testBeyonder("models/oneindexonetype",
                 singletonList("twitter"),
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Test
@@ -139,7 +140,7 @@ public abstract class AbstractBeyonderTest {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
                 singletonList("twitter"),
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Test
@@ -147,7 +148,7 @@ public abstract class AbstractBeyonderTest {
         // 1 index and no type
         testBeyonder("models/oneindexnotype",
                 singletonList("twitter"),
-                null, null, null, null);
+                null, null, null, null, null);
     }
 
     @Test
@@ -155,12 +156,12 @@ public abstract class AbstractBeyonderTest {
         // 1 template
         testBeyonder("models/templates",
                 null,
-                singletonList("twitter_template"), null, null, null);
+                singletonList("twitter_template"), null, null, null, null);
     }
 
     @Test
     public void testWrongClasspathDir() throws Exception {
         testBeyonder("models/bad-classpath-7/doesnotexist",
-                null, null, null, null, null);
+                null, null, null, null, null, null);
     }
 }
