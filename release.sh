@@ -213,6 +213,11 @@ then
             SMTP_USERNAME=$(readvalue "Enter your SMTP username" "david@pilato.fr")
             SMTP_PASSWORD=$(readvalue "Enter your SMTP password" "")
             mvn changes:announcement-mail -Dchanges.username=${SMTP_USERNAME} -Dchanges.password=${SMTP_PASSWORD} >> /tmp/beyonder-${RELEASE_VERSION}.log
+            if [ $? -ne 0 ]
+            then
+                tail -20 /tmp/beyonder-${RELEASE_VERSION}.log
+                echo "We have not been able to send the email. Full log available at /tmp/beyonder-$RELEASE_VERSION.log"
+            fi
             git checkout -q ${CURRENT_BRANCH}
         else
             echo "Message not sent. You can send it manually using:"
