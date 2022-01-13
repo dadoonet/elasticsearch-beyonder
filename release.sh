@@ -87,7 +87,7 @@ then
     echo "Let's start the release process"
 else
     echo "switch to another java version by using for example:"
-    echo "sdk use java 10.0.2-oracle"
+    echo "sdk use java 14.0.2-open"
     exit 1
 fi
 
