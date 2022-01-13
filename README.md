@@ -11,25 +11,26 @@ you start your application.
 Versions
 ========
 
-| elasticsearch-beyonder  | elasticsearch | Release date |
-|:-----------------------:|:-------------:|:------------:|
-| 7.16-SNAPSHOT           | 7.x           |              |
-| 7.15                    | 7.x           |  2021-10-14  |
-| 7.13.2                  | 7.x           |  2021-07-22  |
-| 7.13.1                  | 7.x           |  2021-06-21  |
-| 7.13                    | 7.x           |  2021-06-03  |
-| 7.5                     | 7.x           |  2020-01-15  |
-| 7.0                     | 7.0 -> 7.x    |  2019-04-04  |
-| 6.5                     | 6.5 -> 6.x    |  2019-01-04  |
-| 6.3                     | 6.3 -> 6.4    |  2018-07-21  |
-| 6.0                     | 6.0 -> 6.2    |  2018-02-05  |
-| 5.1                     | 5.x, 6.x      |  2017-07-12  |
-| 5.0                     | 5.x, 6.x      |  2017-07-11  |
-| 2.1.0                   | 2.0, 2.1      |  2015-11-25  |
-| 2.0.0                   |      2.0      |  2015-10-24  |
-| 1.5.0                   |      1.5      |  2015-03-27  |
-| 1.4.1                   |      1.4      |  2015-03-02  |
-| 1.4.0                   |      1.4      |  2015-02-27  |
+| elasticsearch-beyonder | elasticsearch | Release date |
+|:----------------------:|:-------------:|:------------:|
+|     7.17-SNAPSHOT      | 7.x           |              |
+|          7.16          | 7.x           |  2022-01-13  |
+|          7.15          | 7.x           |  2021-10-14  |
+|         7.13.2         | 7.x           |  2021-07-22  |
+|         7.13.1         | 7.x           |  2021-06-21  |
+|          7.13          | 7.x           |  2021-06-03  |
+|          7.5           | 7.x           |  2020-01-15  |
+|          7.0           | 7.0 -> 7.x    |  2019-04-04  |
+|          6.5           | 6.5 -> 6.x    |  2019-01-04  |
+|          6.3           | 6.3 -> 6.4    |  2018-07-21  |
+|          6.0           | 6.0 -> 6.2    |  2018-02-05  |
+|          5.1           | 5.x, 6.x      |  2017-07-12  |
+|          5.0           | 5.x, 6.x      |  2017-07-11  |
+|         2.1.0          | 2.0, 2.1      |  2015-11-25  |
+|         2.0.0          |      2.0      |  2015-10-24  |
+|         1.5.0          |      1.5      |  2015-03-27  |
+|         1.4.1          |      1.4      |  2015-03-02  |
+|         1.4.0          |      1.4      |  2015-02-27  |
 
 
 Documentation
@@ -49,6 +50,11 @@ Build Status
 
 Release notes
 =============
+
+7.16.0
+------
+
+* Update Log4J (optional) dependency to 2.17.1.
 
 7.15.0
 ------
@@ -83,7 +89,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>7.15</version>
+  <version>7.16</version>
 </dependency>
 ```
 
@@ -96,7 +102,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.15.0</version>
+    <version>7.16.2</version>
 </dependency>
 ```
 
@@ -106,7 +112,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.15.0</version>
+    <version>7.16.2</version>
 </dependency>
 ```
 
@@ -497,7 +503,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2021 David Pilato
+	Copyright 2011-2022 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of
