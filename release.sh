@@ -80,6 +80,17 @@ DRY_RUN=0
 # Enter project dir
 cd "$FS_HOME"
 
+echo "Java version used:"
+java --version
+if promptyn "Do you want to use this version?"
+then
+    echo "Let's start the release process"
+else
+    echo "switch to another java version by using for example:"
+    echo "sdk use java 10.0.2-oracle"
+    exit 1
+fi
+
 CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 CURRENT_VERSION=`mvn help:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)'`
 
