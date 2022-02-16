@@ -191,7 +191,7 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.9.0</version>
+                <version>3.10.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <optimize>true</optimize>
