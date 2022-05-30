@@ -297,7 +297,7 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.39.1</version>
+                <version>0.40.0</version>
                 <configuration>
                     <skip>${skipIntegTests}</skip>
                     <images>
