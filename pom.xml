@@ -272,7 +272,7 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M7</version>
                 <executions>
                     <!--
                         Invokes both the integration-test and the verify goals of the
