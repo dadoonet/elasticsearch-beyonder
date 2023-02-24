@@ -180,6 +180,13 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/documentation</directory>
+                <filtering>true</filtering>
+                <targetPath>${project.basedir}</targetPath>
+            </resource>
+        </resources>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
@@ -209,6 +216,14 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>1.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <propertiesEncoding>UTF-8</propertiesEncoding>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
