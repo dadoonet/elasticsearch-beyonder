@@ -17,7 +17,7 @@ Versions
 
 | elasticsearch-beyonder | elasticsearch | Release date |
 |:----------------------:|:-------------:|:------------:|
-|  7.17-SNAPSHOT    | 7.x           |              |
+|  ${project.version}    | 7.x           |              |
 |          7.16          | 7.x           |  2022-01-13  |
 |          7.15          | 7.x           |  2021-10-14  |
 |         7.13.2         | 7.x           |  2021-07-22  |
@@ -93,7 +93,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>7.17-SNAPSHOT</version>
+  <version>${project.version}</version>
 </dependency>
 ```
 
@@ -106,7 +106,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.16.3</version>
+    <version>${elasticsearch.version}</version>
 </dependency>
 ```
 
@@ -116,7 +116,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.16.3</version>
+    <version>${elasticsearch.version}</version>
 </dependency>
 ```
 
