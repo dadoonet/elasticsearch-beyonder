@@ -55,13 +55,13 @@ Build Status
 Release notes
 =============
 
-7.16.0
-------
+7.16
+----
 
 * Update Log4J (optional) dependency to 2.17.1.
 
-7.15.0
-------
+7.15
+----
 
 * Add support for Index Lifecycles.
 
