@@ -51,12 +51,6 @@ public class ElasticsearchPipelineUpdater {
      */
     public static void createPipeline(RestClient client, String root, String pipeline) throws Exception {
         String json = getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, pipeline);
-        if (json == null) {
-            logger.warn("Please rename [{}/{}/{}{}] to [{}/{}/{}{}].",
-                    root, SettingsFinder.Defaults.PipelineDir, pipeline, SettingsFinder.Defaults.JsonFileExtension,
-                    root, SettingsFinder.Defaults.PipelinesDir, pipeline, SettingsFinder.Defaults.JsonFileExtension);
-            json = getJsonContent(root, SettingsFinder.Defaults.PipelineDir, pipeline);
-        }
         createPipelineWithJsonInElasticsearch(client, pipeline, json);
     }
 

@@ -17,20 +17,20 @@ Versions
 
 | elasticsearch-beyonder | elasticsearch | Release date |
 |:----------------------:|:-------------:|:------------:|
-|  7.17-SNAPSHOT    | 7.x           |              |
-|          7.16          | 7.x           |  2022-01-13  |
-|          7.15          | 7.x           |  2021-10-14  |
-|         7.13.2         | 7.x           |  2021-07-22  |
-|         7.13.1         | 7.x           |  2021-06-21  |
-|          7.13          | 7.x           |  2021-06-03  |
-|          7.5           | 7.x           |  2020-01-15  |
-|          7.0           | 7.0 -> 7.x    |  2019-04-04  |
-|          6.5           | 6.5 -> 6.x    |  2019-01-04  |
-|          6.3           | 6.3 -> 6.4    |  2018-07-21  |
-|          6.0           | 6.0 -> 6.2    |  2018-02-05  |
-|          5.1           | 5.x, 6.x      |  2017-07-12  |
-|          5.0           | 5.x, 6.x      |  2017-07-11  |
-|         2.1.0          | 2.0, 2.1      |  2015-11-25  |
+|  8.6-SNAPSHOT    |      8.x      |              |
+|          7.16          |      7.x      |  2022-01-13  |
+|          7.15          |      7.x      |  2021-10-14  |
+|         7.13.2         |      7.x      |  2021-07-22  |
+|         7.13.1         |      7.x      |  2021-06-21  |
+|          7.13          |      7.x      |  2021-06-03  |
+|          7.5           |      7.x      |  2020-01-15  |
+|          7.0           |  7.0 -> 7.x   |  2019-04-04  |
+|          6.5           |  6.5 -> 6.x   |  2019-01-04  |
+|          6.3           |  6.3 -> 6.4   |  2018-07-21  |
+|          6.0           |  6.0 -> 6.2   |  2018-02-05  |
+|          5.1           |   5.x, 6.x    |  2017-07-12  |
+|          5.0           |   5.x, 6.x    |  2017-07-11  |
+|         2.1.0          |   2.0, 2.1    |  2015-11-25  |
 |         2.0.0          |      2.0      |  2015-10-24  |
 |         1.5.0          |      1.5      |  2015-03-27  |
 |         1.4.1          |      1.4      |  2015-03-02  |
@@ -40,7 +40,8 @@ Versions
 Documentation
 =============
 
-* For 7.x elasticsearch versions, you are reading the latest documentation.
+* For 8.x elasticsearch versions, you are reading the latest documentation.
+* For 7.x elasticsearch versions, look at [es-7.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-7.x).
 * For 6.x elasticsearch versions, look at [es-6.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-6.x).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
 * For 2.x elasticsearch versions, look at [es-2.1 branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-2.1).
@@ -54,6 +55,14 @@ Build Status
 
 Release notes
 =============
+
+8.6
+----
+
+* Update project to Elasticsearch 8.6.2.
+* Remove the deprecated Transport Client
+* Remove the old elasticsearch template support
+* Remove some old `start()` methods
 
 7.16
 ----
@@ -93,7 +102,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>7.17-SNAPSHOT</version>
+  <version>8.6-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -106,7 +115,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>7.17.9</version>
+    <version>8.6.2</version>
 </dependency>
 ```
 
@@ -116,7 +125,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>7.17.9</version>
+    <version>8.6.2</version>
 </dependency>
 ```
 
@@ -124,10 +133,15 @@ For example, here is how to import the Transport Client to your project (depreca
 Adding Beyonder to your client
 ------------------------------
 
-For RestClient or TransportClient, you can define many properties to manage automatic creation
-of index, mappings, templates and aliases.
+Elasticsearch provides a [Low Level Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/java-rest-low.html).
+You can create it like this:
 
-To activate those features, you only need to call:
+```java
+RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200")).build();
+```
+
+Once you have the client, you can use it to manage automatic creation of index, mappings, templates and aliases.
+To activate those features, you only need to pass to Beyonder the Rest Client instance:
 
 ```java
 ElasticsearchBeyonder.start(client);
@@ -153,36 +167,14 @@ ElasticsearchBeyonder.start(client, "models/myelasticsearch", true);
 This last parameter is known as `force`. It removes any existing index which is managed by Beyonder.
 It is super useful for integration testing but it is **super dangerous** in production.
 
-## Using REST Client (recommended)
-
-Elasticsearch provides a [Rest Client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.0/index.html).
-It's the recommended way as the Transport Client is now deprecated and will be removed in a next major version.
-
-Just pass to Beyonder a Rest Client instance:
-
-```java
-RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200")).build();
-ElasticsearchBeyonder.start(client);
-```
-
 For the record, when your cluster is secured, you can use for example the
-[Basic Authentication](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_basic_authentication.html):
+[Basic Authentication](https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/_basic_authentication.html):
 
 ```java
 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "changeme"));
 RestClient client = RestClient.builder(HttpHost.create("http://127.0.0.1:9200"))
         .setHttpClientConfigCallback(hcb -> hcb.setDefaultCredentialsProvider(credentialsProvider)).build();
-ElasticsearchBeyonder.start(client);
-```
-
-## Using Transport Client (deprecated)
-
-To use the deprecated TransportClient, just pass it to Beyonder:
-
-```java
-Client client = new PreBuiltTransportClient(Settings.EMPTY)
-           .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress("127.0.0.1", 9300)));
 ElasticsearchBeyonder.start(client);
 ```
 
@@ -358,33 +350,6 @@ When Beyonder starts, it will create the index templates named `template_1` into
 Note that this index template references 2 component templates that must be available before Beyonder starts
 or defined within the `component_templates` dir as we saw just before.
 
-Managing legacy templates (deprecated)
---------------------------------------
-
-This method is deprecated as Elasticsearch has deprecated [legacy templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates-v1.html).
-
-Sometimes it's useful to define a template mapping that will automatically be applied to new indices created. 
-
-For example, if you planned to have indexes per year for twitter feeds (twitter2012, twitter2013, twitter2014) and you want
-to define a template named `twitter_template`, you can add a file named `elasticsearch/_templates/twitter_template.json`
-in your project:
-
-```json
-{
-    "template" : "twitter*",
-    "settings" : {
-        "number_of_shards" : 1
-    },
-    "mappings" : {
-        "properties" : {
-            "message" : {
-                "type" : "text"
-            }
-        }
-    }
-}
-```
-
 Managing pipelines
 ------------------
 
@@ -474,12 +439,11 @@ following settings to locate your cluster:
 |            setting            |          default        |
 |:-----------------------------:|:-----------------------:|
 | `tests.cluster`               | `http://127.0.0.1:9400` |
-| `tests.cluster.transport.port`| `9500`                  |
 
 For example:
 
 ```sh
-mvn clean install -Dtests.cluster=http://127.0.0.1:9200 -Dtests.cluster.transport.port=9300
+mvn clean install -Dtests.cluster=http://127.0.0.1:9200
 ```
 
 If you want to run your tests against an [Elastic Cloud](https://cloud.elastic.co/) instance, you can use something like:
