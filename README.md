@@ -61,8 +61,9 @@ Release notes
 
 * Update project to Elasticsearch 8.6.2.
 * Remove the deprecated Transport Client
-* Remove the old elasticsearch template support
-* Remove some old `start()` methods
+* `_pipeline` dir is not supported anymore. Use `_pipelines` dir.
+* `_template` and `_templates` dir are not supported anymore. Use `_index_templates` and `_component_templates` dirs.
+* method `start(RestClient client, String root, boolean merge, boolean force)` is now `start(RestClient client, String root, boolean force)`.
 
 7.16
 ----
