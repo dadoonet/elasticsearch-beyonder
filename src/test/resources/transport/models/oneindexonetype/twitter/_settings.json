@@ -1,9 +1,0 @@
-{
-  "mappings": {
-    "_doc": {
-      "properties" : {
-        "message" : {"type" : "text", "store" : true}
-      }
-    }
-  }
-}

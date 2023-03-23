@@ -46,17 +46,16 @@ public abstract class AbstractBeyonderTest {
 
     static final Logger logger = LoggerFactory.getLogger(AbstractBeyonderTest.class);
 
-    private final static String DEFAULT_TEST_CLUSTER = "http://127.0.0.1:9200";
-    private final static Integer DEFAULT_TEST_CLUSTER_TRANSPORT_PORT = 9300;
+    private final static String DEFAULT_TEST_CLUSTER = "https://127.0.0.1:9200";
+    private final static String DEFAULT_TEST_USER = "elastic";
+    private final static String DEFAULT_TEST_PASSWORD = "changeme";
 
     final static String testCluster = System.getProperty("tests.cluster", DEFAULT_TEST_CLUSTER);
-    final static String testClusterUser = System.getProperty("tests.cluster.user");
-    final static String testClusterPass = System.getProperty("tests.cluster.pass");
-    final static int testClusterTransportPort = Integer.parseInt(System.getProperty("tests.cluster.transport.port", DEFAULT_TEST_CLUSTER_TRANSPORT_PORT.toString()));
+    final static String testClusterUser = System.getProperty("tests.cluster.user", DEFAULT_TEST_USER);
+    final static String testClusterPass = System.getProperty("tests.cluster.pass", DEFAULT_TEST_PASSWORD);
 
     abstract protected void testBeyonder(String root,
                                          List<String> indices,
-                                         List<String> templates,
                                          List<String> componentTemplates,
                                          List<String> indexTemplates,
                                          List<String> pipelines,
@@ -74,31 +73,29 @@ public abstract class AbstractBeyonderTest {
     private static void startRestClient() throws IOException {
         if (client == null) {
             RestClientBuilder builder = RestClient.builder(HttpHost.create(testCluster));
-            if (testClusterUser != null) {
-                final CredentialsProvider credentialsProvider =
-                        new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(AuthScope.ANY,
-                        new UsernamePasswordCredentials(testClusterUser, testClusterPass));
-                builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
-                        .setDefaultCredentialsProvider(credentialsProvider));
-            }
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(testClusterUser, testClusterPass));
+
+            builder.setHttpClientConfigCallback(hcb -> hcb
+                    .setDefaultCredentialsProvider(credentialsProvider)
+                    .setSSLContext(SSLUtils.yesSSLContext())
+            );
 
             client = builder.build();
             testClusterRunning();
         }
     }
 
-    private static boolean testClusterRunning() throws IOException {
+    private static void testClusterRunning() throws IOException {
         try {
             Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
             logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
-            return false;
         } catch (ConnectException e) {
             // If we have an exception here, let's ignore the test
             logger.warn("Integration tests are skipped: [{}]", e.getMessage());
             assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-            return false;
         } catch (IOException e) {
             logger.error("Full error is", e);
             throw e;
@@ -124,7 +121,7 @@ public abstract class AbstractBeyonderTest {
         // Default dir es
         testBeyonder(null,
                 singletonList("twitter"),
-                null, null, null, null, null);
+                null, null, null, null);
     }
 
     @Test
@@ -132,7 +129,7 @@ public abstract class AbstractBeyonderTest {
         // Single index/single type
         testBeyonder("models/oneindexonetype",
                 singletonList("twitter"),
-                null, null, null, null, null);
+                null, null, null, null);
     }
 
     @Test
@@ -140,7 +137,7 @@ public abstract class AbstractBeyonderTest {
         // Custom settings (analyzer)
         testBeyonder("models/settingsanalyzer",
                 singletonList("twitter"),
-                null, null, null, null, null);
+                null, null, null, null);
     }
 
     @Test
@@ -148,20 +145,12 @@ public abstract class AbstractBeyonderTest {
         // 1 index and no type
         testBeyonder("models/oneindexnotype",
                 singletonList("twitter"),
-                null, null, null, null, null);
-    }
-
-    @Test
-    public void testTemplates() throws Exception {
-        // 1 template
-        testBeyonder("models/templates",
-                null,
-                singletonList("twitter_template"), null, null, null, null);
+                null, null, null, null);
     }
 
     @Test
     public void testWrongClasspathDir() throws Exception {
         testBeyonder("models/bad-classpath-7/doesnotexist",
-                null, null, null, null, null, null);
+                null, null, null, null, null);
     }
 }

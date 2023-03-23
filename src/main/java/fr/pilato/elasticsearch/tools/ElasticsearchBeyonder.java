@@ -21,7 +21,6 @@ package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.util.SettingsFinder.Defaults;
 import fr.pilato.elasticsearch.tools.util.ResourceList;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,6 @@ import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.u
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateSettings;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexTemplateUpdater.createIndexTemplate;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchPipelineUpdater.createPipeline;
-import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchTemplateUpdater.createTemplate;
 
 /**
  * By default, indexes are created with their default Elasticsearch settings. You can specify
@@ -83,7 +81,7 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client) throws Exception {
-		start(client, Defaults.ConfigDir);
+		start(client, Defaults.ConfigDir, Defaults.ForceCreation);
 	}
 
 	/**
@@ -93,21 +91,7 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client, String root) throws Exception {
-		start(client, root, Defaults.MergeMappings, Defaults.ForceCreation);
-	}
-
-	/**
-	 * Automatically scan classpath and create indices, mappings, templates, and other settings.
-	 * @param client elasticsearch client
-	 * @param root dir within the classpath
-	 * @param merge whether or not to merge mappings (not used anymore)
-	 * @param force whether or not to force creation of indices and templates
-	 * @throws Exception when beyonder can not start
-	 * @since 6.1
-	 */
-	@Deprecated
-	public static void start(RestClient client, String root, boolean merge, boolean force) throws Exception {
-		start(client, root, force);
+		start(client, root, Defaults.ForceCreation);
 	}
 
 	/**
@@ -119,21 +103,6 @@ public class ElasticsearchBeyonder {
 	 */
 	public static void start(RestClient client, String root, boolean force) throws Exception {
 		logger.info("starting automatic settings/mappings discovery");
-
-		// create legacy templates
-		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplatesDir);
-		if (templateNames.isEmpty()) {
-			// We check for deprecated resources
-			templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
-			if (!templateNames.isEmpty()) {
-				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.TemplateDir, Defaults.TemplatesDir);
-			}
-		}
-		for (String templateName : templateNames) {
-			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
-					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
-			createTemplate(client, root, templateName);
-		}
 
 		// create index lifecycles
 		List<String> indexLifecycles = ResourceList.getResourceNames(root, Defaults.IndexLifecyclesDir);
@@ -155,13 +124,6 @@ public class ElasticsearchBeyonder {
 
 		// create pipelines
 		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelinesDir);
-		if (pipelineNames.isEmpty()) {
-			// We check for deprecated resources
-			pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelineDir);
-			if (!pipelineNames.isEmpty()) {
-				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.PipelineDir, Defaults.PipelinesDir);
-			}
-		}
 		for (String pipelineName : pipelineNames) {
 			createPipeline(client, root, pipelineName);
 		}
@@ -177,57 +139,6 @@ public class ElasticsearchBeyonder {
 		// Manage aliases
 		manageAliases(client, root);
 
-		logger.info("start done. Rock & roll!");
-	}
-
-	/**
-	 * Automatically scan classpath and creates indices, types, templates... in default dir.
-	 * @param client elasticsearch client
-	 * @throws Exception when beyonder can not start
-	 * @deprecated You should use now the RestClient implementation
-	 * @see #start(RestClient) for the RestClient implementation
-	 */
-	@Deprecated
-	public static void start(Client client) throws Exception {
-		start(client, Defaults.ConfigDir);
-	}
-
-	/**
-	 * Automatically scan classpath and creates indices, types, templates...
-	 * @param client elasticsearch client
-	 * @param root dir within the classpath
-	 * @throws Exception when beyonder can not start
-	 * @deprecated You should use now the RestClient implementation
-	 * @see #start(RestClient, String) for the RestClient implementation
-	 */
-	@Deprecated
-	public static void start(Client client, String root) throws Exception {
-		logger.info("starting automatic settings/mappings discovery");
-
-		boolean force = Defaults.ForceCreation;
-
-		// create legacy templates
-		List<String> templateNames = ResourceList.getResourceNames(root, Defaults.TemplatesDir);
-		if (templateNames.isEmpty()) {
-			// We check for deprecated resources
-			templateNames = ResourceList.getResourceNames(root, Defaults.TemplateDir);
-			if (!templateNames.isEmpty()) {
-				logger.warn("{} dir has been deprecated. Please use {} dir instead.", Defaults.TemplateDir, Defaults.TemplatesDir);
-			}
-		}
-		for (String templateName : templateNames) {
-			logger.warn("Legacy Templates are deprecated in Elasticsearch. Switch to Index Templates instead by using {}/{}{}",
-					Defaults.IndexTemplatesDir, templateName, Defaults.JsonFileExtension);
-			createTemplate(client, root, templateName);
-		}
-
-		// create indices
-		Collection<String> indexNames = ResourceList.findIndexNames(root);
-		for (String indexName : indexNames) {
-			createIndex(client, root, indexName, force);
-			updateSettings(client, root, indexName);
-			updateMapping(client, root, indexName);
-		}
 		logger.info("start done. Rock & roll!");
 	}
 }

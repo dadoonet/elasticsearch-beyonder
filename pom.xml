@@ -5,7 +5,7 @@
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
     <packaging>jar</packaging>
-    <version>7.17-SNAPSHOT</version>
+    <version>8.6-SNAPSHOT</version>
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -21,8 +21,7 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
     </licenses>
 
     <properties>
-        <elasticsearch.version>7.17.9</elasticsearch.version>
-        <test.elasticsearch.version>${elasticsearch.version}</test.elasticsearch.version>
+        <elasticsearch.version>8.6.2</elasticsearch.version>
         <slf4j.version>2.0.7</slf4j.version>
         <log4j.version>2.20.0</log4j.version>
         <commons.io.version>2.11.0</commons.io.version>
@@ -32,7 +31,6 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
         <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
         <integ.elasticsearch.version>${elasticsearch.version}</integ.elasticsearch.version>
         <tests.cluster.rest.port>9200</tests.cluster.rest.port>
-        <tests.cluster.transport.port>9300</tests.cluster.transport.port>
 
         <skipTests>false</skipTests>
         <skipUnitTests>${skipTests}</skipUnitTests>
@@ -100,13 +98,6 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
 
     <dependencies>
         <!-- Elasticsearch -->
-        <!-- TODO remove in next major version as deprecated -->
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>transport</artifactId>
-            <version>${elasticsearch.version}</version>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
@@ -127,21 +118,25 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
             <version>${slf4j.version}</version>
         </dependency>
 
-        <!-- LOG4J2 implementation is optional -->
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
-            <optional>true</optional>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
-            <optional>true</optional>
+            <scope>test</scope>
         </dependency>
-
-        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
@@ -323,17 +318,18 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
                                 <from>${integ.elasticsearch.image}:${integ.elasticsearch.version}</from>
                                 <env>
                                     <discovery.type>single-node</discovery.type>
+                                    <ELASTIC_PASSWORD>changeme</ELASTIC_PASSWORD>
                                 </env>
                             </build>
                             <run>
                                 <ports>
                                     <port>tests.cluster.rest.port:9200</port>
-                                    <port>tests.cluster.transport.port:9300</port>
                                 </ports>
                                 <wait>
                                     <http>
-                                        <url>http://localhost:${tests.cluster.rest.port}/</url>
+                                        <url>https://localhost:${tests.cluster.rest.port}/</url>
                                         <status>200..499</status>
+                                        <allowAllHosts>true</allowAllHosts>
                                     </http>
                                     <time>60000</time>
                                 </wait>

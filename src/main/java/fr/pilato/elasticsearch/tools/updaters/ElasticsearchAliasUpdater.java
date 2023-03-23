@@ -33,7 +33,7 @@ public class ElasticsearchAliasUpdater {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchAliasUpdater.class);
 
     /**
-     * Create an component template in Elasticsearch.
+     * Create a component template in Elasticsearch.
      * @param client Elasticsearch client
      * @param root dir within the classpath
      * @throws Exception if something goes wrong

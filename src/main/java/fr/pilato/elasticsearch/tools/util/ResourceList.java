@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -39,8 +38,8 @@ import java.util.jar.JarFile;
 
 /**
  * list resources available from the classpath @ *
- * From http://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory
- * http://www.uofr.net/~greg/java/get-resource-listing.html
+ * From <a href="http://stackoverflow.com/questions/3923129/get-a-list-of-resources-from-classpath-directory">stackoverflow</a>
+ * <a href="http://www.uofr.net/~greg/java/get-resource-listing.html">Greg Briggs' Technical Articles</a>
  * @author Greg Briggs
  */
 public class ResourceList {
@@ -182,9 +181,6 @@ public class ResourceList {
                 }
                 if (!key.equals(SettingsFinder.Defaults.IndexTemplatesDir) &&
                         !key.equals(SettingsFinder.Defaults.ComponentTemplatesDir) &&
-                        !key.equals(SettingsFinder.Defaults.TemplateDir) &&
-                        !key.equals(SettingsFinder.Defaults.TemplatesDir) &&
-                        !key.equals(SettingsFinder.Defaults.PipelineDir) &&
                         !key.equals(SettingsFinder.Defaults.PipelinesDir) &&
                         !key.equals(SettingsFinder.Defaults.AliasesFile + SettingsFinder.Defaults.JsonFileExtension) &&
                         !key.equals(SettingsFinder.Defaults.IndexLifecyclesDir) &&

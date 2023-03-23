@@ -26,8 +26,6 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**

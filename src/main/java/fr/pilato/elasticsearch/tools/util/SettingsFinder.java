@@ -31,21 +31,11 @@ public class SettingsFinder {
 		public static String IndexSettingsFileName = "_settings";
 		public static String UpdateIndexSettingsFileName = "_update_settings";
 		public static String UpdateIndexMappingFileName = "_update_mapping";
-		@Deprecated
-		public static String TemplateDir = "_template";
-		public static String TemplatesDir = "_templates";
 		public static String IndexTemplatesDir = "_index_templates";
 		public static String ComponentTemplatesDir = "_component_templates";
 		public static String PipelinesDir = "_pipelines";
-		@Deprecated
-		public static String PipelineDir = "_pipeline";
 		public static String AliasesFile = "_aliases";
 		public static String IndexLifecyclesDir = "_index_lifecycles";
-
-		/**
-		 * Default setting of whether or not to merge mappings on start.
-		 */
-		public static boolean MergeMappings = true;
 
 		/**
 		 * Default setting of whether or not to force creation of indices and templates on start.
