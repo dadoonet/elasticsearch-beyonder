@@ -116,7 +116,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>8.6.2</version>
+    <version>8.7.0</version>
 </dependency>
 ```
 
@@ -126,7 +126,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>8.6.2</version>
+    <version>8.7.0</version>
 </dependency>
 ```
 
