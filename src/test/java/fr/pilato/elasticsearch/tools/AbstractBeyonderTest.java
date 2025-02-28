@@ -28,12 +28,18 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -70,36 +76,67 @@ public abstract class AbstractBeyonderTest {
         return client;
     }
 
+    @ClassRule
+    public static final TemporaryFolder folder = new TemporaryFolder();
+    protected static Path rootTmpDir;
+
+    @BeforeClass
+    public static void createTmpDir() throws IOException {
+        folder.create();
+        rootTmpDir = Paths.get(folder.getRoot().toURI());
+    }
+
     private static void startRestClient() throws IOException {
         if (client == null) {
-            RestClientBuilder builder = RestClient.builder(HttpHost.create(testCluster));
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY,
-                    new UsernamePasswordCredentials(testClusterUser, testClusterPass));
-
-            builder.setHttpClientConfigCallback(hcb -> hcb
-                    .setDefaultCredentialsProvider(credentialsProvider)
-                    .setSSLContext(SSLUtils.yesSSLContext())
-            );
-
-            client = builder.build();
-            testClusterRunning();
+            client = buildClient(testCluster, testClusterUser, null);
+            try {
+                if (!testClusterRunning()) {
+                    TestContainerHelper containerHelper = new TestContainerHelper();
+                    String url = containerHelper.startElasticsearch();
+                    Path clusterCaCrtPath = null;
+                    if (containerHelper.getCertAsBytes() != null) {
+                        clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
+                        Files.write(clusterCaCrtPath, containerHelper.getCertAsBytes());
+                    }
+                    client = buildClient(url, DEFAULT_TEST_USER, clusterCaCrtPath);
+                }
+            } catch (ConnectException e) {
+                // If we have an exception here, let's ignore the test
+                logger.warn("Integration tests are skipped: [{}]", e.getMessage());
+                assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
+            } catch (IOException e) {
+                logger.error("Full error is", e);
+                throw e;
+            }
         }
     }
 
-    private static void testClusterRunning() throws IOException {
+    private static boolean testClusterRunning() throws IOException {
         try {
             Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
             logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
+            return true;
         } catch (ConnectException e) {
-            // If we have an exception here, let's ignore the test
-            logger.warn("Integration tests are skipped: [{}]", e.getMessage());
-            assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-        } catch (IOException e) {
-            logger.error("Full error is", e);
-            throw e;
+            return false;
         }
+    }
+
+    private static RestClient buildClient(String url, String user, Path caCertificate) {
+        RestClientBuilder builder = RestClient.builder(HttpHost.create(url));
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, testClusterPass));
+        builder.setHttpClientConfigCallback(hcb -> {
+                hcb.setDefaultCredentialsProvider(credentialsProvider);
+                if (caCertificate == null) {
+                    hcb.setSSLContext(SSLUtils.yesSSLContext());
+                } else {
+                    hcb.setSSLContext(SSLUtils.sslContextFromHttpCaCrt(caCertificate));
+                }
+                return hcb;
+            }
+        );
+        return builder.build();
     }
 
     @FunctionalInterface

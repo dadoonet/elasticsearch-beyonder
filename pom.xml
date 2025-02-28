@@ -27,11 +27,6 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
         <commons.io.version>2.18.0</commons.io.version>
         <jackson.version>2.15.3</jackson.version>
 
-        <!-- For integration tests using Docker or external cluster -->
-        <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
-        <integ.elasticsearch.version>${elasticsearch.version}</integ.elasticsearch.version>
-        <tests.cluster.rest.port>9200</tests.cluster.rest.port>
-
         <skipTests>false</skipTests>
         <skipUnitTests>${skipTests}</skipUnitTests>
         <skipIntegTests>${skipTests}</skipIntegTests>
@@ -149,6 +144,13 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.20.4</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -303,59 +305,6 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
                     </execution>
                 </executions>
             </plugin>
-            <!-- For IT using Docker -->
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.43.4</version>
-                <configuration>
-                    <skip>${skipIntegTests}</skip>
-                    <images>
-                        <image>
-                            <alias>elasticsearch-beyonder</alias>
-                            <name>dadoonet/elasticsearch-beyonder:${project.version}</name>
-                            <build>
-                                <from>${integ.elasticsearch.image}:${integ.elasticsearch.version}</from>
-                                <env>
-                                    <discovery.type>single-node</discovery.type>
-                                    <ELASTIC_PASSWORD>changeme</ELASTIC_PASSWORD>
-                                </env>
-                            </build>
-                            <run>
-                                <ports>
-                                    <port>tests.cluster.rest.port:9200</port>
-                                </ports>
-                                <wait>
-                                    <http>
-                                        <url>https://localhost:${tests.cluster.rest.port}/</url>
-                                        <status>200..499</status>
-                                        <allowAllHosts>true</allowAllHosts>
-                                    </http>
-                                    <time>60000</time>
-                                </wait>
-                            </run>
-                        </image>
-                    </images>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>start-elasticsearch</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>build</goal>
-                            <goal>stop</goal>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-elasticsearch</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -377,7 +326,7 @@ Elasticsearch beyonder provides automatic index, mapping, alias, template creati
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.6.2</version>
+                        <version>3.11.2</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
