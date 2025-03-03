@@ -58,6 +58,12 @@ public class ResourceList {
             /* A file path: easy enough */
             logger.trace("found a file resource: {}", dirURL);
             String[] resources = new File(dirURL.toURI()).list();
+
+            if (resources == null) {
+                // We return an empty array
+                return NO_RESOURCE;
+            }
+
             Arrays.sort(resources);
             return resources;
         }
@@ -100,7 +106,7 @@ public class ResourceList {
                     }
                 }
             }
-            String[] resources = result.toArray(new String[result.size()]);
+            String[] resources = result.toArray(new String[0]);
             Arrays.sort(resources);
             return resources;
         }
@@ -232,6 +238,10 @@ public class ResourceList {
             }
         }
 
-        return bulkFiles;
+        // Sort the collection before returning it
+        List<String> sortedBulkFiles = new ArrayList<>(bulkFiles);
+        Collections.sort(sortedBulkFiles);
+
+        return sortedBulkFiles;
     }
 }
