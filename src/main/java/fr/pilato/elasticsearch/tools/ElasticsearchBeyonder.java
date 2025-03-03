@@ -30,6 +30,7 @@ import java.util.List;
 
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchAliasUpdater.manageAliases;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchComponentTemplateUpdater.createComponentTemplate;
+import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchDataUpdater.loadBulkData;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexLifecycleUpdater.createIndexLifecycle;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.createIndex;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.updateMapping;
@@ -138,6 +139,15 @@ public class ElasticsearchBeyonder {
 
 		// Manage aliases
 		manageAliases(client, root);
+
+		// index sample data if any
+		for (String indexName : indexNames) {
+			Collection<String> bulkFiles = ResourceList.findBulkFiles(root, indexName);
+			loadBulkData(client, root, indexName, bulkFiles);
+		}
+		Collection<String> bulkFiles = ResourceList.findBulkFiles(root, null);
+		loadBulkData(client, root, null, bulkFiles);
+
 
 		logger.info("start done. Rock & roll!");
 	}

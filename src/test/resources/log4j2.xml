@@ -19,6 +19,9 @@
       <Logger name="fr.pilato" level="info" additivity="false">
          <AppenderRef ref="CONSOLE"/>
       </Logger>
+      <Logger name="fr.pilato.elasticsearch.tools.AbstractBeyonderTest" level="info" additivity="false">
+         <AppenderRef ref="CONSOLE"/>
+      </Logger>
       <Logger name="org.elasticsearch" level="info" additivity="false">
          <AppenderRef ref="CONSOLE"/>
       </Logger>

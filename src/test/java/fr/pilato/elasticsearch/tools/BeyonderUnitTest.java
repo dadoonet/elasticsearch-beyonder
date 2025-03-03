@@ -68,34 +68,14 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
             assertThat(indexNames, emptyIterable());
         }
 
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates, (name) -> {
-            try {
-                return getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, name);
-            } catch (IOException e) {
-                throw new RuntimeException("Our test is failing...");
-            }
-        });
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates, (name) -> {
-            try {
-                return getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name);
-            } catch (IOException e) {
-                throw new RuntimeException("Our test is failing...");
-            }
-        });
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.PipelinesDir), pipelines, (name) -> {
-            try {
-                return getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, name);
-            } catch (IOException e) {
-                throw new RuntimeException("Our test is failing...");
-            }
-        });
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexLifecyclesDir), indexLifecycles, (name) -> {
-            try {
-                return getJsonContent(root, SettingsFinder.Defaults.IndexLifecyclesDir, name);
-            } catch (IOException e) {
-                throw new RuntimeException("Our test is failing...");
-            }
-        });
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates,
+                (name) -> getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, name));
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates,
+                (name) -> getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name));
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.PipelinesDir), pipelines,
+                (name) -> getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, name));
+        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexLifecyclesDir), indexLifecycles,
+                (name) -> getJsonContent(root, SettingsFinder.Defaults.IndexLifecyclesDir, name));
     }
 
     private void check(List<String> names, List<String> expectedNames,
@@ -119,7 +99,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
     }
 
     @Test
-    public void testVariableReplacement() throws Exception {
+    public void testVariableReplacement() {
 
         // given: A settings json with a variable that should be replaced.
         //        And an environment variable with matching name (set in configuration of maven-surefire-plugin).
