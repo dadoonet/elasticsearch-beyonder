@@ -1,0 +1,27 @@
+{
+  "name": "Elya Maya",
+  "dateofbirth": "1996-01-20",
+  "gender": "female",
+  "children": 1,
+  "marketing": {
+    "cars": null,
+    "shoes": 2015,
+    "toys": 1667,
+    "fashion": null,
+    "music": 308,
+    "garden": null,
+    "electronic": null,
+    "hifi": 1902,
+    "food": null
+  },
+  "address": {
+    "country": "France",
+    "zipcode": "44000",
+    "city": "Nantes",
+    "countrycode": "FR",
+    "location": {
+      "lon": -1.5712502504534431,
+      "lat": 47.20884123362346
+    }
+  }
+}

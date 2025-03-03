@@ -36,6 +36,8 @@ public class SettingsFinder {
 		public static String PipelinesDir = "_pipelines";
 		public static String AliasesFile = "_aliases";
 		public static String IndexLifecyclesDir = "_index_lifecycles";
+		public static String DataDir = "_data";
+		public static String NdJsonFileExtension = ".ndjson";
 
 		/**
 		 * Default setting of whether or not to force creation of indices and templates on start.

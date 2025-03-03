@@ -56,14 +56,16 @@ Build Status
 Release notes
 =============
 
-8.6
+8.17-SNAPSHOT
 ----
 
-* Update project to Elasticsearch 8.6.2.
+* Update project to Elasticsearch 8.17.2.
 * Remove the deprecated Transport Client
 * `_pipeline` dir is not supported anymore. Use `_pipelines` dir.
 * `_template` and `_templates` dir are not supported anymore. Use `_index_templates` and `_component_templates` dirs.
 * method `start(RestClient client, String root, boolean merge, boolean force)` is now `start(RestClient client, String root, boolean force)`.
+* support for sample dataset has been added. If we detect a directory named `_data` in the classpath, we will try to load sample data from it.
+We support both `ndjson` files which will be loaded using the Bulk API and `json` files which will loaded using the Index API.
 
 7.16
 ----
@@ -407,6 +409,119 @@ Let's create a `elasticsearch/_index_lifecycles/my_lifecycle.json`:
 
 When Beyonder starts, it will create the index templates named `my_lifecycle` into elasticsearch.
 
+Loading sample data
+-------------------
+
+If you want to load sample data into your cluster, you can create a directory named `_data` in your classpath.
+We support both `ndjson` files which will be loaded using the Bulk API (recommended) and `json` files which will loaded 
+using the Index API (slower).
+
+If the `_data` directory is created within an index directory, the data will be loaded only for this index, meaning
+that you don't need to define the index name in the bulk headers.
+
+For example, let's assume that you have the following files under your `elasticsearch` directory:
+
+```txt
+.
+├── _data
+│   ├── bulk-001.ndjson
+│   └── bulk-002.ndjson
+├── person
+│   ├── _data
+│   │   ├── doc001.json
+│   │   ├── doc002.json
+│   │   ├── doc003.json
+│   │   └── doc004.json
+│   └── _index_templates
+│       └── person.json
+├── test_1
+│   ├── _data
+│   │   ├── bulk-001.ndjson
+│   │   └── bulk-002.ndjson
+│   └── _settings.json
+├── test_2
+│   ├── _data
+│   │   └── abcd.ndjson
+│   └── _settings.json
+└── twitter
+    └── _settings.json
+```
+
+The `_data/bulk-001.ndjson` file contains:
+
+```ndjson
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 1" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 2" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 3" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 4" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 5" }
+```
+
+The `person/_data/doc001.json` file contains something like:
+
+```json
+{ 
+  "name": "John Doe"
+}
+```
+
+Note that it contains no header and could be pretty formatted unlike the `ndjson` format.
+
+JSon documents can be only added within a given index directory and not at the root level in the `_data` directory.
+
+The `test_1/_data/bulk-001.ndjson` file contains:
+
+```ndjson
+{ "index" : {  } }
+{ "message" : "message 1" }
+{ "index" : {  } }
+{ "message" : "message 2" }
+{ "index" : {  } }
+{ "message" : "message 3" }
+{ "index" : {  } }
+{ "message" : "message 4" }
+{ "index" : {  } }
+{ "message" : "message 5" }
+```
+
+And the `test_2/_data/abcd.ndjson` file contains:
+
+```ndjson
+{ "index" : {  } }
+{ "message" : "message 1" }
+{ "index" : {  } }
+{ "message" : "message 2" }
+{ "index" : {  } }
+{ "message" : "message 3" }
+{ "index" : {  } }
+{ "message" : "message 4" }
+{ "index" : {  } }
+{ "message" : "message 5" }
+```
+
+When Beyonder starts,
+
+Beyonder will:
+
+* Create the `person` index with the mapping defined in `elasticsearch/person/_index_templates/person.json`.
+* Create the `test_1` index with the settings defined in `elasticsearch/test_1/_settings.json`.
+* Create the `test_2` index with the settings defined in `elasticsearch/test_2/_settings.json`.
+* Create the `twitter` index with the settings defined in `elasticsearch/twitter/_settings.json`.
+* Load the data from `elasticsearch/test_1/_data/bulk-001.ndjson` and then `elasticsearch/test_1/_data/bulk-002.ndjson` 
+into the `test_1` index.
+* Load the data from `elasticsearch/test_2/_data/abcd.ndjson` into the `test_2` index.
+* Load the data from `elasticsearch/_data/bulk-001.ndjson` and `elasticsearch/_data/bulk-002.ndjson` into the indices
+specified within the bulk files.
+* Load the data from `elasticsearch/person/_data/doc*.json` files into the `person` index.
+
+Note that files are sorted by name before being loaded which means that a file `bulk_001.ndjson` will be loaded before
+`bulk_002.ndjson`.
+
 # Tests
 
 This project comes with unit tests and integration tests.
@@ -472,7 +587,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-	Copyright 2011-2023 David Pilato
+	Copyright 2011-2025 David Pilato
 	
 	Licensed under the Apache License, Version 2.0 (the "License"); you may not
 	use this file except in compliance with the License. You may obtain a copy of

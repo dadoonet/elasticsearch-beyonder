@@ -287,6 +287,134 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
                 singletonList("index_lifecycle"));
     }
 
+    @Test
+    public void testDataBulkAndJsonGlobalWithIndices() throws Exception {
+        // 2 indices with 10 documents + 1 global bulk file with 10 documents
+        testBeyonder("models/data-bulk-and-json-global-with-indices",
+                asList("person", "twitter", "test_1", "test_2"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 5 documents in person index. This is coming from the 4 person json files
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/person/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("4"));
+        }
+
+        // Check that we have 10 documents in twitter index. This is coming from the global bulk file
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_1 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_1/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_2 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_2/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+    }
+
+    @Test
+    public void testDataGlobal() throws Exception {
+        // 1 index and no type with 10 documents
+        testBeyonder("models/data-global",
+                singletonList("twitter"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in twitter index
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+        assertThat(numberOfHits, equalTo("10"));
+    }
+
+    @Test
+    public void testDataGlobalWithIndices() throws Exception {
+        // 2 indices with 10 documents + 1 global bulk file with 10 documents
+        testBeyonder("models/data-global-with-indices",
+                asList("twitter", "test_1", "test_2"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in twitter index. This is coming from the global bulk file
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_1 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_1/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_2 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_2/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+    }
+
+    @Test
+    public void testDataMoreIndices() throws Exception {
+        // 1 index and no type with 10 documents
+        testBeyonder("models/data-more-indices",
+                asList("test_1", "test_2"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in test_1 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_1/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_2 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_2/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+    }
+
+    @Test
+    public void testDataOneIndex() throws Exception {
+        // 1 index and no type with 10 documents
+        testBeyonder("models/data-one-index",
+                singletonList("twitter"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in twitter index
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+        assertThat(numberOfHits, equalTo("10"));
+    }
+
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();
         ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength() > 0 ? response.getContentLength() : 4000L));

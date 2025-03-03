@@ -1,0 +1,72 @@
+{
+    "index_patterns": ["person*"],
+    "template": {
+        "mappings": {
+            "properties": {
+                "address": {
+                    "properties": {
+                        "city": {
+                            "type": "keyword"
+                        },
+                        "country": {
+                            "type": "keyword"
+                        },
+                        "countrycode": {
+                            "type": "keyword"
+                        },
+                        "location": {
+                            "type": "geo_point"
+                        },
+                        "zipcode": {
+                            "type": "keyword"
+                        }
+                    }
+                },
+                "children": {
+                    "type": "long"
+                },
+                "dateOfBirth": {
+                    "type": "date",
+                    "format": "date_optional_time"
+                },
+                "gender": {
+                    "type": "keyword"
+                },
+                "marketing": {
+                    "properties": {
+                        "cars": {
+                            "type": "long"
+                        },
+                        "electronic": {
+                            "type": "long"
+                        },
+                        "fashion": {
+                            "type": "long"
+                        },
+                        "food": {
+                            "type": "long"
+                        },
+                        "garden": {
+                            "type": "long"
+                        },
+                        "hifi": {
+                            "type": "long"
+                        },
+                        "music": {
+                            "type": "long"
+                        },
+                        "shoes": {
+                            "type": "long"
+                        },
+                        "toys": {
+                            "type": "long"
+                        }
+                    }
+                },
+                "name": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+}

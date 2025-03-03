@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class SettingsReader {
 
@@ -45,15 +46,27 @@ public class SettingsReader {
 				logger.trace("Can not find [{}] in class loader.", file);
 				return null;
 			}
-			content = IOUtils.toString(asStream, "UTF-8");
+			content = IOUtils.toString(asStream, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			logger.warn("Can not read [{}].", file);
 		}
 
+		return content;
+	}
+
+	/**
+	 * This method will read a file from the classpath and replace variables with environment variables
+	 * @param root		The root directory
+	 * @param subdir	The subdirectory
+	 * @param name		The resource name without the .json extension
+	 * @return The content of the file
+	 */
+	public static String getJsonContent(String root, String subdir, String name) {
+		String content = getFileContent(root, subdir, name + SettingsFinder.Defaults.JsonFileExtension);
 		return StringSubstitutor.replace(content, System.getenv());
 	}
 
-	public static String getJsonContent(String root, String subdir, String name) throws IOException {
+	public static String getFileContent(String root, String subdir, String name) {
 		String path = root;
 		if (root == null) {
 			path = SettingsFinder.Defaults.ConfigDir;
@@ -61,7 +74,7 @@ public class SettingsReader {
 		if (subdir != null) {
 			path += "/" + subdir;
 		}
-		path += "/" + name + SettingsFinder.Defaults.JsonFileExtension;
+		path += "/" + name;
 		logger.debug("Reading file [{}] from the classpath.", path);
 		return readFileFromClasspath(path);
 	}

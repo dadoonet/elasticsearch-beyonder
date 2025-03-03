@@ -1,0 +1,10 @@
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 6" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 7" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 8" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 9" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 10" }

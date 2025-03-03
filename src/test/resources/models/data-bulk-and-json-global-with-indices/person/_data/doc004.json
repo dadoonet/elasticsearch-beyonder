@@ -1,0 +1,27 @@
+{
+  "name": "Mathieu Ilyess",
+  "dateofbirth": "1965-03-20",
+  "gender": "male",
+  "children": 0,
+  "marketing": {
+    "cars": null,
+    "shoes": 1551,
+    "toys": null,
+    "fashion": null,
+    "music": null,
+    "garden": null,
+    "electronic": null,
+    "hifi": null,
+    "food": null
+  },
+  "address": {
+    "country": "Germany",
+    "zipcode": "0099",
+    "city": "Bonn",
+    "countrycode": "DE",
+    "location": {
+      "lon": 7.117027432828915,
+      "lat": 50.723906014033695
+    }
+  }
+}

@@ -27,12 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -63,6 +58,12 @@ public class ResourceList {
             /* A file path: easy enough */
             logger.trace("found a file resource: {}", dirURL);
             String[] resources = new File(dirURL.toURI()).list();
+
+            if (resources == null) {
+                // We return an empty array
+                return NO_RESOURCE;
+            }
+
             Arrays.sort(resources);
             return resources;
         }
@@ -105,7 +106,7 @@ public class ResourceList {
                     }
                 }
             }
-            String[] resources = result.toArray(new String[result.size()]);
+            String[] resources = result.toArray(new String[0]);
             Arrays.sort(resources);
             return resources;
         }
@@ -184,6 +185,7 @@ public class ResourceList {
                         !key.equals(SettingsFinder.Defaults.PipelinesDir) &&
                         !key.equals(SettingsFinder.Defaults.AliasesFile + SettingsFinder.Defaults.JsonFileExtension) &&
                         !key.equals(SettingsFinder.Defaults.IndexLifecyclesDir) &&
+                        !key.equals(SettingsFinder.Defaults.DataDir) &&
                         !keys.contains(key)) {
                     logger.trace(" - found [{}].", key);
                     keys.add(key);
@@ -193,5 +195,79 @@ public class ResourceList {
         }
 
         return indexNames;
+    }
+
+    /**
+     * Find all bulk files (*.ndjson) existing in a given classpath dir for a given index under the _data subdir
+     *
+     * @param root  dir within the classpath
+     * @param index index name
+     * @return a set of bulk files (*.ndjson)
+     * @throws IOException        if we can't read the classpath or the filesystem
+     * @throws URISyntaxException this should not happen
+     */
+    public static Collection<String> findBulkFiles(final String root, final String index) throws IOException, URISyntaxException {
+        return findFilesByExtension(root, index, SettingsFinder.Defaults.NdJsonFileExtension);
+    }
+
+    /**
+     * Find all json files (*.json) existing in a given classpath dir for a given index under the _data subdir
+     *
+     * @param root  dir within the classpath
+     * @param index index name
+     * @return a set of json files (*.json)
+     * @throws IOException        if we can't read the classpath or the filesystem
+     * @throws URISyntaxException this should not happen
+     */
+    public static Collection<String> findJsonFiles(final String root, final String index) throws IOException, URISyntaxException {
+        return findFilesByExtension(root, index, SettingsFinder.Defaults.JsonFileExtension);
+    }
+
+    /**
+     * Find all files matching a given extension and existing in a given classpath dir for a given index under the _data subdir
+     *
+     * @param root  dir within the classpath
+     * @param index index name
+     * @return a set of json files (*.json)
+     * @throws IOException        if we can't read the classpath or the filesystem
+     * @throws URISyntaxException this should not happen
+     */
+    public static Collection<String> findFilesByExtension(final String root, final String index, final String extension) throws IOException, URISyntaxException {
+        String path = root;
+        String indexName = index;
+        if (path == null) {
+            path = SettingsFinder.Defaults.ConfigDir;
+        }
+        if (indexName == null) {
+            indexName = SettingsFinder.Defaults.DataDir;
+        } else {
+            indexName = indexName + "/" + SettingsFinder.Defaults.DataDir;
+        }
+
+        logger.debug("Looking for [{}] files in classpath under [{}/{}].", extension, path, indexName);
+
+        final Set<String> filenames = new HashSet<>();
+        String[] resources = ResourceList.getResources(path + "/" + indexName); // "es/" or "a/b/c/"
+        for (String resource : resources) {
+            if (!resource.isEmpty()) {
+                logger.trace(" - resource [{}].", resource);
+                String key;
+                if (resource.contains("/")) {
+                    key = resource.substring(0, resource.indexOf("/"));
+                } else {
+                    key = resource;
+                }
+                if (key.endsWith(extension) && !filenames.contains(key)) {
+                    logger.trace(" - found [{}].", key);
+                    filenames.add(key);
+                }
+            }
+        }
+
+        // Sort the collection before returning it
+        List<String> sortedFilenames = new ArrayList<>(filenames);
+        Collections.sort(sortedFilenames);
+
+        return sortedFilenames;
     }
 }

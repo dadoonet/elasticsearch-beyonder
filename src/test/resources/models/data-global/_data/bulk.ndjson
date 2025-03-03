@@ -1,0 +1,20 @@
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 1" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 2" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 3" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 4" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 5" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 6" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 7" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 8" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 9" }
+{ "index" : { "_index" : "twitter" } }
+{ "message" : "message 10" }
