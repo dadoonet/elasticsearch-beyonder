@@ -65,7 +65,7 @@ Release notes
 * `_template` and `_templates` dir are not supported anymore. Use `_index_templates` and `_component_templates` dirs.
 * method `start(RestClient client, String root, boolean merge, boolean force)` is now `start(RestClient client, String root, boolean force)`.
 * support for sample dataset has been added. If we detect a directory named `_data` in the classpath, we will try to load sample data from it.
-We support for now only `ndjson` files which will be loaded using the Bulk API.
+We support both `ndjson` files which will be loaded using the Bulk API and `json` files which will loaded using the Index API.
 
 7.16
 ----
@@ -413,7 +413,8 @@ Loading sample data
 -------------------
 
 If you want to load sample data into your cluster, you can create a directory named `_data` in your classpath.
-We support for now only `ndjson` files which will be loaded using the Bulk API.
+We support both `ndjson` files which will be loaded using the Bulk API (recommended) and `json` files which will loaded 
+using the Index API (slower).
 
 If the `_data` directory is created within an index directory, the data will be loaded only for this index, meaning
 that you don't need to define the index name in the bulk headers.
@@ -425,6 +426,14 @@ For example, let's assume that you have the following files under your `elastics
 ├── _data
 │   ├── bulk-001.ndjson
 │   └── bulk-002.ndjson
+├── person
+│   ├── _data
+│   │   ├── doc001.json
+│   │   ├── doc002.json
+│   │   ├── doc003.json
+│   │   └── doc004.json
+│   └── _index_templates
+│       └── person.json
 ├── test_1
 │   ├── _data
 │   │   ├── bulk-001.ndjson
@@ -452,6 +461,18 @@ The `_data/bulk-001.ndjson` file contains:
 { "index" : { "_index" : "twitter" } }
 { "message" : "message 5" }
 ```
+
+The `person/_data/doc001.json` file contains something like:
+
+```json
+{ 
+  "name": "John Doe"
+}
+```
+
+Note that it contains no header and could be pretty formatted unlike the `ndjson` format.
+
+JSon documents can be only added within a given index directory and not at the root level in the `_data` directory.
 
 The `test_1/_data/bulk-001.ndjson` file contains:
 
@@ -487,14 +508,16 @@ When Beyonder starts,
 
 Beyonder will:
 
-* Create the `twitter` index with the settings defined in `elasticsearch/twitter/_settings.json`.
+* Create the `person` index with the mapping defined in `elasticsearch/person/_index_templates/person.json`.
 * Create the `test_1` index with the settings defined in `elasticsearch/test_1/_settings.json`.
 * Create the `test_2` index with the settings defined in `elasticsearch/test_2/_settings.json`.
+* Create the `twitter` index with the settings defined in `elasticsearch/twitter/_settings.json`.
 * Load the data from `elasticsearch/test_1/_data/bulk-001.ndjson` and then `elasticsearch/test_1/_data/bulk-002.ndjson` 
 into the `test_1` index.
 * Load the data from `elasticsearch/test_2/_data/abcd.ndjson` into the `test_2` index.
 * Load the data from `elasticsearch/_data/bulk-001.ndjson` and `elasticsearch/_data/bulk-002.ndjson` into the indices
 specified within the bulk files.
+* Load the data from `elasticsearch/person/_data/doc*.json` files into the `person` index.
 
 Note that files are sorted by name before being loaded which means that a file `bulk_001.ndjson` will be loaded before
 `bulk_002.ndjson`.

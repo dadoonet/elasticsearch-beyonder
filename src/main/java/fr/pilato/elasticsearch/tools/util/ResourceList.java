@@ -207,6 +207,32 @@ public class ResourceList {
      * @throws URISyntaxException this should not happen
      */
     public static Collection<String> findBulkFiles(final String root, final String index) throws IOException, URISyntaxException {
+        return findFilesByExtension(root, index, SettingsFinder.Defaults.NdJsonFileExtension);
+    }
+
+    /**
+     * Find all json files (*.json) existing in a given classpath dir for a given index under the _data subdir
+     *
+     * @param root  dir within the classpath
+     * @param index index name
+     * @return a set of json files (*.json)
+     * @throws IOException        if we can't read the classpath or the filesystem
+     * @throws URISyntaxException this should not happen
+     */
+    public static Collection<String> findJsonFiles(final String root, final String index) throws IOException, URISyntaxException {
+        return findFilesByExtension(root, index, SettingsFinder.Defaults.JsonFileExtension);
+    }
+
+    /**
+     * Find all files matching a given extension and existing in a given classpath dir for a given index under the _data subdir
+     *
+     * @param root  dir within the classpath
+     * @param index index name
+     * @return a set of json files (*.json)
+     * @throws IOException        if we can't read the classpath or the filesystem
+     * @throws URISyntaxException this should not happen
+     */
+    public static Collection<String> findFilesByExtension(final String root, final String index, final String extension) throws IOException, URISyntaxException {
         String path = root;
         String indexName = index;
         if (path == null) {
@@ -218,9 +244,9 @@ public class ResourceList {
             indexName = indexName + "/" + SettingsFinder.Defaults.DataDir;
         }
 
-        logger.debug("Looking for bulk files in classpath under [{}/{}].", path, indexName);
+        logger.debug("Looking for [{}] files in classpath under [{}/{}].", extension, path, indexName);
 
-        final Set<String> bulkFiles = new HashSet<>();
+        final Set<String> filenames = new HashSet<>();
         String[] resources = ResourceList.getResources(path + "/" + indexName); // "es/" or "a/b/c/"
         for (String resource : resources) {
             if (!resource.isEmpty()) {
@@ -231,17 +257,17 @@ public class ResourceList {
                 } else {
                     key = resource;
                 }
-                if (key.endsWith(SettingsFinder.Defaults.NdJsonFileExtension) && !bulkFiles.contains(key)) {
+                if (key.endsWith(extension) && !filenames.contains(key)) {
                     logger.trace(" - found [{}].", key);
-                    bulkFiles.add(key);
+                    filenames.add(key);
                 }
             }
         }
 
         // Sort the collection before returning it
-        List<String> sortedBulkFiles = new ArrayList<>(bulkFiles);
-        Collections.sort(sortedBulkFiles);
+        List<String> sortedFilenames = new ArrayList<>(filenames);
+        Collections.sort(sortedFilenames);
 
-        return sortedBulkFiles;
+        return sortedFilenames;
     }
 }

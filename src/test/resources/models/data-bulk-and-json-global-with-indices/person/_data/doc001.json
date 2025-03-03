@@ -1,0 +1,27 @@
+{
+  "name": "Emna Honore",
+  "dateofbirth": "2000-06-17",
+  "gender": "female",
+  "children": 4,
+  "marketing": {
+    "cars": null,
+    "shoes": null,
+    "toys": null,
+    "fashion": 246,
+    "music": null,
+    "garden": null,
+    "electronic": null,
+    "hifi": null,
+    "food": 704
+  },
+  "address": {
+    "country": "Germany",
+    "zipcode": "45445",
+    "city": "Munich",
+    "countrycode": "DE",
+    "location": {
+      "lon": 11.640470036934097,
+      "lat": 48.15497396333028
+    }
+  }
+}

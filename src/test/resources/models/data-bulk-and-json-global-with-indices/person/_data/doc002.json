@@ -1,0 +1,27 @@
+{
+  "name": "Fiona Samuel",
+  "dateofbirth": "1998-12-16",
+  "gender": "female",
+  "children": 1,
+  "marketing": {
+    "cars": 890,
+    "shoes": null,
+    "toys": null,
+    "fashion": null,
+    "music": 276,
+    "garden": null,
+    "electronic": null,
+    "hifi": null,
+    "food": null
+  },
+  "address": {
+    "country": "England",
+    "zipcode": "86767",
+    "city": "Liverpool",
+    "countrycode": "GB",
+    "location": {
+      "lon": -2.593568673252019,
+      "lat": 53.42101315196141
+    }
+  }
+}

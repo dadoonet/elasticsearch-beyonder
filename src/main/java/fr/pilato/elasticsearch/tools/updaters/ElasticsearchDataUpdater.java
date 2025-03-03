@@ -39,9 +39,7 @@ public class ElasticsearchDataUpdater {
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchDataUpdater.class);
 
 	/**
-	 * Load data from a directory within the classpath and send it to elasticsearch using the Bulk API.
-	 * Each file to process should start with _bulk. It could have as well a number like _bulk-001.json.
-	 * We will process them in order.
+	 * Load data from a given ndjson file within the classpath and send it to elasticsearch using the Bulk API.
 	 *
 	 * @param client    Elasticsearch client
 	 * @param root      dir within the classpath
@@ -56,13 +54,38 @@ public class ElasticsearchDataUpdater {
 			String ndjson = getFileContent(root, subdir, bulkFile);
 			if (ndjson != null) {
 				logger.debug("Found [{}/{}/{}] file", root, subdir, bulkFile);
-				loadBulkDataWithNdJsonInElasticsearch(client, index, bulkFile, ndjson);
+				loadBulkDataToElasticsearch(client, index, bulkFile, ndjson);
 			}
 		}
 	}
 
-	private static void loadBulkDataWithNdJsonInElasticsearch(RestClient client, String index, String bulkFile, String ndjson) throws Exception {
-		logger.trace("loadBulkDataWithNdJsonInElasticsearch([{}], [{}], [{}])", index, bulkFile, ndjson.length());
+	/**
+	 * Load data from a json file within the classpath and send it to elasticsearch using the Index API (slow).
+	 *
+	 * @param client    Elasticsearch client
+	 * @param root      dir within the classpath
+	 * @param index     Index name
+	 * @param jsonFiles The list of json files to load
+	 * @throws Exception if the elasticsearch API call is failing
+	 */
+	public static void loadJsonData(RestClient client, String root, String index, Collection<String> jsonFiles) throws Exception {
+		// If we don't have an index name, we must fail
+		if (index == null) {
+			throw new Exception("You must provide an index name when you want to load data from a json file.");
+		}
+
+		String subdir = index + "/" + Defaults.DataDir;
+		for (String jsonFile : jsonFiles) {
+			String json = getFileContent(root, subdir, jsonFile);
+			if (json != null) {
+				logger.debug("Found [{}/{}/{}] file", root, subdir, jsonFile);
+				loadJsonDataToElasticsearch(client, index, jsonFile, json);
+			}
+		}
+	}
+
+	private static void loadBulkDataToElasticsearch(RestClient client, String index, String bulkFile, String ndjson) throws Exception {
+		logger.trace("loadBulkDataToElasticsearch([{}], [{}], [{}])", index, bulkFile, ndjson.length());
 
 		assert client != null;
 
@@ -81,6 +104,24 @@ public class ElasticsearchDataUpdater {
 			throw new Exception("Could not load bulk data from file [" + bulkFile + "].");
 		}
 
-		logger.trace("/loadBulkDataWithNdJsonInElasticsearch([{}], [{}], [{}])", index, bulkFile, ndjson.length());
+		logger.trace("/loadBulkDataToElasticsearch([{}], [{}], [{}])", index, bulkFile, ndjson.length());
+	}
+
+	private static void loadJsonDataToElasticsearch(RestClient client, String index, String jsonFile, String json) throws Exception {
+		logger.trace("loadJsonDataToElasticsearch([{}], [{}], [{}])", index, jsonFile, json.length());
+
+		assert client != null;
+
+		String endpoint = "/" + index + "/_doc/";
+		Request request = new Request("POST", endpoint);
+		request.setJsonEntity(json);
+		Response response = client.performRequest(request);
+
+		if (response.getStatusLine().getStatusCode() != 201) {
+			logger.warn("Could not load json file [{}] of size [{}] into Elasticsearch", jsonFile, json.length());
+			throw new Exception("Could not load json data from file [" + jsonFile + "].");
+		}
+
+		logger.trace("/loadJsonDataToElasticsearch([{}], [{}], [{}])", index, jsonFile, json.length());
 	}
 }
