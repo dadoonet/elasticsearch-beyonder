@@ -22,9 +22,15 @@ package fr.pilato.elasticsearch.tools;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,6 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -46,11 +55,82 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeThat;
 
 public class BeyonderRestIT extends AbstractBeyonderTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BeyonderRestIT.class);
+
+    private static final String DEFAULT_TEST_CLUSTER = "https://127.0.0.1:9200";
+    private static final String DEFAULT_TEST_USER = "elastic";
+    private static final String DEFAULT_TEST_PASSWORD = "changeme";
+
+    private static final String testCluster = System.getProperty("tests.cluster", DEFAULT_TEST_CLUSTER);
+    private static final String testClusterUser = System.getProperty("tests.cluster.user", DEFAULT_TEST_USER);
+    private static final String testClusterPass = System.getProperty("tests.cluster.pass", DEFAULT_TEST_PASSWORD);
+
     private static RestClient client;
+
+    static RestClient restClient() throws IOException {
+        if (client == null) {
+            startRestClient();
+        }
+        return client;
+    }
+
+    private static void startRestClient() throws IOException {
+        if (client == null) {
+            client = buildClient(testCluster, testClusterUser, null);
+            try {
+                if (!testClusterRunning()) {
+                    TestContainerHelper containerHelper = new TestContainerHelper();
+                    String url = containerHelper.startElasticsearch(testClusterPass);
+                    Path clusterCaCrtPath = null;
+                    if (containerHelper.getCertAsBytes() != null) {
+                        clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
+                        Files.write(clusterCaCrtPath, containerHelper.getCertAsBytes());
+                    }
+                    client = buildClient(url, DEFAULT_TEST_USER, clusterCaCrtPath);
+                }
+            } catch (ConnectException e) {
+                // If we have an exception here, let's ignore the test
+                logger.warn("Integration tests are skipped: [{}]", e.getMessage());
+                assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
+            } catch (IOException e) {
+                logger.error("Full error is", e);
+                throw e;
+            }
+        }
+    }
+
+    private static boolean testClusterRunning() throws IOException {
+        try {
+            Response response = client.performRequest(new Request("GET", "/"));
+            Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
+            logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
+            return true;
+        } catch (ConnectException e) {
+            return false;
+        }
+    }
+
+    private static RestClient buildClient(String url, String user, Path caCertificate) {
+        RestClientBuilder builder = RestClient.builder(HttpHost.create(url));
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, testClusterPass));
+        builder.setHttpClientConfigCallback(hcb -> {
+                    hcb.setDefaultCredentialsProvider(credentialsProvider);
+                    if (caCertificate == null) {
+                        hcb.setSSLContext(SSLUtils.yesSSLContext());
+                    } else {
+                        hcb.setSSLContext(SSLUtils.sslContextFromHttpCaCrt(caCertificate));
+                    }
+                    return hcb;
+                }
+        );
+        return builder.build();
+    }
+
 
     @BeforeClass
     public static void startElasticsearchRestClient() throws IOException {
@@ -72,6 +152,10 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_1")));
         // DELETE /test_2
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_2")));
+        // DELETE /person
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/person")));
+        // DELETE /person
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/my-index-*")));
 
         // DELETE /_ingest/pipeline/twitter_pipeline
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ingest/pipeline/twitter_pipeline")));

@@ -19,15 +19,6 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -36,29 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assume.assumeThat;
 
 public abstract class AbstractBeyonderTest {
 
     static final Logger logger = LoggerFactory.getLogger(AbstractBeyonderTest.class);
-
-    private final static String DEFAULT_TEST_CLUSTER = "https://127.0.0.1:9200";
-    private final static String DEFAULT_TEST_USER = "elastic";
-    private final static String DEFAULT_TEST_PASSWORD = "changeme";
-
-    final static String testCluster = System.getProperty("tests.cluster", DEFAULT_TEST_CLUSTER);
-    final static String testClusterUser = System.getProperty("tests.cluster.user", DEFAULT_TEST_USER);
-    final static String testClusterPass = System.getProperty("tests.cluster.pass", DEFAULT_TEST_PASSWORD);
 
     abstract protected void testBeyonder(String root,
                                          List<String> indices,
@@ -66,15 +43,6 @@ public abstract class AbstractBeyonderTest {
                                          List<String> indexTemplates,
                                          List<String> pipelines,
                                          List<String> indexLifecycles) throws Exception;
-
-    private static RestClient client;
-
-    static RestClient restClient() throws IOException {
-        if (client == null) {
-            startRestClient();
-        }
-        return client;
-    }
 
     @ClassRule
     public static final TemporaryFolder folder = new TemporaryFolder();
@@ -84,59 +52,6 @@ public abstract class AbstractBeyonderTest {
     public static void createTmpDir() throws IOException {
         folder.create();
         rootTmpDir = Paths.get(folder.getRoot().toURI());
-    }
-
-    private static void startRestClient() throws IOException {
-        if (client == null) {
-            client = buildClient(testCluster, testClusterUser, null);
-            try {
-                if (!testClusterRunning()) {
-                    TestContainerHelper containerHelper = new TestContainerHelper();
-                    String url = containerHelper.startElasticsearch();
-                    Path clusterCaCrtPath = null;
-                    if (containerHelper.getCertAsBytes() != null) {
-                        clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
-                        Files.write(clusterCaCrtPath, containerHelper.getCertAsBytes());
-                    }
-                    client = buildClient(url, DEFAULT_TEST_USER, clusterCaCrtPath);
-                }
-            } catch (ConnectException e) {
-                // If we have an exception here, let's ignore the test
-                logger.warn("Integration tests are skipped: [{}]", e.getMessage());
-                assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
-            } catch (IOException e) {
-                logger.error("Full error is", e);
-                throw e;
-            }
-        }
-    }
-
-    private static boolean testClusterRunning() throws IOException {
-        try {
-            Response response = client.performRequest(new Request("GET", "/"));
-            Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
-            logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
-            return true;
-        } catch (ConnectException e) {
-            return false;
-        }
-    }
-
-    private static RestClient buildClient(String url, String user, Path caCertificate) {
-        RestClientBuilder builder = RestClient.builder(HttpHost.create(url));
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, testClusterPass));
-        builder.setHttpClientConfigCallback(hcb -> {
-                hcb.setDefaultCredentialsProvider(credentialsProvider);
-                if (caCertificate == null) {
-                    hcb.setSSLContext(SSLUtils.yesSSLContext());
-                } else {
-                    hcb.setSSLContext(SSLUtils.sslContextFromHttpCaCrt(caCertificate));
-                }
-                return hcb;
-            }
-        );
-        return builder.build();
     }
 
     @FunctionalInterface

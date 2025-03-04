@@ -40,10 +40,10 @@ class TestContainerHelper {
 
     /**
      * Start the container
-     *
+     * @param password the password to use
      * @throws IOException in case of error
      */
-    String startElasticsearch() throws IOException {
+    String startElasticsearch(String password) throws IOException {
         Properties props = new Properties();
         props.load(TestContainerHelper.class.getResourceAsStream("/beyonder-tests.properties"));
         String version = props.getProperty("elasticsearch.version");
@@ -56,7 +56,7 @@ class TestContainerHelper {
                     DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch")
                             .withTag(version))
                     .withReuse(true)
-                    .withPassword(AbstractBeyonderTest.testClusterPass);
+                    .withPassword(password);
             elasticsearch.start();
 
             // Try to get the https certificate if exists
