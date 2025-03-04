@@ -289,7 +289,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Test
     public void testDataBulkAndJsonGlobalWithIndices() throws Exception {
-        // 2 indices with 10 documents + 1 global bulk file with 10 documents
+        // 2 indices with 10 documents + 1 index with 4 documents + 1 global bulk file with 10 documents
         testBeyonder("models/data-bulk-and-json-global-with-indices",
                 asList("person", "twitter", "test_1", "test_2"),
                 null, null, null, null);
@@ -328,7 +328,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Test
     public void testDataGlobal() throws Exception {
-        // 1 index and no type with 10 documents
+        // 1 index with 10 documents
         testBeyonder("models/data-global",
                 singletonList("twitter"),
                 null, null, null, null);
@@ -376,7 +376,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Test
     public void testDataMoreIndices() throws Exception {
-        // 1 index and no type with 10 documents
+        // 2 indices with 10 documents each
         testBeyonder("models/data-more-indices",
                 asList("test_1", "test_2"),
                 null, null, null, null);
@@ -401,7 +401,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
 
     @Test
     public void testDataOneIndex() throws Exception {
-        // 1 index and no type with 10 documents
+        // 1 index with 10 documents
         testBeyonder("models/data-one-index",
                 singletonList("twitter"),
                 null, null, null, null);
@@ -413,6 +413,84 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
         String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
         assertThat(numberOfHits, equalTo("10"));
+    }
+
+    @Test
+    public void testDataShouldNotBeLoadedTwice() throws Exception {
+        // 2 indices with 10 documents each
+        testBeyonder("models/data-more-indices",
+                asList("test_1", "test_2"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in test_1 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_1/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_2 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_2/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // We execute it again, which should not add more documents
+        testBeyonder("models/data-more-indices",
+                asList("test_1", "test_2"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in test_1 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_1/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // Check that we have 10 documents in test_2 index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/test_2/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+    }
+
+    @Test
+    public void testDataOnForcedIndexShouldBeLoadedTwice() throws Exception {
+        // 1 index with 10 documents
+        testBeyonder("models/data-one-index",
+                singletonList("twitter"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in twitter index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
+
+        // We execute it again, which should now add more documents as we are forcing the recreation of the indices
+        ElasticsearchBeyonder.start(client, "models/data-one-index", true);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in twitter index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/twitter/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("10"));
+        }
     }
 
     private String getMapping(String indexName) throws IOException {

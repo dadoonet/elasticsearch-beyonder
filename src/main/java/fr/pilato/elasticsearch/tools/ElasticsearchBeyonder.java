@@ -25,6 +25,7 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -132,8 +133,12 @@ public class ElasticsearchBeyonder {
 
 		// create indices
 		Collection<String> indexNames = ResourceList.findIndexNames(root);
+		// Save the list of created indices within a Collection
+		Collection<String> createdIndices = new ArrayList<>();
 		for (String indexName : indexNames) {
-			createIndex(client, root, indexName, force);
+			if (createIndex(client, root, indexName, force)) {
+				createdIndices.add(indexName);
+			}
 			updateSettings(client, root, indexName);
 			updateMapping(client, root, indexName);
 		}
@@ -142,7 +147,7 @@ public class ElasticsearchBeyonder {
 		manageAliases(client, root);
 
 		// index sample data if any
-		for (String indexName : indexNames) {
+		for (String indexName : createdIndices) {
 			Collection<String> bulkFiles = ResourceList.findBulkFiles(root, indexName);
 			loadBulkData(client, root, indexName, bulkFiles);
 			Collection<String> singleFiles = ResourceList.findJsonFiles(root, indexName);

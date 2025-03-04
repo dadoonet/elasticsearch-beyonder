@@ -45,9 +45,9 @@ public class ElasticsearchIndexUpdater {
 	 * @param force Remove index if exists (Warning: remove all data)
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	public static void createIndex(RestClient client, String root, String index, boolean force) throws Exception {
+	public static boolean createIndex(RestClient client, String root, String index, boolean force) throws Exception {
 		String json = getJsonContent(root, index, SettingsFinder.Defaults.IndexSettingsFileName);
-		createIndexWithSettings(client, index, json, force);
+		return createIndexWithSettings(client, index, json, force);
 	}
 
 	/**
@@ -56,9 +56,10 @@ public class ElasticsearchIndexUpdater {
 	 * @param index Index name
 	 * @param settings Settings if any, null if no specific settings
 	 * @param force Remove index if exists (Warning: remove all data)
+	 * @return true if we created the index and false if the index already existed
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	public static void createIndexWithSettings(RestClient client, String index, String settings, boolean force) throws Exception {
+	public static boolean createIndexWithSettings(RestClient client, String index, String settings, boolean force) throws Exception {
 		if (force && isIndexExist(client, index)) {
 			logger.debug("Index [{}] already exists but force set to true. Removing all data!", index);
 			removeIndexInElasticsearch(client, index);
@@ -66,8 +67,10 @@ public class ElasticsearchIndexUpdater {
 		if (force || !isIndexExist(client, index)) {
 			logger.debug("Index [{}] doesn't exist. Creating it.", index);
 			createIndexWithSettingsInElasticsearch(client, index, settings);
+			return true;
 		} else {
 			logger.debug("Index [{}] already exists.", index);
+			return false;
 		}
 	}
 
