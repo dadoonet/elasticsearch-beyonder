@@ -26,7 +26,6 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * This creates a TestContainer Elasticsearch instance
@@ -43,11 +42,7 @@ class TestContainerHelper {
      * @param password the password to use
      * @throws IOException in case of error
      */
-    String startElasticsearch(String password) throws IOException {
-        Properties props = new Properties();
-        props.load(TestContainerHelper.class.getResourceAsStream("/beyonder-tests.properties"));
-        String version = props.getProperty("elasticsearch.version");
-
+    String startElasticsearch(String version, String password) throws IOException {
         if (elasticsearch == null) {
             // Start the container. This step might take some time...
             log.info("Starting testcontainers with Elasticsearch [{}].", version);
@@ -56,6 +51,7 @@ class TestContainerHelper {
                     DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch")
                             .withTag(version))
                     .withReuse(true)
+                    .withEnv("action.destructive_requires_name", "false")
                     .withPassword(password);
             elasticsearch.start();
 

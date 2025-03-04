@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static fr.pilato.elasticsearch.tools.JsonUtil.asMap;
 import static fr.pilato.elasticsearch.tools.updaters.ElasticsearchIndexUpdater.isIndexExist;
@@ -83,8 +84,12 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             client = buildClient(testCluster, testClusterUser, null);
             try {
                 if (!testClusterRunning()) {
+                    Properties props = new Properties();
+                    props.load(TestContainerHelper.class.getResourceAsStream("/beyonder-tests.properties"));
+                    String version = props.getProperty("elasticsearch.version");
+
                     TestContainerHelper containerHelper = new TestContainerHelper();
-                    String url = containerHelper.startElasticsearch(testClusterPass);
+                    String url = containerHelper.startElasticsearch(version, testClusterPass);
                     Path clusterCaCrtPath = null;
                     if (containerHelper.getCertAsBytes() != null) {
                         clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
@@ -148,10 +153,8 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     public void cleanCluster() {
         // DELETE /twitter
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/twitter")));
-        // DELETE /test_1
-        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_1")));
-        // DELETE /test_2
-        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_2")));
+        // DELETE /test_*
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_*")));
         // DELETE /person
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/person")));
         // DELETE /person
@@ -575,6 +578,21 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
             String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
             assertThat(numberOfHits, equalTo("10"));
         }
+    }
+
+    @Test
+    public void testDateMathIndices() throws Exception {
+        testBeyonder("models/date-math-indices",
+                singletonList("my-index-*"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in my-index-* index
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
+        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+        assertThat(numberOfHits, equalTo("10"));
     }
 
     private String getMapping(String indexName) throws IOException {
