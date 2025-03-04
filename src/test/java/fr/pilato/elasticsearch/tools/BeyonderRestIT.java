@@ -595,6 +595,43 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         assertThat(numberOfHits, equalTo("10"));
     }
 
+    @Test
+    public void testDateMathIndicesWithExistingDailyIndex() throws Exception {
+        // Manually create an index named <my-index-{now/d}>
+        client.performRequest(new Request("PUT", "%3Cmy-index-%7Bnow%2Fd%7D%3E"));
+
+        testBeyonder("models/date-math-indices",
+                singletonList("my-index-*"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 0 documents in my-index-* index because the index was already existing
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
+        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+        assertThat(numberOfHits, equalTo("0"));
+    }
+
+    @Test
+    public void testDateMathIndicesWithExistingOlderIndex() throws Exception {
+        // Manually create an index named <my-index-{now/d-1d}>
+        client.performRequest(new Request("PUT", "%3Cmy-index-%7Bnow%2Fd-1d%7D%3E"));
+
+        testBeyonder("models/date-math-indices",
+                singletonList("my-index-*"),
+                null, null, null, null);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 10 documents in my-index-* index because the daily index was not existing yet but only
+        // the yesterday index
+        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
+        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+        assertThat(numberOfHits, equalTo("10"));
+    }
+
     private String getMapping(String indexName) throws IOException {
         HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();
         ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength() > 0 ? response.getContentLength() : 4000L));
