@@ -243,6 +243,18 @@ And you can create `elasticsearch/twitter/_update_mapping.json`:
 This will change the `search_analyzer` for the `message` field and will add a new field named `bar`.
 All other existing fields (like `foo` in the previous example) won't be changed.
 
+If you would like to use [math expressions for the index name](https://www.elastic.co/guide/en/elasticsearch/reference/current/api-conventions.html#api-date-math-index-names), 
+you can use the URI encoded version of the expression.
+For example, the following directory structure will end up creating an index named `my-index-{now/d}`:
+
+```txt
+.
+└── %3Cmy-index-%7Bnow%2Fd%7D%3E
+    ├── _data
+    │   └── bulk.ndjson
+    └── _settings.json
+```
+
 Managing aliases
 ----------------
 
