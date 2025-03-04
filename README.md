@@ -504,9 +504,7 @@ And the `test_2/_data/abcd.ndjson` file contains:
 { "message" : "message 5" }
 ```
 
-When Beyonder starts,
-
-Beyonder will:
+When Beyonder starts, it will:
 
 * Create the `person` index with the mapping defined in `elasticsearch/person/_index_templates/person.json`.
 * Create the `test_1` index with the settings defined in `elasticsearch/test_1/_settings.json`.
@@ -521,6 +519,9 @@ specified within the bulk files.
 
 Note that files are sorted by name before being loaded which means that a file `bulk_001.ndjson` will be loaded before
 `bulk_002.ndjson`.
+
+If the index already existed before Beyonder starts, the data won't be loaded unless you are using the `force` option.
+This does not apply to the `_data` root directory which will **always load the data at every startup**.
 
 # Tests
 
