@@ -270,4 +270,19 @@ public class ResourceList {
 
         return sortedFilenames;
     }
+
+    /**
+     * Replace index name from a form of "<my-index-{now/d}-000001>" to "my-index-{now/d}-*"
+     * @param indexName the index name to replace
+     * @return the replaced index name
+     */
+    public static String replaceIndexName(String indexName) {
+        logger.trace("replaceIndexName({})", indexName);
+        String replaced = indexName
+                .replaceAll("\\{[^}]*\\}", "*")
+                .replaceAll("<([^>]*)>", "$1")
+                .replaceAll("-\\d{6}", "-*");
+        logger.trace("/replaceIndexName({}) = [{}]", indexName, replaced);
+        return replaced;
+    }
 }
