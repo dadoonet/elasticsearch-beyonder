@@ -33,7 +33,7 @@ public class ElasticsearchAliasUpdater {
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchAliasUpdater.class);
 
     /**
-     * Create a component template in Elasticsearch.
+     * Manage global aliases in Elasticsearch.
      * @param client Elasticsearch client
      * @param root dir within the classpath
      * @throws Exception if something goes wrong
@@ -52,7 +52,7 @@ public class ElasticsearchAliasUpdater {
      * @param json JSon content for the aliases
      * @throws Exception if something goes wrong
      */
-    public static void manageAliasesWithJsonInElasticsearch(RestClient client, String json) throws Exception {
+    private static void manageAliasesWithJsonInElasticsearch(RestClient client, String json) throws Exception {
         logger.trace("manageAliases()");
 
         assert client != null;

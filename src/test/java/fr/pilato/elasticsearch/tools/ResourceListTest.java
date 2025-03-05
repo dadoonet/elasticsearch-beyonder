@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 
+import static fr.pilato.elasticsearch.tools.util.ResourceList.replaceIndexName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -48,6 +49,13 @@ public class ResourceListTest {
         String filename = "/Users/dpilato/Documents/Elasticsearch/dev/spring-elasticsearch/target/test-classes/es/twitter/_settings.json";
         Pattern pattern = Pattern.compile(".*/" + root + "/.*");
         assertThat(pattern.matcher(filename).matches(), is(true));
+    }
 
+    @Test
+    public void testIndexNames() {
+        assertThat(replaceIndexName("foo"), is("foo"));
+        assertThat(replaceIndexName("my-index-000001"), is("my-index-*"));
+        assertThat(replaceIndexName("<my-index-{now/d}>"), is("my-index-*"));
+        assertThat(replaceIndexName("<my-index-{now/d}-000001>"), is("my-index-*-*"));
     }
 }

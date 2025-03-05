@@ -27,6 +27,10 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import static fr.pilato.elasticsearch.tools.util.ResourceList.replaceIndexName;
 import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
 /**
@@ -59,7 +63,7 @@ public class ElasticsearchIndexUpdater {
 	 * @return true if we created the index and false if the index already existed
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	public static boolean createIndexWithSettings(RestClient client, String index, String settings, boolean force) throws Exception {
+	private static boolean createIndexWithSettings(RestClient client, String index, String settings, boolean force) throws Exception {
 		if (force && isIndexExist(client, index)) {
 			logger.debug("Index [{}] already exists but force set to true. Removing all data!", index);
 			removeIndexInElasticsearch(client, index);
@@ -80,7 +84,7 @@ public class ElasticsearchIndexUpdater {
 	 * @param index Index name
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	public static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
+	private static void removeIndexInElasticsearch(RestClient client, String index) throws Exception {
 		logger.trace("removeIndex([{}])", index);
 
 		assert client != null;
@@ -189,9 +193,23 @@ public class ElasticsearchIndexUpdater {
 	 * @return true if index already exists
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
-	public static boolean isIndexExist(RestClient client, String index) throws Exception {
-		Response response = client.performRequest(new Request("HEAD", "/" + index));
-		return response.getStatusLine().getStatusCode() == 200;
+	public static boolean isIndexExist(RestClient client, final String index) throws Exception {
+		try {
+			Response response = client.performRequest(new Request("GET", "/" + replaceIndexName(index)));
+
+			// Read the response as a String
+			String responseBody = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))
+					.lines().reduce("", (accumulator, actual) -> accumulator + actual);
+			logger.trace("{}", responseBody);
+
+			// If we don't have an empty response ("{}"), then at least one index exists with the pattern
+			return !"{}".equals(responseBody);
+		} catch (ResponseException e) {
+			if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+				return false;
+			}
+			throw e;
+		}
 	}
 
 	/**

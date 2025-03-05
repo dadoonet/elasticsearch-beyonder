@@ -31,7 +31,6 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,8 +38,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -149,7 +150,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         }
     }
 
-    @Before @After
+    @Before // @After
     public void cleanCluster() {
         // DELETE /twitter
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/twitter")));
@@ -157,8 +158,10 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/test_*")));
         // DELETE /person
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/person")));
-        // DELETE /person
+        // DELETE /my-index-*
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/my-index-*")));
+        // DELETE /timeseries-*
+        launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/timeseries-*")));
 
         // DELETE /_ingest/pipeline/twitter_pipeline
         launchAndIgnoreFailure(() -> client.performRequest(new Request("DELETE", "/_ingest/pipeline/twitter_pipeline")));
@@ -630,6 +633,111 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
         String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
         assertThat(numberOfHits, equalTo("10"));
+    }
+
+    @Test
+    public void testRolloverSimple() throws Exception {
+        testBeyonder("models/rollover-simple",
+                singletonList("timeseries-000001"),
+                null, null, null, null);
+
+        // Manually trigger the rollover
+        client.performRequest(new Request("POST", "/timeseries/_rollover"));
+
+        // Post another document to trigger rollover
+        Request postDoc = new Request("POST", "/timeseries/_doc");
+        postDoc.setJsonEntity("{\"message\":\"message 2\"}");
+        client.performRequest(postDoc);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 2 documents in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("2"));
+        }
+
+        // Delete the first index to simulate an ILM DELETE phase
+        client.performRequest(new Request("DELETE", "/timeseries-000001"));
+
+        // Check that we have 1 document in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("1"));
+        }
+
+        // Call Beyonder again and it should not fail
+        testBeyonder("models/rollover-simple",
+                singletonList("timeseries-000002"),
+                null, null, null, null);
+
+        // We should not have the timeseries-000001 index
+        assertThat(client.performRequest(new Request("HEAD", "/timeseries-000001"))
+                .getStatusLine().getStatusCode(), not(200));
+
+        // Check that we still have only 1 document in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("1"));
+        }
+    }
+
+    @Test
+    public void testRolloverWithDateMaths() throws Exception {
+        testBeyonder("models/rollover-date-maths",
+                singletonList("timeseries-*-000001"),
+                null, null, null, null);
+
+        // Manually trigger the rollover
+        client.performRequest(new Request("POST", "/timeseries/_rollover"));
+
+        // Post another document to trigger rollover
+        Request postDoc = new Request("POST", "/timeseries/_doc");
+        postDoc.setJsonEntity("{\"message\":\"message 2\"}");
+        client.performRequest(postDoc);
+
+        // Refresh the indices
+        client.performRequest(new Request("POST", "/_refresh"));
+
+        // Check that we have 2 documents in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("2"));
+        }
+
+        // Delete the first index to simulate an ILM DELETE phase
+        client.performRequest(new Request("DELETE", "/timeseries-*-000001"));
+
+        // Check that we have 1 document in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("1"));
+        }
+
+        // Call Beyonder again and it should not fail
+        testBeyonder("models/rollover-simple",
+                singletonList("timeseries-*-000002"),
+                null, null, null, null);
+
+        // We should not have the timeseries-*-000001 index
+        String responseBody = new BufferedReader(new InputStreamReader(
+                client.performRequest(new Request("GET", "/timeseries-*-000001")).getEntity().getContent()))
+                .lines()
+                .reduce("", (accumulator, actual) -> accumulator + actual);
+        assertThat(responseBody, is("{}"));
+
+        // Check that we still have only 1 document in timeseries index
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/timeseries/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("1"));
+        }
     }
 
     private String getMapping(String indexName) throws IOException {
