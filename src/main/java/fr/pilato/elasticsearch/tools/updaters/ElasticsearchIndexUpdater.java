@@ -194,15 +194,22 @@ public class ElasticsearchIndexUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static boolean isIndexExist(RestClient client, final String index) throws Exception {
-		Response response = client.performRequest(new Request("GET", "/" + replaceIndexName(index)));
+		try {
+			Response response = client.performRequest(new Request("GET", "/" + replaceIndexName(index)));
 
-		// Read the response as a String
-		String responseBody = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))
-				.lines().reduce("", (accumulator, actual) -> accumulator + actual);
-		logger.trace("{}", responseBody);
+			// Read the response as a String
+			String responseBody = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))
+					.lines().reduce("", (accumulator, actual) -> accumulator + actual);
+			logger.trace("{}", responseBody);
 
-		// If we don't have an empty response ("{}"), then at least one index exists with the pattern
-		return !"{}".equals(responseBody);
+			// If we don't have an empty response ("{}"), then at least one index exists with the pattern
+			return !"{}".equals(responseBody);
+		} catch (ResponseException e) {
+			if (e.getResponse().getStatusLine().getStatusCode() == 404) {
+				return false;
+			}
+			throw e;
+		}
 	}
 
 	/**
