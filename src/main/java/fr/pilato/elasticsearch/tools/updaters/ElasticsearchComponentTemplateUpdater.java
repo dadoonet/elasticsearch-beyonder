@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -36,6 +36,10 @@ public class ElasticsearchComponentTemplateUpdater {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchComponentTemplateUpdater.class);
 
+	private ElasticsearchComponentTemplateUpdater() {
+		// empty
+	}
+
 	/**
 	 * Create an component template in Elasticsearch.
 	 * @param client Elasticsearch client
@@ -44,7 +48,7 @@ public class ElasticsearchComponentTemplateUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createComponentTemplate(RestClient client, String root, String template) throws Exception {
-		String json = getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, template);
+		String json = getJsonContent(root, DefaultSettings.ComponentTemplatesDir, template + DefaultSettings.JsonFileExtension);
 		createComponentTemplateWithJsonInElasticsearch(client, template, json);
 	}
 

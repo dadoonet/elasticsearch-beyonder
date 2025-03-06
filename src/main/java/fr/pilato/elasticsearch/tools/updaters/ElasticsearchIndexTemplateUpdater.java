@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -36,6 +36,10 @@ public class ElasticsearchIndexTemplateUpdater {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndexTemplateUpdater.class);
 
+	private ElasticsearchIndexTemplateUpdater() {
+		// empty
+	}
+
 	/**
 	 * Create an index template in Elasticsearch.
 	 * @param client Elasticsearch client
@@ -44,7 +48,7 @@ public class ElasticsearchIndexTemplateUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createIndexTemplate(RestClient client, String root, String template) throws Exception {
-		String json = getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, template);
+		String json = getJsonContent(root, DefaultSettings.IndexTemplatesDir, template + DefaultSettings.JsonFileExtension);
 		createIndexTemplateWithJsonInElasticsearch(client, template, json);
 	}
 

@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -38,6 +38,10 @@ public class ElasticsearchDataUpdater {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchDataUpdater.class);
 
+	private ElasticsearchDataUpdater() {
+		// empty
+	}
+
 	/**
 	 * Load data from a given ndjson file within the classpath and send it to elasticsearch using the Bulk API.
 	 *
@@ -49,7 +53,7 @@ public class ElasticsearchDataUpdater {
 	 */
 	public static void loadBulkData(RestClient client, String root, String index, Collection<String> bulkFiles) throws Exception {
 		// If we don't have an index name, we will use _bulk as the subdir to use
-		String subdir = index == null ? Defaults.DataDir : index + "/" + Defaults.DataDir;
+		String subdir = index == null ? DefaultSettings.DataDir : index + "/" + DefaultSettings.DataDir;
 		for (String bulkFile : bulkFiles) {
 			String ndjson = getFileContent(root, subdir, bulkFile);
 			if (ndjson != null) {
@@ -74,7 +78,7 @@ public class ElasticsearchDataUpdater {
 			throw new Exception("You must provide an index name when you want to load data from a json file.");
 		}
 
-		String subdir = index + "/" + Defaults.DataDir;
+		String subdir = index + "/" + DefaultSettings.DataDir;
 		for (String jsonFile : jsonFiles) {
 			String json = getFileContent(root, subdir, jsonFile);
 			if (json != null) {

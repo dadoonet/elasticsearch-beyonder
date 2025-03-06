@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder.Defaults;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import fr.pilato.elasticsearch.tools.util.ResourceList;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -78,13 +78,17 @@ public class ElasticsearchBeyonder {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchBeyonder.class);
 
+	private ElasticsearchBeyonder() {
+		// empty
+	}
+
 	/**
 	 * Automatically scan classpath and creates indices, types, templates... in default dir.
 	 * @param client elasticsearch client
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client) throws Exception {
-		start(client, Defaults.ConfigDir, Defaults.ForceCreation);
+		start(client, DefaultSettings.ConfigDir, DefaultSettings.ForceCreation);
 	}
 
 	/**
@@ -94,7 +98,7 @@ public class ElasticsearchBeyonder {
 	 * @throws Exception when beyonder can not start
 	 */
 	public static void start(RestClient client, String root) throws Exception {
-		start(client, root, Defaults.ForceCreation);
+		start(client, root, DefaultSettings.ForceCreation);
 	}
 
 	/**
@@ -108,25 +112,25 @@ public class ElasticsearchBeyonder {
 		logger.info("starting automatic settings/mappings discovery");
 
 		// create index lifecycles
-		List<String> indexLifecycles = ResourceList.getResourceNames(root, Defaults.IndexLifecyclesDir);
+		List<String> indexLifecycles = ResourceList.getResourceNames(root, DefaultSettings.IndexLifecyclesDir);
 		for (String indexLifecycleName : indexLifecycles) {
 			createIndexLifecycle(client, root, indexLifecycleName);
 		}
 
 		// create component templates
-		List<String> componentTemplates = ResourceList.getResourceNames(root, Defaults.ComponentTemplatesDir);
+		List<String> componentTemplates = ResourceList.getResourceNames(root, DefaultSettings.ComponentTemplatesDir);
 		for (String componentTemplateName : componentTemplates) {
 			createComponentTemplate(client, root, componentTemplateName);
 		}
 
 		// create index templates
-		List<String> indexTemplateNames = ResourceList.getResourceNames(root, Defaults.IndexTemplatesDir);
+		List<String> indexTemplateNames = ResourceList.getResourceNames(root, DefaultSettings.IndexTemplatesDir);
 		for (String indexTemplateName : indexTemplateNames) {
 			createIndexTemplate(client, root, indexTemplateName);
 		}
 
 		// create pipelines
-		List<String> pipelineNames = ResourceList.getResourceNames(root, Defaults.PipelinesDir);
+		List<String> pipelineNames = ResourceList.getResourceNames(root, DefaultSettings.PipelinesDir);
 		for (String pipelineName : pipelineNames) {
 			createPipeline(client, root, pipelineName);
 		}

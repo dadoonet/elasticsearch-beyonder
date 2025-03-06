@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
@@ -41,16 +41,21 @@ public class ElasticsearchIndexUpdater {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndexUpdater.class);
 
+	private ElasticsearchIndexUpdater() {
+		// empty
+	}
+
 	/**
 	 * Create a new index in Elasticsearch. Read also _settings.json if exists.
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param index Index name
 	 * @param force Remove index if exists (Warning: remove all data)
+	 * @return true if we created the index and false if the index already existed
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static boolean createIndex(RestClient client, String root, String index, boolean force) throws Exception {
-		String json = getJsonContent(root, index, SettingsFinder.Defaults.IndexSettingsFileName);
+		String json = getJsonContent(root, index, DefaultSettings.IndexSettingsFileName);
 		return createIndexWithSettings(client, index, json, force);
 	}
 
@@ -220,7 +225,7 @@ public class ElasticsearchIndexUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateSettings(RestClient client, String root, String index) throws Exception {
-		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexSettingsFileName);
+		String json = getJsonContent(root, index, DefaultSettings.UpdateIndexSettingsFileName);
 		updateIndexWithSettingsInElasticsearch(client, index, json);
 	}
 
@@ -232,7 +237,7 @@ public class ElasticsearchIndexUpdater {
 	 * @throws Exception if the elasticsearch API call is failing
 	 */
 	public static void updateMapping(RestClient client, String root, String index) throws Exception {
-		String json = getJsonContent(root, index, SettingsFinder.Defaults.UpdateIndexMappingFileName);
+		String json = getJsonContent(root, index, DefaultSettings.UpdateIndexMappingFileName);
 		updateMappingInElasticsearch(client, index, json);
 	}
 }

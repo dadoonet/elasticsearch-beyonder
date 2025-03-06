@@ -28,9 +28,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Setting files reader
+ */
 public class SettingsReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(SettingsReader.class);
+
+	private SettingsReader() {
+		// empty
+	}
 
 	/**
 	 * Read a file content from the classpath
@@ -58,18 +65,25 @@ public class SettingsReader {
 	 * This method will read a file from the classpath and replace variables with environment variables
 	 * @param root		The root directory
 	 * @param subdir	The subdirectory
-	 * @param name		The resource name without the .json extension
+	 * @param name		The resource name
 	 * @return The content of the file
 	 */
 	public static String getJsonContent(String root, String subdir, String name) {
-		String content = getFileContent(root, subdir, name + SettingsFinder.Defaults.JsonFileExtension);
+		String content = getFileContent(root, subdir, name);
 		return StringSubstitutor.replace(content, System.getenv());
 	}
 
+	/**
+	 * Read the content of a file from the classpath
+	 * @param root		The root directory
+	 * @param subdir	The subdirectory
+	 * @param name		The resource name without the .json extension
+	 * @return The content of the file
+	 */
 	public static String getFileContent(String root, String subdir, String name) {
 		String path = root;
 		if (root == null) {
-			path = SettingsFinder.Defaults.ConfigDir;
+			path = DefaultSettings.ConfigDir;
 		}
 		if (subdir != null) {
 			path += "/" + subdir;
