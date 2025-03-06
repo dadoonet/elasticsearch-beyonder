@@ -625,11 +625,20 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         // Refresh the indices
         client.performRequest(new Request("POST", "/_refresh"));
 
-        // Check that we have 10 documents in my-index-* index because the daily index was not existing yet but only
-        // the yesterday index
-        Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
-        String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
-        assertThat(numberOfHits, equalTo("10"));
+        // Expected outcome is:
+        // Index from yesterday should exist but with no documents
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/%3Cmy-index-%7Bnow%2Fd-1d%7D%3E/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("0"));
+        }
+
+        // Index from today should not have been created as we do have yet an older index with the same date math
+        {
+            Map<String, Object> response = asMap(client.performRequest(new Request("GET", "/my-index-*/_search")));
+            String numberOfHits = BeanUtils.getProperty(response, "hits.total.value");
+            assertThat(numberOfHits, equalTo("0"));
+        }
     }
 
     @Test

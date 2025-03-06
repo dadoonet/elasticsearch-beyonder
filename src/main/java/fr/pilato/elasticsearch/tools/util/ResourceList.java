@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -272,17 +273,29 @@ public class ResourceList {
     }
 
     /**
-     * Replace index name from a form of "<my-index-{now/d}-000001>" to "my-index-{now/d}-*"
+     * Replace index name from a form of "<my-index-{now/d}-000001>" or "%3Cmy-index-%7Bnow%2Fd%7D-000001%3E"
+     * to "my-index-*-*".
      * @param indexName the index name to replace
      * @return the replaced index name
      */
-    public static String replaceIndexName(String indexName) {
+    public static String replaceIndexName(final String indexName) {
         logger.trace("replaceIndexName({})", indexName);
-        String replaced = indexName
-                .replaceAll("\\{[^}]*\\}", "*")
-                .replaceAll("<([^>]*)>", "$1")
-                .replaceAll("-\\d{6}", "-*");
-        logger.trace("/replaceIndexName({}) = [{}]", indexName, replaced);
-        return replaced;
+        try {
+            String replaced =
+                    // We need to first URL decode the index name
+                    URLDecoder.decode(indexName, "UTF8")
+                    // We replace {WHATEVER} with *
+                    .replaceAll("\\{[^}]*\\}", "*")
+                    // We replace <WHATEVER> with WHATEVER
+                    .replaceAll("<([^>]*)>", "$1")
+                    // We replace the six ending digits like -123456 with -*
+                    .replaceAll("-\\d{6}", "-*");
+            logger.trace("/replaceIndexName({}) = [{}]", indexName, replaced);
+            return replaced;
+        } catch (UnsupportedEncodingException e) {
+            logger.warn("Exception raised while URL decoding [{}]: {}. We return the original value.",
+                    indexName, e.getMessage());
+            return indexName;
+        }
     }
 }
