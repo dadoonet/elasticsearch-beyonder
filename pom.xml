@@ -5,7 +5,7 @@
     <groupId>fr.pilato.elasticsearch</groupId>
     <artifactId>elasticsearch-beyonder</artifactId>
     <packaging>jar</packaging>
-    <version>8.17</version>
+    <version>8.18-SNAPSHOT</version>
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
@@ -234,18 +234,6 @@ index lifecycle policies when an elasticsearch client starts.
                 <extensions>true</extensions>
                 <configuration>
                     <autoPublish>true</autoPublish>
-                    <waitUntil>published</waitUntil>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.7.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>sonatype-nexus-staging</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
