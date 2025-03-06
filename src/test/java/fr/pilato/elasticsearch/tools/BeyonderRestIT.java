@@ -54,7 +54,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
 
 public class BeyonderRestIT extends AbstractBeyonderTest {
 
@@ -81,39 +80,44 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
         if (client == null) {
             client = buildClient(testCluster, testClusterUser, null);
             try {
-                if (!testClusterRunning()) {
-                    Properties props = new Properties();
-                    props.load(TestContainerHelper.class.getResourceAsStream("/beyonder-tests.properties"));
-                    String version = props.getProperty("elasticsearch.version");
+                ConnectException connectException = testClusterRunning();
+                if (connectException != null) {
+                    if (testCluster.equals(DEFAULT_TEST_CLUSTER)) {
+                        Properties props = new Properties();
+                        props.load(TestContainerHelper.class.getResourceAsStream("/beyonder-tests.properties"));
+                        String version = props.getProperty("elasticsearch.version");
 
-                    TestContainerHelper containerHelper = new TestContainerHelper();
-                    String url = containerHelper.startElasticsearch(version, testClusterPass);
-                    Path clusterCaCrtPath = null;
-                    if (containerHelper.getCertAsBytes() != null) {
-                        clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
-                        Files.write(clusterCaCrtPath, containerHelper.getCertAsBytes());
+                        TestContainerHelper containerHelper = new TestContainerHelper();
+                        String url = containerHelper.startElasticsearch(version, testClusterPass);
+                        Path clusterCaCrtPath = null;
+                        if (containerHelper.getCertAsBytes() != null) {
+                            clusterCaCrtPath = rootTmpDir.resolve("cluster-ca.crt");
+                            Files.write(clusterCaCrtPath, containerHelper.getCertAsBytes());
+                        }
+                        client = buildClient(url, DEFAULT_TEST_USER, clusterCaCrtPath);
+                        connectException = testClusterRunning();
+                        if (connectException != null) {
+                            throw new IOException(connectException);
+                        }
+                    } else {
+                        throw new IOException(connectException);
                     }
-                    client = buildClient(url, DEFAULT_TEST_USER, clusterCaCrtPath);
                 }
-            } catch (ConnectException e) {
-                // If we have an exception here, let's ignore the test
-                logger.warn("Integration tests are skipped: [{}]", e.getMessage());
-                assumeThat("Integration tests are skipped", e.getMessage(), not(containsString("Connection refused")));
             } catch (IOException e) {
-                logger.error("Full error is", e);
+                logger.error("Can not connect to [{}]: {}", testCluster, e.getMessage());
                 throw e;
             }
         }
     }
 
-    private static boolean testClusterRunning() throws IOException {
+    private static ConnectException testClusterRunning() throws IOException {
         try {
             Response response = client.performRequest(new Request("GET", "/"));
             Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
             logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
-            return true;
+            return null;
         } catch (ConnectException e) {
-            return false;
+            return e;
         }
     }
 
@@ -598,7 +602,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Test
     public void testDateMathIndicesWithExistingDailyIndex() throws Exception {
         // Manually create an index named <my-index-{now/d}>
-        client.performRequest(new Request("PUT", "%3Cmy-index-%7Bnow%2Fd%7D%3E"));
+        client.performRequest(new Request("PUT", "/%3Cmy-index-%7Bnow%2Fd%7D%3E"));
 
         testBeyonder("models/date-math-indices",
                 singletonList("my-index-*"),
@@ -616,7 +620,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     @Test
     public void testDateMathIndicesWithExistingOlderIndex() throws Exception {
         // Manually create an index named <my-index-{now/d-1d}>
-        client.performRequest(new Request("PUT", "%3Cmy-index-%7Bnow%2Fd-1d%7D%3E"));
+        client.performRequest(new Request("PUT", "/%3Cmy-index-%7Bnow%2Fd-1d%7D%3E"));
 
         testBeyonder("models/date-math-indices",
                 singletonList("my-index-*"),
@@ -747,7 +751,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     }
 
     private String getMapping(String indexName) throws IOException {
-        HttpEntity response = client.performRequest(new Request("GET", indexName + "/_mapping")).getEntity();
+        HttpEntity response = client.performRequest(new Request("GET", "/" + indexName + "/_mapping")).getEntity();
         ByteArrayOutputStream out = new ByteArrayOutputStream(Math.toIntExact(response.getContentLength() > 0 ? response.getContentLength() : 4000L));
         IOUtils.copy(response.getContent(), out);
         return out.toString();

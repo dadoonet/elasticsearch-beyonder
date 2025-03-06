@@ -571,7 +571,8 @@ mvn clean install -DskipUnitTests
 
 ## Integration Tests
 
-Integration tests are launching a Docker instance. So you need to have Docker installed.
+Integration tests are launching a Docker instance using [TestContainers](https://java.testcontainers.org/modules/elasticsearch/). 
+So you need to have Docker installed.
 
 If you want to disable running integration tests, use `skipIntegTests` option:
 
@@ -582,26 +583,26 @@ mvn clean install -DskipIntegTests
 If you wish to run integration tests against a cluster which is already running externally, you can configure the
 following settings to locate your cluster:
 
-|            setting            |          default        |
-|:-----------------------------:|:-----------------------:|
-| `tests.cluster`               | `http://127.0.0.1:9400` |
+|       setting        |         default          |
+|:--------------------:|:------------------------:|
+|   `tests.cluster`    | `https://127.0.0.1:9200` |
+| `tests.cluster.user` |        `elastic`         |
+| `tests.cluster.pass` |        `changeme`        |
 
 For example:
 
 ```sh
-mvn clean install -Dtests.cluster=http://127.0.0.1:9200
+mvn clean install -Dtests.cluster=https://127.0.0.1:9200
 ```
 
 If you want to run your tests against an [Elastic Cloud](https://cloud.elastic.co/) instance, you can use something like:
 
 ```sh
 mvn clean install \
-    -Dtests.cluster=https://CLUSTERID.eu-west-1.aws.found.io:9243 \
+    -Dtests.cluster=https://CLUSTERID.us-central1.gcp.cloud.es.io:443 \
     -Dtests.cluster.user=elastic \
     -Dtests.cluster.pass=GENERATEDPASSWORD
 ```
-
-When user and password are set only Rest Tests are ran.
 
 Why this name?
 ==============
