@@ -604,6 +604,21 @@ mvn clean install \
     -Dtests.cluster.pass=GENERATEDPASSWORD
 ```
 
+Release guide
+=============
+
+To release the project, you simply need to run:
+
+```sh
+./release.sh
+```
+
+If you want to just test the release without deploying anything, run:
+
+```sh
+DRY_RUN=1 ./release.sh
+```
+
 Why this name?
 ==============
 

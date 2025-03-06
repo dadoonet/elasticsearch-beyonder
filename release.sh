@@ -58,7 +58,7 @@ promptyn () {
 }
 
 run_integration_tests () {
-    echo "Building the release..."
+    echo "Building the release... If asked, please enter your GPG passphrase."
     mvn clean install -DskipTests -Prelease ${MAVEN_OPTION} >> /tmp/beyonder-${RELEASE_VERSION}.log
 
     if [ $? -ne 0 ]
@@ -75,7 +75,14 @@ PROJECT_HOME=`dirname "$SCRIPT"`
 # make PROJECT_HOME absolute
 PROJECT_HOME=`cd "$PROJECT_HOME"; pwd`
 
-DRY_RUN=0
+# Dry run mode (default is 0). This can be set externally by running the script with the CLI option DRY_RUN:
+# DRY_RUN=1 ./release.sh
+if [ -z "$DRY_RUN" ]; then
+    DRY_RUN=0
+else
+    DRY_RUN=1
+    echo "Running in dry run mode"
+fi
 
 # Enter project dir
 cd "$PROJECT_HOME"
@@ -191,28 +198,15 @@ git commit -q -a -m "prepare for next development iteration"
 # git checkout branch we started from
 git checkout -q ${CURRENT_BRANCH}
 
-if [ ${DRY_RUN} -eq 0 ]
-then
-    echo "Inspect Sonatype staging repositories"
-    open https://s01.oss.sonatype.org/#stagingRepositories
-
-    if promptyn "Is the staging repository ok?"
-    then
-        echo "releasing the nexus repository"
-        mvn nexus-staging:release >> /tmp/beyonder-${RELEASE_VERSION}.log
-    else
-        echo "dropping the nexus repository"
-        RELEASE=0
-        mvn nexus-staging:drop >> /tmp/beyonder-${RELEASE_VERSION}.log
-    fi
-fi
-
 # We are releasing, so let's merge into the original branch
 if [ ${RELEASE} -eq 1 ]
 then
     echo "Merging changes into ${CURRENT_BRANCH}"
-    git merge -q ${RELEASE_BRANCH}
-    git branch -q -d ${RELEASE_BRANCH}
+    if [ ${DRY_RUN} -eq 0 ]
+    then
+      git merge -q ${RELEASE_BRANCH}
+      git branch -q -d ${RELEASE_BRANCH}
+    fi
     echo "Push changes to origin"
     if [ ${DRY_RUN} -eq 0 ]
     then
@@ -233,24 +227,6 @@ then
         else
             echo "Message not sent. You can send it manually using:"
             echo "mvn changes:announcement-mail -Dchanges.username=EMAIL_FROM -Dchanges.password=EMAIL_PASSWORD"
-        fi
-    else
-        if promptyn "Do you want to announce the release?"
-        then
-            # We need to checkout the tag, announce and checkout the branch we started from
-            git checkout -q beyonder-${RELEASE_VERSION}
-            SMTP_USERNAME=$(readvalue "Enter your SMTP username" "david@pilato.fr")
-            SMTP_PASSWORD=$(readvalue "Enter your SMTP password" "")
-            mvn changes:announcement-mail -Dchanges.username=${SMTP_USERNAME} -Dchanges.password=${SMTP_PASSWORD} -Dchanges.toAddresses=${SMTP_USERNAME} >> /tmp/beyonder-${RELEASE_VERSION}.log
-            if [ $? -ne 0 ]
-            then
-                tail -20 /tmp/beyonder-${RELEASE_VERSION}.log
-                echo "We have not been able to send the email. Full log available at /tmp/beyonder-$RELEASE_VERSION.log"
-            fi
-            git checkout -q ${CURRENT_BRANCH}
-        else
-            echo "Message not sent. You can send it manually using:"
-            echo "mvn changes:announcement-mail -Dchanges.username=${SMTP_USERNAME} -Dchanges.password=${SMTP_PASSWORD} -Dchanges.toAddresses=${SMTP_USERNAME}"
         fi
     fi
 else
