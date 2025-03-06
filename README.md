@@ -628,6 +628,21 @@ powerful character.
 
 This project gives some features beyond elasticsearch itself. :)
 
+Release guide
+=============
+
+To release the project, you simply need to run:
+
+```sh
+./release.sh
+```
+
+If you want to just test the release without deploying anything, run:
+
+```sh
+DRY_RUN=1 ./release.sh
+```
+
 License
 =======
 
