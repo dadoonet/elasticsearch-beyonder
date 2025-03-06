@@ -70,15 +70,15 @@ run_integration_tests () {
 }
 
 # determine beyonder home
-FS_HOME=`dirname "$SCRIPT"`
+PROJECT_HOME=`dirname "$SCRIPT"`
 
-# make FS_HOME absolute
-FS_HOME=`cd "$FS_HOME"; pwd`
+# make PROJECT_HOME absolute
+PROJECT_HOME=`cd "$PROJECT_HOME"; pwd`
 
 DRY_RUN=0
 
 # Enter project dir
-cd "$FS_HOME"
+cd "$PROJECT_HOME"
 
 echo "Java version used:"
 java --version
@@ -232,7 +232,25 @@ then
             git checkout -q ${CURRENT_BRANCH}
         else
             echo "Message not sent. You can send it manually using:"
-            echo "mvn changes:announcement-mail"
+            echo "mvn changes:announcement-mail -Dchanges.username=EMAIL_FROM -Dchanges.password=EMAIL_PASSWORD"
+        fi
+    else
+        if promptyn "Do you want to announce the release?"
+        then
+            # We need to checkout the tag, announce and checkout the branch we started from
+            git checkout -q beyonder-${RELEASE_VERSION}
+            SMTP_USERNAME=$(readvalue "Enter your SMTP username" "david@pilato.fr")
+            SMTP_PASSWORD=$(readvalue "Enter your SMTP password" "")
+            mvn changes:announcement-mail -Dchanges.username=${SMTP_USERNAME} -Dchanges.password=${SMTP_PASSWORD} -Dchanges.toAddresses=${SMTP_USERNAME} >> /tmp/beyonder-${RELEASE_VERSION}.log
+            if [ $? -ne 0 ]
+            then
+                tail -20 /tmp/beyonder-${RELEASE_VERSION}.log
+                echo "We have not been able to send the email. Full log available at /tmp/beyonder-$RELEASE_VERSION.log"
+            fi
+            git checkout -q ${CURRENT_BRANCH}
+        else
+            echo "Message not sent. You can send it manually using:"
+            echo "mvn changes:announcement-mail -Dchanges.username=${SMTP_USERNAME} -Dchanges.password=${SMTP_PASSWORD} -Dchanges.toAddresses=${SMTP_USERNAME}"
         fi
     fi
 else
