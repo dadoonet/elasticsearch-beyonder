@@ -53,9 +53,21 @@ public class ResourceListTest {
 
     @Test
     public void testIndexNames() {
+        // We test simple index names
         assertThat(replaceIndexName("foo"), is("foo"));
+        assertThat(replaceIndexName("foo-001"), is("foo-001"));
+        assertThat(replaceIndexName("000001-foo"), is("000001-foo"));
+
+        // We test rollover indices
         assertThat(replaceIndexName("my-index-000001"), is("my-index-*"));
+        assertThat(replaceIndexName("my-index-001234"), is("my-index-*"));
+
+        // We test date maths
         assertThat(replaceIndexName("<my-index-{now/d}>"), is("my-index-*"));
         assertThat(replaceIndexName("<my-index-{now/d}-000001>"), is("my-index-*-*"));
+
+        // The same but with URL encoded characters
+        assertThat(replaceIndexName("%3Cmy-index-%7Bnow%2Fd%7D%3E"), is("my-index-*"));
+        assertThat(replaceIndexName("%3Cmy-index-%7Bnow%2Fd%7D-000001%3E"), is("my-index-*-*"));
     }
 }
