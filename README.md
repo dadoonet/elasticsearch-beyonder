@@ -17,7 +17,8 @@ Versions
 
 | elasticsearch-beyonder | elasticsearch | Release date |
 |:----------------------:|:-------------:|:------------:|
-|  8.18-SNAPSHOT    |      8.x      |              |
+|   8.18-SNAPSHOT   |      8.x      |              |
+|          8.17          |      8.x      |  2025-03-06  |
 |          7.16          |      7.x      |  2022-01-13  |
 |          7.15          |      7.x      |  2021-10-14  |
 |         7.13.2         |      7.x      |  2021-07-22  |
@@ -57,6 +58,11 @@ Release notes
 =============
 
 8.18-SNAPSHOT
+----
+
+* No changes yet.
+
+8.17
 ----
 
 * Update project to Elasticsearch 8.17.2.
