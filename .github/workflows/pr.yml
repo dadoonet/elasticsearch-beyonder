@@ -11,17 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 8 and Maven Central Repository
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'adopt'
-        cache: 'maven'
-#    - name: Build with Maven
-#      run: mvn --batch-mode --update-snapshots verify
-    - name: Deploy with Maven (TODO remove me)
-      run: mvn deploy -DskipTests
-      env:
-        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+      - name: Set up JDK 8 and Maven Central Repository
+        uses: actions/checkout@v4
+      - name: foo
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: 'maven'
+      - name: maven-settings-action
+        uses: s4u/maven-settings-action@v3.1.0
+        with:
+          githubServer: false
+          servers: '[{"id": "central", "username": "${{ secrets.CENTRAL_USERNAME }}", "password": "${{ secrets.CENTRAL_TOKEN }}"}]'
+#     - name: Build with Maven
+#       run: mvn --batch-mode --update-snapshots verify
+      - name: Deploy with Maven (TODO remove me)
+        run: mvn deploy -DskipTests
