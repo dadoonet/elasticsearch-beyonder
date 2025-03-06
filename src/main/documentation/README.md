@@ -132,6 +132,23 @@ For example, here is how to import the Transport Client to your project (depreca
 </dependency>
 ```
 
+If you are using a SNAPSHOT version of elasticsearch-beyonder, you need to add the Sonatype repository to your `pom.xml` file:
+
+```xml
+<repositories>
+  <repository>
+    <name>Central Portal Snapshots</name>
+    <id>central-portal-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    <releases>
+      <enabled>false</enabled>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
 
 Adding Beyonder to your client
 ------------------------------
