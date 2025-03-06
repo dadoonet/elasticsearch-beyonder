@@ -20,7 +20,7 @@
 package fr.pilato.elasticsearch.tools;
 
 import fr.pilato.elasticsearch.tools.util.ResourceList;
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -61,21 +61,21 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
                 logger.debug("  --> index [{}]:", indexName);
                 assertThat(indexName, is(indices.get(iIndex)));
 
-                String settings = getJsonContent(root, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
+                String settings = getJsonContent(root, indexName, DefaultSettings.IndexSettingsFileName);
                 logger.debug("    --> Settings: [{}]", settings);
             }
         } else {
             assertThat(indexNames, emptyIterable());
         }
 
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.ComponentTemplatesDir), componentTemplates,
-                (name) -> getJsonContent(root, SettingsFinder.Defaults.ComponentTemplatesDir, name));
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexTemplatesDir), indexTemplates,
-                (name) -> getJsonContent(root, SettingsFinder.Defaults.IndexTemplatesDir, name));
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.PipelinesDir), pipelines,
-                (name) -> getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, name));
-        check(ResourceList.getResourceNames(root, SettingsFinder.Defaults.IndexLifecyclesDir), indexLifecycles,
-                (name) -> getJsonContent(root, SettingsFinder.Defaults.IndexLifecyclesDir, name));
+        check(ResourceList.getResourceNames(root, DefaultSettings.ComponentTemplatesDir), componentTemplates,
+                (name) -> getJsonContent(root, DefaultSettings.ComponentTemplatesDir, name));
+        check(ResourceList.getResourceNames(root, DefaultSettings.IndexTemplatesDir), indexTemplates,
+                (name) -> getJsonContent(root, DefaultSettings.IndexTemplatesDir, name));
+        check(ResourceList.getResourceNames(root, DefaultSettings.PipelinesDir), pipelines,
+                (name) -> getJsonContent(root, DefaultSettings.PipelinesDir, name));
+        check(ResourceList.getResourceNames(root, DefaultSettings.IndexLifecyclesDir), indexLifecycles,
+                (name) -> getJsonContent(root, DefaultSettings.IndexLifecyclesDir, name));
     }
 
     private void check(List<String> names, List<String> expectedNames,
@@ -107,7 +107,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         String indexName = "twitter";
 
         // when: this settings file is read
-        String settings = getJsonContent(folder, indexName, SettingsFinder.Defaults.IndexSettingsFileName);
+        String settings = getJsonContent(folder, indexName, DefaultSettings.IndexSettingsFileName);
         Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
 
         // then: the variables got replaced by environment variables of the same name

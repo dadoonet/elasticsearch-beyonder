@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -28,9 +28,16 @@ import org.slf4j.LoggerFactory;
 
 import static fr.pilato.elasticsearch.tools.util.SettingsReader.getJsonContent;
 
+/**
+ * Manage aliases in Elasticsearch.
+ */
 public class ElasticsearchAliasUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchAliasUpdater.class);
+
+    private ElasticsearchAliasUpdater() {
+        // empty
+    }
 
     /**
      * Manage global aliases in Elasticsearch.
@@ -39,9 +46,9 @@ public class ElasticsearchAliasUpdater {
      * @throws Exception if something goes wrong
      */
     public static void manageAliases(RestClient client, String root) throws Exception {
-        String json = getJsonContent(root, null, SettingsFinder.Defaults.AliasesFile);
+        String json = getJsonContent(root, null, DefaultSettings.AliasesFile);
         if (json != null) {
-            logger.debug("Found [{}/{}.{}] file", root, SettingsFinder.Defaults.AliasesFile, SettingsFinder.Defaults.JsonFileExtension);
+            logger.debug("Found [{}/{}] file", root, DefaultSettings.AliasesFile);
             manageAliasesWithJsonInElasticsearch(client, json);
         }
     }

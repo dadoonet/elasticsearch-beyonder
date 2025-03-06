@@ -19,7 +19,7 @@
 
 package fr.pilato.elasticsearch.tools.updaters;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -35,6 +35,10 @@ public class ElasticsearchIndexLifecycleUpdater {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndexLifecycleUpdater.class);
 
+	private ElasticsearchIndexLifecycleUpdater() {
+		// empty
+	}
+
 	/**
 	 * Create an index lifecycle policy in Elasticsearch.
 	 * @param client Elasticsearch client
@@ -43,7 +47,7 @@ public class ElasticsearchIndexLifecycleUpdater {
 	 * @throws Exception if something goes wrong
 	 */
 	public static void createIndexLifecycle(RestClient client, String root, String policy) throws Exception {
-		String json = getJsonContent(root, SettingsFinder.Defaults.IndexLifecyclesDir, policy);
+		String json = getJsonContent(root, DefaultSettings.IndexLifecyclesDir, policy  + DefaultSettings.JsonFileExtension);
 		createIndexLifecycleWithJsonInElasticsearch(client, policy, json);
 	}
 

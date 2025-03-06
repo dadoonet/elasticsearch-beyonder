@@ -21,7 +21,7 @@ package fr.pilato.elasticsearch.tools.updaters;
 
 import java.io.IOException;
 
-import fr.pilato.elasticsearch.tools.util.SettingsFinder;
+import fr.pilato.elasticsearch.tools.util.DefaultSettings;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
@@ -41,6 +41,10 @@ public class ElasticsearchPipelineUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchPipelineUpdater.class);
 
+    private ElasticsearchPipelineUpdater() {
+        // empty
+    }
+
     /**
      * Create a pipeline in Elasticsearch.
      * 
@@ -50,7 +54,7 @@ public class ElasticsearchPipelineUpdater {
      * @throws Exception if something goes wrong
      */
     public static void createPipeline(RestClient client, String root, String pipeline) throws Exception {
-        String json = getJsonContent(root, SettingsFinder.Defaults.PipelinesDir, pipeline);
+        String json = getJsonContent(root, DefaultSettings.PipelinesDir, pipeline + DefaultSettings.JsonFileExtension);
         createPipelineWithJsonInElasticsearch(client, pipeline, json);
     }
 

@@ -42,6 +42,10 @@ public class ResourceList {
     private static final Logger logger = LoggerFactory.getLogger(ResourceList.class);
     private static final String[] NO_RESOURCE = {};
 
+    private ResourceList() {
+        // empty
+    }
+
     /**
      * List directory contents for a resource folder. Not recursive.
      * This is basically a brute-force implementation.
@@ -127,7 +131,7 @@ public class ResourceList {
         for (String resource : resources) {
             if (!resource.isEmpty()) {
                 String withoutIndex = resource.substring(resource.indexOf("/")+1);
-                String name = withoutIndex.substring(0, withoutIndex.indexOf(SettingsFinder.Defaults.JsonFileExtension));
+                String name = withoutIndex.substring(0, withoutIndex.indexOf(DefaultSettings.JsonFileExtension));
                 logger.trace(" - found [{}].", name);
                 names.add(name);
             }
@@ -147,7 +151,7 @@ public class ResourceList {
     public static List<String> getResourceNames(final String root, final String subdir) throws URISyntaxException, IOException {
         String path = root;
         if (root == null) {
-            path = SettingsFinder.Defaults.ConfigDir;
+            path = DefaultSettings.ConfigDir;
         }
         path += "/" + subdir + "/";
         logger.debug("Looking for resources in classpath under [{}].", path);
@@ -164,7 +168,7 @@ public class ResourceList {
     public static List<String> findIndexNames(final String root) throws IOException, URISyntaxException {
         String path = root;
         if (root == null) {
-            path = SettingsFinder.Defaults.ConfigDir;
+            path = DefaultSettings.ConfigDir;
         }
 
         logger.debug("Looking for indices in classpath under [{}].", path);
@@ -181,12 +185,12 @@ public class ResourceList {
                 } else {
                     key = resource;
                 }
-                if (!key.equals(SettingsFinder.Defaults.IndexTemplatesDir) &&
-                        !key.equals(SettingsFinder.Defaults.ComponentTemplatesDir) &&
-                        !key.equals(SettingsFinder.Defaults.PipelinesDir) &&
-                        !key.equals(SettingsFinder.Defaults.AliasesFile + SettingsFinder.Defaults.JsonFileExtension) &&
-                        !key.equals(SettingsFinder.Defaults.IndexLifecyclesDir) &&
-                        !key.equals(SettingsFinder.Defaults.DataDir) &&
+                if (!key.equals(DefaultSettings.IndexTemplatesDir) &&
+                        !key.equals(DefaultSettings.ComponentTemplatesDir) &&
+                        !key.equals(DefaultSettings.PipelinesDir) &&
+                        !key.equals(DefaultSettings.AliasesFile) &&
+                        !key.equals(DefaultSettings.IndexLifecyclesDir) &&
+                        !key.equals(DefaultSettings.DataDir) &&
                         !keys.contains(key)) {
                     logger.trace(" - found [{}].", key);
                     keys.add(key);
@@ -208,7 +212,7 @@ public class ResourceList {
      * @throws URISyntaxException this should not happen
      */
     public static Collection<String> findBulkFiles(final String root, final String index) throws IOException, URISyntaxException {
-        return findFilesByExtension(root, index, SettingsFinder.Defaults.NdJsonFileExtension);
+        return findFilesByExtension(root, index, DefaultSettings.NdJsonFileExtension);
     }
 
     /**
@@ -221,7 +225,7 @@ public class ResourceList {
      * @throws URISyntaxException this should not happen
      */
     public static Collection<String> findJsonFiles(final String root, final String index) throws IOException, URISyntaxException {
-        return findFilesByExtension(root, index, SettingsFinder.Defaults.JsonFileExtension);
+        return findFilesByExtension(root, index, DefaultSettings.JsonFileExtension);
     }
 
     /**
@@ -229,20 +233,21 @@ public class ResourceList {
      *
      * @param root  dir within the classpath
      * @param index index name
-     * @return a set of json files (*.json)
+     * @param extension the extension to look for like json or ndjson
+     * @return a set of files
      * @throws IOException        if we can't read the classpath or the filesystem
      * @throws URISyntaxException this should not happen
      */
-    public static Collection<String> findFilesByExtension(final String root, final String index, final String extension) throws IOException, URISyntaxException {
+    private static Collection<String> findFilesByExtension(final String root, final String index, final String extension) throws IOException, URISyntaxException {
         String path = root;
         String indexName = index;
         if (path == null) {
-            path = SettingsFinder.Defaults.ConfigDir;
+            path = DefaultSettings.ConfigDir;
         }
         if (indexName == null) {
-            indexName = SettingsFinder.Defaults.DataDir;
+            indexName = DefaultSettings.DataDir;
         } else {
-            indexName = indexName + "/" + SettingsFinder.Defaults.DataDir;
+            indexName = indexName + "/" + DefaultSettings.DataDir;
         }
 
         logger.debug("Looking for [{}] files in classpath under [{}/{}].", extension, path, indexName);
@@ -273,8 +278,8 @@ public class ResourceList {
     }
 
     /**
-     * Replace index name from a form of "<my-index-{now/d}-000001>" or "%3Cmy-index-%7Bnow%2Fd%7D-000001%3E"
-     * to "my-index-*-*".
+     * Replace index name from a form of {@code "<my-index-{now/d}-000001>"} or
+     * {@code "%3Cmy-index-%7Bnow%2Fd%7D-000001%3E"} to "my-index-*-*".
      * @param indexName the index name to replace
      * @return the replaced index name
      */
