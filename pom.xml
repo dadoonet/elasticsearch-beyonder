@@ -9,8 +9,8 @@
     <name>Elasticsearch Beyonder</name>
     <url>https://github.com/dadoonet/elasticsearch-beyonder</url>
     <description>
-Elasticsearch beyonder provides automatic index, mapping, alias, template creation and
-index lifecycle policies when an elasticsearch client starts.
+Elasticsearch beyonder provides automatic index, mapping, alias, template creation,
+index lifecycle policies and data when an elasticsearch client starts.
     </description>
 
     <licenses>
