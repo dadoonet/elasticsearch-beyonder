@@ -41,7 +41,8 @@ Versions
 Documentation
 =============
 
-* For 8.x elasticsearch versions, you are reading the latest documentation.
+* For 9.x elasticsearch versions, you are reading the latest documentation.
+* For 8.x elasticsearch versions, look at [es-8.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-8.x).
 * For 7.x elasticsearch versions, look at [es-7.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-7.x).
 * For 6.x elasticsearch versions, look at [es-6.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-6.x).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
