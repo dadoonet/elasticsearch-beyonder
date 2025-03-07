@@ -17,7 +17,7 @@ Versions
 
 | elasticsearch-beyonder | elasticsearch | Release date |
 |:----------------------:|:-------------:|:------------:|
-|   8.18-SNAPSHOT   |      8.x      |              |
+|   9.0-SNAPSHOT   |      8.x      |              |
 |          8.17          |      8.x      |  2025-03-06  |
 |          7.16          |      7.x      |  2022-01-13  |
 |          7.15          |      7.x      |  2021-10-14  |
@@ -41,7 +41,8 @@ Versions
 Documentation
 =============
 
-* For 8.x elasticsearch versions, you are reading the latest documentation.
+* For 9.x elasticsearch versions, you are reading the latest documentation.
+* For 8.x elasticsearch versions, look at [es-8.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-8.x).
 * For 7.x elasticsearch versions, look at [es-7.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-7.x).
 * For 6.x elasticsearch versions, look at [es-6.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-6.x).
 * For 5.x elasticsearch versions, look at [es-5.x branch](https://github.com/dadoonet/elasticsearch-beyonder/tree/es-5.x).
@@ -57,7 +58,7 @@ Build Status
 Release notes
 =============
 
-8.18-SNAPSHOT
+9.0-SNAPSHOT
 ----
 
 * No changes yet.
@@ -111,7 +112,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>8.18-SNAPSHOT</version>
+  <version>9.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -124,7 +125,7 @@ For example, here is how to import the REST Client to your project:
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>elasticsearch-rest-client</artifactId>
-    <version>8.17.3</version>
+    <version>9.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -134,7 +135,7 @@ For example, here is how to import the Transport Client to your project (depreca
 <dependency>
     <groupId>org.elasticsearch.client</groupId>
     <artifactId>transport</artifactId>
-    <version>8.17.3</version>
+    <version>9.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
