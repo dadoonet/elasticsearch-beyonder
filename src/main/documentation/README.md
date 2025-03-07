@@ -61,7 +61,7 @@ Release notes
 ${project.version}
 ----
 
-* No changes yet.
+* Update project to Elasticsearch 9.0.0-SNAPSHOT.
 
 8.17
 ----
