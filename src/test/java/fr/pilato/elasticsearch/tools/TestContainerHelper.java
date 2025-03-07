@@ -40,9 +40,8 @@ class TestContainerHelper {
     /**
      * Start the container
      * @param password the password to use
-     * @throws IOException in case of error
      */
-    String startElasticsearch(String version, String password) throws IOException {
+    String startElasticsearch(String version, String password) {
         if (elasticsearch == null) {
             // Start the container. This step might take some time...
             log.info("Starting testcontainers with Elasticsearch [{}].", version);

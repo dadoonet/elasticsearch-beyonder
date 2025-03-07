@@ -30,65 +30,65 @@ public class DefaultSettings {
 	/**
 	 * Default classpath dir: "elasticsearch"
 	 */
-	public static String ConfigDir = "elasticsearch";
+	public static final String ConfigDir = "elasticsearch";
 
 	/**
 	 * Json file extension: ".json"
 	 */
-	public static String JsonFileExtension = ".json";
+	public static final String JsonFileExtension = ".json";
 
 	/**
 	 * NdJson file extension: ".ndjson"
 	 */
-	public static String NdJsonFileExtension = ".ndjson";
+	public static final String NdJsonFileExtension = ".ndjson";
 
 	/**
 	 * Default index settings file name: "_settings.json"
 	 */
-	public static String IndexSettingsFileName = "_settings.json";
+	public static final String IndexSettingsFileName = "_settings.json";
 
 	/**
 	 * Default index update settings file name: "_update_settings.json"
 	 */
-	public static String UpdateIndexSettingsFileName = "_update_settings.json";
+	public static final String UpdateIndexSettingsFileName = "_update_settings.json";
 
 	/**
 	 * Default index update mapping file name: "_update_mapping"
 	 */
-	public static String UpdateIndexMappingFileName = "_update_mapping.json";
+	public static final String UpdateIndexMappingFileName = "_update_mapping.json";
 
 	/**
 	 * Default index templates directory: "_index_templates"
 	 */
-	public static String IndexTemplatesDir = "_index_templates";
+	public static final String IndexTemplatesDir = "_index_templates";
 
 	/**
 	 * Default component templates directory: "_component_templates"
 	 */
-	public static String ComponentTemplatesDir = "_component_templates";
+	public static final String ComponentTemplatesDir = "_component_templates";
 
 	/**
 	 * Default ingest pipelines directory: "_pipelines"
 	 */
-	public static String PipelinesDir = "_pipelines";
+	public static final String PipelinesDir = "_pipelines";
 
 	/**
 	 * Default aliases file : "_aliases.json"
 	 */
-	public static String AliasesFile = "_aliases.json";
+	public static final String AliasesFile = "_aliases.json";
 
 	/**
 	 * Default index lifecycles directory: "_index_lifecycles"
 	 */
-	public static String IndexLifecyclesDir = "_index_lifecycles";
+	public static final String IndexLifecyclesDir = "_index_lifecycles";
 
 	/**
 	 * Default data directory: "_data"
 	 */
-	public static String DataDir = "_data";
+	public static final String DataDir = "_data";
 
 	/**
-	 * Default setting of whether or not to force creation of indices and templates on start.
+	 * Default setting of whether to force creation of indices and templates on start.
 	 */
-	public static boolean ForceCreation = false;
+	public static final boolean ForceCreation = false;
 }

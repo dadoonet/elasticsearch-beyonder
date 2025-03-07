@@ -62,6 +62,7 @@ ${project.version}
 ----
 
 * Update project to Elasticsearch 9.0.0-SNAPSHOT.
+* Update required JVM to Java 17
 
 8.17
 ----
@@ -192,7 +193,7 @@ ElasticsearchBeyonder.start(client, "models/myelasticsearch", true);
 ```
 
 This last parameter is known as `force`. It removes any existing index which is managed by Beyonder.
-It is super useful for integration testing but it is **super dangerous** in production.
+It is super useful for integration testing, but it is **super dangerous** in production.
 
 For the record, when your cluster is secured, you can use for example the
 [Basic Authentication](https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/_basic_authentication.html):
@@ -241,7 +242,7 @@ You can also provide a file named `_update_settings.json` to update your index s
 and a file named `_update_mapping.json` if you want to update an existing mapping. 
 Note that Elasticsearch do not allow updating all settings and mappings.
 
-You can for example add a new field, or change the `search_analyzer` for a given field but you can not modify
+You can for example add a new field, or change the `search_analyzer` for a given field, but you can not modify
 the field `type`.
 
 Considering the previous example we saw, you can create a `elasticsearch/twitter/_update_settings.json` to update the
@@ -395,7 +396,7 @@ Managing pipelines
 A pipeline is a definition of a series of processors that are to be executed in the same order as they are declared while 
 documents are being indexed. Please note that this feature is only supported when you use the REST client not the Transport client.
 
-For example, setting one fields value based on another field by using an Set Processor you can add a file named `elasticsearch/_pipelines/set_field_processor.json`
+For example, setting one fields value based on another field by using a Set Processor you can add a file named `elasticsearch/_pipelines/set_field_processor.json`
 in your project:
 
 ```json

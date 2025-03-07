@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -96,7 +97,7 @@ public class ResourceList {
                         // remove leading slash that is not part of the JarEntry::getName
                         .substring(1);
             Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
-            try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"))) {
+            try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8))) {
                 Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
                 while(entries.hasMoreElements()) {
                     String name = entries.nextElement().getName();
@@ -285,22 +286,16 @@ public class ResourceList {
      */
     public static String replaceIndexName(final String indexName) {
         logger.trace("replaceIndexName({})", indexName);
-        try {
-            String replaced =
-                    // We need to first URL decode the index name
-                    URLDecoder.decode(indexName, "UTF8")
-                    // We replace {WHATEVER} with *
-                    .replaceAll("\\{[^}]*\\}", "*")
-                    // We replace <WHATEVER> with WHATEVER
-                    .replaceAll("<([^>]*)>", "$1")
-                    // We replace the six ending digits like -123456 with -*
-                    .replaceAll("-\\d{6}", "-*");
-            logger.trace("/replaceIndexName({}) = [{}]", indexName, replaced);
-            return replaced;
-        } catch (UnsupportedEncodingException e) {
-            logger.warn("Exception raised while URL decoding [{}]: {}. We return the original value.",
-                    indexName, e.getMessage());
-            return indexName;
-        }
+        String replaced =
+                // We need to first URL decode the index name
+                URLDecoder.decode(indexName, StandardCharsets.UTF_8)
+                // We replace {WHATEVER} with *
+                .replaceAll("\\{[^}]*\\}", "*")
+                // We replace <WHATEVER> with WHATEVER
+                .replaceAll("<([^>]*)>", "$1")
+                // We replace the six ending digits like -123456 with -*
+                .replaceAll("-\\d{6}", "-*");
+        logger.trace("/replaceIndexName({}) = [{}]", indexName, replaced);
+        return replaced;
     }
 }

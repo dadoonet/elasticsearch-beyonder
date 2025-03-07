@@ -16,7 +16,7 @@ index lifecycle policies and data when an elasticsearch client starts.
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -34,8 +34,8 @@ index lifecycle policies and data when an elasticsearch client starts.
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <!-- Smtp Settings for announcements -->
         <changes.smtpHost>smtp.ionos.fr</changes.smtpHost>
@@ -284,7 +284,7 @@ index lifecycle policies and data when an elasticsearch client starts.
             <id>dadoonet</id>
             <name>David Pilato</name>
             <email>david@pilato.fr</email>
-            <url>http://david.pilato.fr/</url>
+            <url>https://david.pilato.fr/</url>
             <timezone>+1</timezone>
         </developer>
     </developers>
