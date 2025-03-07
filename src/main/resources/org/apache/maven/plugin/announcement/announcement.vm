@@ -22,7 +22,7 @@ ${introduction}
 
 <h2>Usage</h2>
 
-Add this library to you project:
+Add this library to your project:
 
 ```
 <dependency>
