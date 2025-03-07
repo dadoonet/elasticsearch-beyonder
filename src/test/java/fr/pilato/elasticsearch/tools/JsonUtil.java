@@ -31,7 +31,7 @@ public class JsonUtil {
 
     static final ObjectMapper mapper = new ObjectMapper();
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE =
-        new TypeReference<Map<String, Object>>() {};
+            new TypeReference<>() {};
 
     public static Map<String, Object> asMap(Response response) {
         try {

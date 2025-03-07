@@ -111,7 +111,7 @@ public class BeyonderUnitTest extends AbstractBeyonderTest {
         Map<String, Object> settingsMap = JsonUtil.asMap(new ByteArrayInputStream(settings.getBytes()));
 
         // then: the variables got replaced by environment variables of the same name
-        String numberOfReplicas = (String) ((Map) settingsMap.get("settings")).get("number_of_replicas");
+        String numberOfReplicas = (String) ((Map<?, ?>) settingsMap.get("settings")).get("number_of_replicas");
         assertThat(numberOfReplicas, equalTo("2"));
 
     }

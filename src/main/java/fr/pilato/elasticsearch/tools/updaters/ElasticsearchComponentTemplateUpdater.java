@@ -41,7 +41,7 @@ public class ElasticsearchComponentTemplateUpdater {
 	}
 
 	/**
-	 * Create an component template in Elasticsearch.
+	 * Create a component template in Elasticsearch.
 	 * @param client Elasticsearch client
 	 * @param root dir within the classpath
 	 * @param template Template name

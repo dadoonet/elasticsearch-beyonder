@@ -113,6 +113,7 @@ public class BeyonderRestIT extends AbstractBeyonderTest {
     private static ConnectException testClusterRunning() throws IOException {
         try {
             Response response = client.performRequest(new Request("GET", "/"));
+            @SuppressWarnings("unchecked")
             Map<String, Object> asMap = (Map<String, Object>) JsonUtil.asMap(response).get("version");
             logger.info("Starting integration tests against an external cluster running elasticsearch [{}]", asMap.get("number"));
             return null;
