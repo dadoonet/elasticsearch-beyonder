@@ -651,6 +651,13 @@ If you want to just test the release without deploying anything, run:
 DRY_RUN=1 ./release.sh
 ```
 
+Community
+=========
+
+You can find here the list of related community projects:
+* [spring-elasticsearch](https://github.com/dadoonet/spring-elasticsearch) by @dadoonet: the Spring factory provides a Java Rest Client for Elasticsearch and automatically creates index settings and templates based on what is found in the classpath.
+* [Logstash Editor](https://marketplace.visualstudio.com/items/fbaligand.vscode-logstash-editor/) by @fbaligand: provides completion, documentation and auto-formatting for Logstash pipeline configuration files, Filebeat configuration files and Elasticsearch index template json files
+
 License
 =======
 
