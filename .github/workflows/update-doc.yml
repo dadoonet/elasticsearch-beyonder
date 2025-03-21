@@ -16,4 +16,4 @@ jobs:
       - name: Update resources with Maven
         run: mvn -B process-resources
       - name: Update files if needed
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
