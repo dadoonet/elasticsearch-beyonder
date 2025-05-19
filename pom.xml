@@ -203,7 +203,7 @@ index lifecycle policies and data when an elasticsearch client starts.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <configuration>
                     <sslMode>true</sslMode>
                     <fromDeveloperId>dadoonet</fromDeveloperId>
