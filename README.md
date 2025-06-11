@@ -17,7 +17,7 @@ Versions
 
 | elasticsearch-beyonder | elasticsearch | Release date |
 |:----------------------:|:-------------:|:------------:|
-|   9.0-SNAPSHOT   |      9.x      |              |
+|   9.0   |      9.x      |              |
 |          8.17          |      8.x      |  2025-03-06  |
 |          7.16          |      7.x      |  2022-01-13  |
 |          7.15          |      7.x      |  2021-10-14  |
@@ -58,7 +58,7 @@ Build Status
 Release notes
 =============
 
-9.0-SNAPSHOT
+9.0
 ----
 
 * Update project to Elasticsearch 9.0.2.
@@ -113,7 +113,7 @@ Import elasticsearch-beyonder in you project `pom.xml` file:
 <dependency>
   <groupId>fr.pilato.elasticsearch</groupId>
   <artifactId>elasticsearch-beyonder</artifactId>
-  <version>9.0-SNAPSHOT</version>
+  <version>9.0</version>
 </dependency>
 ```
 
