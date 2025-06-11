@@ -61,7 +61,7 @@ Release notes
 9.0-SNAPSHOT
 ----
 
-* Update project to Elasticsearch 9.0.0-SNAPSHOT.
+* Update project to Elasticsearch 9.0.2.
 * Update required JVM to Java 17
 
 8.17
