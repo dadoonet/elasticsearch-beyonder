@@ -139,7 +139,7 @@ index lifecycle policies and data when an elasticsearch client starts.
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.14.0</version>
+            <version>1.15.0</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
