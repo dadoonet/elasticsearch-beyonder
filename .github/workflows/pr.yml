@@ -13,7 +13,7 @@ jobs:
       uses: actions/setup-java@v6
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'oracle-openjdk'
         cache: 'maven'
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots verify
