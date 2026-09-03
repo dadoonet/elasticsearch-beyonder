@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-java@v6
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'oracle-openjdk'
         cache: 'maven'
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots verify
@@ -30,7 +30,7 @@ jobs:
       uses: actions/setup-java@v6
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'oracle-openjdk'
         cache: 'maven'
     - name: Create Maven settings.xml
       uses: s4u/maven-settings-action@v4.0.0
