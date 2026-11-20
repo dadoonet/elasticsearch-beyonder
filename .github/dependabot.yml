@@ -11,7 +11,7 @@ updates:
       - dadoonet
     labels:
       - dependencies
-    milestone: 22
+    milestone: 23
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -24,4 +24,4 @@ updates:
       - dadoonet
     labels:
       - dependencies
-    milestone: 22
+    milestone: 23
